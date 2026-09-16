@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Opportunities · Global Mobility Assistant</title>
+  <link rel="stylesheet" href="shared/tokens.css" />
+  <link rel="stylesheet" href="shared/shell.css" />
+  <link rel="stylesheet" href="shared/joule.css" />
+  <style>
+    /* --------- Journey nav --------- */
+    .journey-nav {
+      display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 10px 12px;
+      background: #fff; border: 1px solid var(--border-soft);
+      border-radius: 8px; margin-bottom: 16px;
+      align-items: center;
+    }
+    .journey-nav .step {
+      padding: 5px 10px; border-radius: 6px;
+      font-size: 12px; color: var(--text-secondary);
+      cursor: pointer; white-space: nowrap;
+      border: 1px solid transparent;
+      display: inline-flex; align-items: center; gap: 6px;
+      user-select: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .journey-nav .step:hover { background: #EAF3FD; color: var(--sap-blue); }
+    .journey-nav .step:active { transform: scale(0.98); }
+    .journey-nav .step.active { background: var(--sap-blue); color: #fff; font-weight: 600; }
+    .journey-nav .step.done { color: var(--status-green); }
+    .journey-nav .step.pending { opacity: 0.9; }
+    .journey-nav .step.pending:hover { opacity: 1; background: #EAF3FD; color: var(--sap-blue); }
+    .journey-nav .step .n {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #EEF1F4; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .journey-nav .step.active .n { background: rgba(255,255,255,0.25); color: #fff; }
+    .journey-nav .step.done .n { background: var(--status-green); color: #fff; }
+    .journey-nav .sep { color: var(--border-mid); align-self: center; padding: 0 2px; font-size: 11px; }
+
+    /* --------- Opportunity cards --------- */
+    .opp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .opp-card {
+      background: #fff; border: 1px solid var(--border-soft);
+      border-radius: 8px; padding: 18px; cursor: pointer;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      display: flex; flex-direction: column;
+    }
+    .opp-card:hover { border-color: var(--sap-blue); box-shadow: 0 4px 12px rgba(0,112,242,0.1); }
+    .opp-card.readonly { cursor: default; opacity: 0.7; }
+    .opp-card.readonly:hover { border-color: var(--border-soft); box-shadow: var(--shadow-card); }
+    .opp-card.highlighted { border-left: 4px solid var(--sap-blue); background: linear-gradient(90deg,#F0F7FF 0,#fff 40%); }
+    .preview-tag { display: inline-block; background: #EEF1F4; color: var(--text-muted); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 6px; letter-spacing: 0.2px; vertical-align: middle; }
+    .opp-card .opp-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+    .opp-card .opp-meta { color: var(--text-secondary); font-size: 12px; margin-bottom: 10px; }
+    .opp-card .opp-summary { color: var(--text-primary); font-size: 13px; flex: 1; margin-bottom: 12px; line-height: 1.5; }
+    .opp-card .opp-footer { display: flex; align-items: center; gap: 8px; }
+    .opp-card .match { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .opp-card .match.green  { background: var(--status-green-bg); color: var(--status-green); }
+    .opp-card .match.yellow { background: var(--status-yellow-bg); color: var(--status-yellow); }
+    .opp-card .match.grey   { background: var(--status-grey-bg); color: var(--status-grey); }
+    .breadcrumb {
+      color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;
+    }
+    .breadcrumb a { color: var(--sap-blue); cursor: pointer; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    /* Tracker */
+    .tracker {
+      padding: 4px 0;
+    }
+    .tracker .stage {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px dashed var(--border-soft);
+    }
+    .tracker .stage:last-child { border-bottom: none; }
+    .tracker .stage .dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #EEF1F4; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px; flex-shrink: 0;
+    }
+    .tracker .stage.done .dot { background: var(--status-green); color: #fff; }
+    .tracker .stage.active .dot { background: var(--sap-blue); color: #fff; box-shadow: 0 0 0 4px rgba(0,112,242,0.15); }
+    .tracker .stage .info { flex: 1; }
+    .tracker .stage .info .label { font-weight: 600; font-size: 13px; }
+    .tracker .stage .info .date { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+    .signal-form {
+      background: #F7F8FA; border: 1px solid var(--border-soft);
+      border-radius: 8px; padding: 14px 16px; margin-top: 14px;
+    }
+    .signal-form textarea {
+      width: 100%; min-height: 60px; padding: 8px 10px;
+      border: 1px solid var(--border-mid); border-radius: 4px;
+      font-family: inherit; font-size: 13px; resize: vertical;
+    }
+    .signal-form .signal-preview {
+      background: #fff; border: 1px dashed var(--joule-purple-border);
+      padding: 8px 10px; border-radius: 4px; margin-top: 10px;
+      font-size: 12px; color: var(--joule-purple-dark);
+    }
+  </style>
+</head>
+<body class="role-employee">
+  <div id="topbarSlot"></div>
+
+  <div class="app-shell">
+    <main class="main-area joule-open" id="mainArea">
+
+      <div class="journey-nav" id="journeyNav"></div>
+
+      <div id="viewContainer"></div>
+
+    </main>
+  </div>
+
+  <div id="jouleSlot"></div>
+
+  <div class="global-footer">
+    非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行 &nbsp;|&nbsp; Not an SAP official product · Learning prototype · Fictional data & simulated execution
+  </div>
+
+  <script src="shared/state.js"></script>
+  <script src="shared/topbar.js"></script>
+  <script src="shared/joule.js"></script>
+  <script src="data/employee-data.js"></script>
+  <script>
+  const D = window.EMPLOYEE_DATA;
+  document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("employee");
+  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Career");
+
+  const STEPS = [
+    { id: "browse",   n: 1, label: "Discover" },
+    { id: "detail",   n: 2, label: "Evaluate" },
+    { id: "prep",     n: 3, label: "Interview prep" },
+    { id: "apply",    n: 4, label: "Apply" },
+    { id: "tracking", n: 5, label: "Track progress" },
+    { id: "mymove",   n: 6, label: "My move" }
+  ];
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function pill(cls, text) { return `<span class="pill ${cls}">${esc(text)}</span>`; }
+
+  const jouleCtl = window.JOULE.bindJouleShell();
+  let jouleExtra = [];   // ephemeral messages this session
+
+  function currentStepId() {
+    const h = (location.hash || "#browse").replace("#","");
+    return STEPS.find(s => s.id === h) ? h : "browse";
+  }
+
+  function stepStatus(stepId) {
+    const s = window.GMA.loadState();
+    const cur = currentStepId();
+    if (stepId === cur) return "active";
+    // "done" if the step's state has clearly happened
+    if (stepId === "browse")   return cur !== "browse" ? "done" : "active";
+    if (stepId === "detail")   return (cur !== "browse" && cur !== "detail") ? "done" : (cur === "detail" ? "active" : "pending");
+    if (stepId === "prep")     return (["apply","tracking","mymove"].includes(cur)) ? "done" : (cur === "prep" ? "active" : "pending");
+    if (stepId === "apply")    return s.employeeApplied ? "done" : (cur === "apply" ? "active" : "pending");
+    if (stepId === "tracking") return s.executionStarted ? "done" : (cur === "tracking" ? "active" : "pending");
+    if (stepId === "mymove")   return (s.executionStarted && !s.provisioningIssue) || s.iasConflictResolved ? "done" : (cur === "mymove" ? "active" : "pending");
+    return "pending";
+  }
+
+  function renderNav() {
+    const nav = document.getElementById("journeyNav");
+    nav.innerHTML = "";
+    STEPS.forEach((step, i) => {
+      const status = stepStatus(step.id);
+      const el = document.createElement("div");
+      el.className = "step " + status;
+      el.innerHTML = `<span class="n">${status === "done" ? "✓" : step.n}</span><span>${esc(step.label)}</span>`;
+      el.addEventListener("click", () => { location.hash = "#" + step.id; });
+      nav.appendChild(el);
+      if (i < STEPS.length - 1) {
+        const sep = document.createElement("span");
+        sep.className = "sep";
+        sep.textContent = "›";
+        nav.appendChild(sep);
+      }
+    });
+  }
+
+  // ============ Views ============
+  function view_browse() {
+    const s = window.GMA.loadState();
+    return `
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Career Opportunities</h1>
+          <div class="page-sub">Recommended for you · based on your role, skills, and career profile</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" id="btnRefresh">🔄 Refresh</button>
+          <button class="btn outlined" id="btnResetAll">↺ Reset demo</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div>
+          <b>Step 1 · Discover.</b> Joule surfaces roles that match your profile. Click a card to see the full detail.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Recommended opportunities</h2>
+            <div class="card-sub">Sourced from Opportunity Marketplace · matched to your Career Profile</div>
+          </div>
+          <span class="cap-tag ai">原生 AI 功能模拟</span>
+        </div>
+        <div class="opp-grid">
+          ${D.opportunities.map(o => `
+            <div class="opp-card ${o.highlight ? "highlighted" : "readonly"}" data-job="${esc(o.id)}">
+              <div class="opp-title">${esc(o.title)}${o.highlight ? "" : ' <span class="preview-tag">read-only preview</span>'}</div>
+              <div class="opp-meta">${esc(o.location)} · ${esc(o.entity)} · ${esc(o.type)}</div>
+              <div class="opp-summary">${esc(o.summary || "")}</div>
+              <div class="opp-footer">
+                <span class="match ${o.matchColor}">${esc(o.matchScore)}</span>
+                <span class="muted" style="font-size:11px;">Posted ${esc(o.posted)}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function view_detail() {
+    const s = window.GMA.loadState();
+    const job = D.opportunities.find(o => o.id === "JOB-ME-SC-14");
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">Career Opportunities</a> › <b>${esc(job.title)}</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">${esc(job.title)}</h1>
+          <div class="page-sub">${esc(job.location)} · ${esc(job.entity)}</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#prep'">Prepare for interview →</button>
+          <button class="btn primary" id="btnApply">Apply for this role</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 2 · Evaluate.</b> Review the role, then check how your experience matches. Joule pulls from authorized records only.</div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="card-title">Role summary</h2></div>
+            <span class="cap-tag native">标准业务功能模拟</span>
+          </div>
+          <div class="mb-16">${esc(job.summary || "")}</div>
+          <div class="bold mb-8">Key requirements</div>
+          <ul style="margin:0 0 12px 18px; padding:0;">
+            ${(job.requirements||[]).map(r => `<li style="margin:3px 0;">${esc(r)}</li>`).join("")}
+          </ul>
+          <div class="bold mb-8">Responsibilities</div>
+          <ul style="margin:0 0 4px 18px; padding:0;">
+            ${(job.responsibilities||[]).map(r => `<li style="margin:3px 0;">${esc(r)}</li>`).join("")}
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="card-title">How your experience matches</h2>
+            <div class="card-sub">Sourced from authorized data · self-reported items labeled</div></div>
+            <span class="cap-tag ext">项目扩展设计</span>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Requirement</th><th>Your match</th></tr></thead>
+            <tbody>
+              ${D.evidence.map(e => `
+                <tr>
+                  <td>${esc(e.req)}<div><span class="src-tag ${esc(e.source)}">${esc(e.srcLabel)}</span></div></td>
+                  <td>${esc(e.match)}${e.note ? `<div class="muted mt-8" style="font-size:11px;">${esc(e.note)}</div>` : ""}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Should you apply?</h2>
+          <div class="card-sub">Joule can help you compare — but this decision is yours.</div></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <div class="muted">Ask Joule anything on the right — including hard questions like "should I take this role?". You'll see how Joule handles decisions that shouldn't be automated.</div>
+      </div>
+    `;
+  }
+
+  function view_prep() {
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">Career Opportunities</a> › <a onclick="location.hash='#detail'">Senior Solution Consultant — Middle East</a> › <b>Interview preparation</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Interview preparation pack</h1>
+          <div class="page-sub">Practice questions · your career preference in this session is not permanently saved or disclosed</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#detail'">← Back to role</button>
+          <button class="btn primary" onclick="location.hash='#apply'">Continue to apply →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 3 · Interview prep.</b> Joule generates practice content but never predicts outcomes or ranks you.</div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="card-title">Likely interview questions</h2></div>
+            <span class="cap-tag ext">项目扩展设计</span>
+          </div>
+          <ul style="margin:0; padding-left:18px;">
+            ${D.interviewPrep.questions.map(q => `<li style="margin:6px 0; line-height:1.5;">${esc(q)}</li>`).join("")}
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="card-title">Reverse questions to ask them</h2></div>
+            <span class="cap-tag ext">项目扩展设计</span>
+          </div>
+          <ul style="margin:0; padding-left:18px;">
+            ${D.interviewPrep.reverse.map(q => `<li style="margin:6px 0; line-height:1.5;">${esc(q)}</li>`).join("")}
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-strip warn">
+        <span class="i-icon">!</span>
+        <div><b>Related native AI (reference only, not rebuilt here):</b> Career Insights · Interview Question Generation (interviewer via Teams) · Performance Preparation Agent (current manager). Each requires the correct role and entry point.</div>
+      </div>
+    `;
+  }
+
+  function view_apply() {
+    const s = window.GMA.loadState();
+    const applied = s.employeeApplied;
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">Career Opportunities</a> › <b>Apply</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Confirm your application</h1>
+          <div class="page-sub">Review what will be shared with the hiring team, then submit</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#detail'">← Back</button>
+        </div>
+      </div>
+
+      <div class="info-strip ${applied ? "success" : ""}">
+        <span class="i-icon">${applied ? "✓" : "i"}</span>
+        <div><b>Step 4 · Apply.</b> ${applied ? "Your application has been submitted. Track progress in the next step." : "Your Candidate Profile will be shared. You can review below before submitting."}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">What will be shared</h2>
+          <div class="card-sub">From your Candidate Profile · you control what stays private</div></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <ul class="kv-list">
+          <li><span class="k">Employee</span><span class="v">${esc(D.self.name)} · ${esc(D.self.id)}</span></li>
+          <li><span class="k">Current role</span><span class="v">${esc(D.self.currentTitle)} · ${esc(D.self.currentOrg)}</span></li>
+          <li><span class="k">Applying for</span><span class="v">Senior Solution Consultant — Middle East · Aurora Middle East LLC</span></li>
+          <li><span class="k">Skills shared</span><span class="v">Solution Consulting · BESS Platform (cert) · English fluent · Arabic A1</span></li>
+          <li><span class="k">Notice period</span><span class="v">4 weeks</span></li>
+          <li><span class="k">Preferred start</span><span class="v">To be discussed</span></li>
+        </ul>
+      </div>
+
+      <div class="row" style="justify-content:flex-end; margin-top:16px;">
+        ${applied
+          ? `<button class="btn primary" onclick="location.hash='#tracking'">Track my application →</button>`
+          : `<button class="btn primary" id="btnSubmitApp">Submit application</button>`}
+      </div>
+    `;
+  }
+
+  function view_tracking() {
+    const s = window.GMA.loadState();
+    const app = D.application;
+    // Determine which stage is active
+    let activeIdx = 4;   // move preparation by default
+    if (s.approvalsSubmitted) activeIdx = 5;
+    if (s.executionStarted) activeIdx = 6;
+    if (s.iasConflictResolved || (s.executionStarted && !s.provisioningIssue)) activeIdx = 6;
+
+    return `
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">My application · Track progress</h1>
+          <div class="page-sub">${esc(app.id)} · Submitted ${esc(app.submittedOn)}</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" id="btnRefresh">🔄 Refresh</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 5 · Track progress.</b> High-level view of where you stand. Approver identities and internal review details are not shown here by design.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Application timeline</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <div class="tracker">
+          ${app.trackerStages.map((st, i) => {
+            const cls = i < activeIdx ? "done" : i === activeIdx ? "active" : "";
+            return `<div class="stage ${cls}">
+              <div class="dot">${i < activeIdx ? "✓" : i + 1}</div>
+              <div class="info"><div class="label">${esc(st.label)}</div><div class="date">${esc(st.date)}</div></div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Interviews</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Round</th><th>With</th><th>Date</th><th>Modality</th><th>Status</th></tr></thead>
+          <tbody>
+            ${D.interviews.map(iv => `<tr>
+              <td>${esc(iv.round)}</td>
+              <td>${esc(iv.with)}</td>
+              <td>${esc(iv.date)}</td>
+              <td>${esc(iv.modality)}</td>
+              <td>${pill("green", "Completed")}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Signal to HR — future extension, hidden by default -->
+      <!-- Kept as extension hook per docs/scenario.md; not part of the 3-pause demo flow -->
+    `;
+  }
+
+  function view_mymove() {
+    const s = window.GMA.loadState();
+    if (!s.executionStarted) {
+      return `
+        <div class="info-strip warn">
+          <span class="i-icon">!</span>
+          <div><b>Step 6 · My move.</b> Not yet available. This section unlocks once HR triggers execution and your move becomes effective.</div>
+        </div>
+        <div class="card">
+          <div class="card-body muted">Once execution starts, you will see:
+            <ul>
+              <li>A summary of what's ready, what's still processing, and what needs a step from you</li>
+              <li>Your new access, reporting line, work location</li>
+              <li>Any updates from HR on your effective date</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+    const routedToGovernance = s.iasConflictResolved;
+    const stillPaused = s.provisioningIssue && !routedToGovernance;
+    return `
+      <div class="conclusion-banner">
+        <div class="cb-icon">!</div>
+        <div>
+          <div class="cb-title">${stillPaused
+            ? "Move effective · Some IT items pending review"
+            : "Move effective · Awaiting target-side verification"}</div>
+          <div class="cb-sub">You start at Aurora Middle East LLC (Riyadh) on <b>${esc(s.effectiveDate)}</b>. ${stillPaused
+            ? "The IT team has flagged an item for internal review. You will be notified once your access is fully in place."
+            : "Some technical steps have been submitted but not yet verified on the target side. You will be notified once your access is confirmed."}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Your move summary</h2>
+          <div class="card-sub">What's confirmed, what's still being verified, what needs a step from you.</div></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <div class="three-col">
+          <div class="handoff-col done">
+            <h4>✓ Confirmed</h4>
+            <ul>
+              <li>New position on record<span class="sub">Senior Solution Consultant · Middle East</span></li>
+              <li>Reporting line updated<span class="sub">Reports to Anna Becker</span></li>
+              <li>Riyadh office desk assigned<span class="sub">KAFD · Tower 4 · Floor 12</span></li>
+              <li>Compensation loaded<span class="sub">Offer v2 · effective ${esc(s.effectiveDate)}</span></li>
+            </ul>
+          </div>
+          <div class="handoff-col progress">
+            <h4>⏳ Awaiting verification</h4>
+            <ul>
+              <li>Work email &amp; system access<span class="sub">Submitted · pending target-side verification</span></li>
+              <li>Payroll setup (Saudi Arabia)<span class="sub">First cycle: end of November</span></li>
+            </ul>
+          </div>
+          <div class="handoff-col paused">
+            <h4>📋 Your step</h4>
+            <ul>
+              <li>Sign data protection consent<span class="sub">Available now (Legal will confirm applicable framework)</span></li>
+              <li>Meet your onboarding buddy<span class="sub">Anna will confirm in week 1</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============ Render ============
+  function renderView() {
+    const step = currentStepId();
+    const container = document.getElementById("viewContainer");
+    const renderer = { browse: view_browse, detail: view_detail, prep: view_prep, apply: view_apply, tracking: view_tracking, mymove: view_mymove };
+    container.innerHTML = renderer[step]();
+    bindViewInteractions(step);
+    renderNav();
+    refreshJoule();
+    refreshBadges();
+  }
+
+  function bindViewInteractions(step) {
+    document.getElementById("btnRefresh")?.addEventListener("click", renderView);
+    document.getElementById("btnResetAll")?.addEventListener("click", () => { window.GMA.resetState(); jouleExtra = []; renderView(); });
+
+    if (step === "browse") {
+      document.querySelectorAll(".opp-card").forEach(c => {
+        c.addEventListener("click", () => {
+          const id = c.getAttribute("data-job");
+          if (id === "JOB-ME-SC-14") location.hash = "#detail";
+          // Non-primary opportunities are read-only preview — no navigation
+        });
+      });
+    }
+
+    if (step === "detail") {
+      document.getElementById("btnApply")?.addEventListener("click", () => { location.hash = "#apply"; });
+    }
+
+    if (step === "apply") {
+      document.getElementById("btnSubmitApp")?.addEventListener("click", () => {
+        window.GMA.mutateState(x => { x.employeeApplied = true; }, "employee-submitted-application");
+        jouleExtra.push({ role: "bot", html: `<strong>Application submitted.</strong> You'll see updates in <b>Track progress</b>. I'll notify you if anything on your side needs action.`, sources: 1 });
+        renderView();
+      });
+    }
+
+    if (step === "tracking") {
+      // Signal card removed from demo flow (kept as extension hook only).
+      // No event bindings needed for this step in the current narrative.
+    }
+  }
+
+  // ============ Joule frames (employee flavor) with autoplay pacing ============
+  function jouleFramesFor(step) {
+    const s = window.GMA.loadState();
+    const dateChanged = s.effectiveDate !== "2026-11-01";
+    const executed = s.executionStarted;
+
+    const overview = {
+      role: "bot", autoplay: true, delay: 300,
+      html: `Hi 林晨. I can help you discover roles, evaluate fit, prepare for interviews, and track your application. I <strong>cannot</strong> predict offer outcomes or make the decision for you.`,
+      sources: 2
+    };
+
+    switch (step) {
+      case "browse":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 800,
+            html: `I surfaced <strong>4 opportunities</strong> based on your Career Profile. The Riyadh role is your strongest match.`,
+            actions: [{ label: "Open Riyadh role detail", event: "goto-detail" }],
+            sources: 3 }
+        ];
+
+      case "detail":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 700,
+            html: `Take a moment to review requirements. Sources are labeled so you know what's on record vs. self-reported.`,
+            sources: 2 },
+          { role: "user", autoplay: false, continueLabel: "▸ Ask Joule a hard question",
+            text: "Should I take this role?" },
+          { role: "bot", autoplay: true, delay: 900,
+            html: `This is a personal decision — I'm not the right one to answer <strong>should you</strong>. What I can do:<ul><li>Compare your comp before/after</li><li>Show what's on record vs. self-reported</li><li>Give you reverse questions to ask</li></ul>Consider: <em>relocation, family plans, growth priorities</em> — those belong to conversations with your manager, mentor, or your own reflection.`,
+            actions: [
+              { label: "Show my experience match", event: "focus-match" },
+              { label: "Continue to interview prep", event: "goto-prep" }
+            ],
+            sources: 2 }
+        ];
+
+      case "prep":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: `Interview prep pack ready. Practice questions — not predictions of what you'll be asked. Your notes stay with you.`,
+            sources: 1 }
+        ];
+
+      case "apply":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: `Ready to apply? Your Candidate Profile will be shared — review it on the page. Nothing beyond what's shown will be sent.`,
+            sources: 1 }
+        ];
+
+      case "tracking": {
+        const frames = [
+          overview,
+          { role: "bot", autoplay: true, delay: 600,
+            html: `Your application is at <strong>${s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation"}</strong>. I'll notify you of anything that needs action.`,
+            sources: 2 }
+        ];
+        if (dateChanged) {
+          frames.push({
+            role: "bot", autoplay: false, continueLabel: "▸ Show what HR changed",
+            html: `<strong>Update from HR:</strong> your proposed effective date is now <strong>${esc(s.effectiveDate)}</strong>. No action needed from you.`,
+            sources: 1
+          });
+        }
+        return frames;
+      }
+
+      case "mymove": {
+        if (!executed) return [ overview, { role: "bot", autoplay: true, delay: 500, html: `Not yet — this section unlocks after your move becomes effective.`, sources: 1 } ];
+        const delayed = s.provisioningIssue && !s.iasConflictResolved;
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: delayed
+              ? `Your move is effective. IT will finalize your account switch within 2 business days — no action needed from you.`
+              : `Your move is complete. All access confirmed. Welcome to the Middle East team.`,
+            sources: 1 }
+        ];
+      }
+    }
+    return [ overview ];
+  }
+
+  function refreshJoule() {
+    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "Career");
+    const base = jouleFramesFor(currentStepId());
+    const frames = base.concat(jouleExtra.map(f => ({ ...f, autoplay: f.autoplay !== undefined ? f.autoplay : true })));
+    window.JOULE.loadSequence(frames, handleJouleAction);
+    window.JOULE.setIntentRouter(employeeIntentRouter);
+    window.JOULE.setSuggestions(suggestionsForStep(currentStepId()));
+  }
+
+  // ============ Interactive input · intent router ============
+  // Keyword-based routing. Not an LLM. Preset replies keep the demo predictable.
+  function suggestionsForStep(step) {
+    switch (step) {
+      case "browse":
+        return ["Which role fits me best?", "Why the Riyadh role?"];
+      case "detail":
+        return ["Should I take this role?", "What's my match strength?", "What's the compensation like?"];
+      case "prep":
+        return ["What might they ask me?", "What should I ask them?"];
+      case "apply":
+        return ["What info gets shared?", "Can I edit before sending?"];
+      case "tracking":
+        return ["Where is my application now?", "Can I send HR a note?", "When will I start?"];
+      case "mymove":
+        return ["What's left for me to do?", "When does payroll start?"];
+      default:
+        return [];
+    }
+  }
+
+  function employeeIntentRouter(userText) {
+    const t = userText.toLowerCase();
+    const s = window.GMA.loadState();
+
+    // ---- Refusal #1 · Should I take this role? ----
+    if (/should i (take|accept|apply)|worth it|is it a good|is this right for me|接受|该不该/i.test(t)) {
+      return {
+        html: `This is a personal decision — I'm not the right one to answer <strong>should you</strong>. What I can do:<ul><li>Compare your comp before/after</li><li>Show what's on record vs. self-reported</li><li>Give you reverse questions to ask</li></ul>Consider <em>relocation, family plans, growth priorities</em> — those belong to conversations with your manager, mentor, or your own reflection.`,
+        actions: [
+          { label: "Show my experience match", event: "focus-match" },
+          { label: "Continue to interview prep", event: "goto-prep" }
+        ],
+        sources: 2
+      };
+    }
+
+    // Compensation
+    if (/(comp|salary|pay|package|money|薪|工资|待遇)/.test(t)) {
+      return {
+        html: `Proposed: <strong>SAR 360,000/yr</strong> base + 18% bonus + housing + one-time relocation. Current: <strong>CNY 480,000/yr</strong> base + 15% bonus. The comparison is on the Evaluate page — I show version + date, but I don't compute post-tax or treat this as a personal commitment.`,
+        sources: 2
+      };
+    }
+
+    // Match / requirements
+    if (/(match|requirements?|qualif|经历|要求)/.test(t)) {
+      return {
+        html: `Your matches: <strong>2 items on system record</strong> (BESS certification, solution consulting on 3 tier-1 pursuits), <strong>1 self-reported</strong> (GCC workshop as observer), <strong>1 with no source</strong> (cross-cultural project scope). I don't fabricate — absent from records is not the same as absent in fact.`,
+        actions: [{ label: "Open Evaluate page", event: "goto-detail" }],
+        sources: 2
+      };
+    }
+
+    // Interview
+    if (/(interview|question|ask me|prep|面试)/.test(t)) {
+      return {
+        html: `I have 3 practice questions and 3 reverse questions for you on the Interview prep page. They're practice — not predictions of what you'll be asked.`,
+        actions: [{ label: "Open Interview prep", event: "goto-prep" }],
+        sources: 1
+      };
+    }
+
+    // Status / progress
+    if (/(status|progress|where|when|start|track|进度|状态)/.test(t)) {
+      const stage = s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation";
+      const startDate = s.effectiveDate || "2026-11-01";
+      return {
+        html: `Your application is at <strong>${stage}</strong>. Planned start at Aurora Middle East LLC (Riyadh): <strong>${startDate}</strong>. I'll update you if anything on your side needs action.`,
+        actions: [{ label: "Open Track progress", event: "goto-tracking" }],
+        sources: 2
+      };
+    }
+
+    // Signal / tell HR
+    if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟)/.test(t)) {
+      return {
+        html: `You can send a signal on the <strong>Track progress</strong> page. I'll show you a preview of what HR will see — an abstract flag, not your exact wording. Your private phrasing stays in your record until you have a real conversation.`,
+        actions: [{ label: "Go to signal box", event: "goto-tracking" }],
+        sources: 1
+      };
+    }
+
+    // Shared info on apply
+    if (/(share|shared|profile|what info|visible|哪些信息)/.test(t)) {
+      return {
+        html: `On the Apply page, you can see exactly what will be shared: your ID, current role, target role, skills (BESS cert, English fluent, Arabic A1), notice period, and preferred start. Nothing beyond that is sent.`,
+        actions: [{ label: "Open Apply page", event: "goto-apply" }],
+        sources: 1
+      };
+    }
+
+    // Payroll / benefits
+    if (/(payroll|benefit|first cycle|gosi|social|housing)/.test(t)) {
+      return {
+        html: `Your first payroll cycle at the target entity runs end of November. Local social insurance and payroll configuration are handled by HR / Payroll specialists. Housing is included as a component of your offer. Global Mobility handles relocation logistics.`,
+        sources: 1
+      };
+    }
+
+    // Which role / recommend
+    if (/(which role|best|recommend|fits|哪个|推荐)/.test(t)) {
+      return {
+        html: `Based on your Career Profile, the <strong>Riyadh Solution Consultant</strong> role is your strongest match — energy-storage domain, senior IC role, aligned with your recent BESS work. The Shanghai Lead role is also a strong match, but a management-track lateral move. I show matches — you choose what fits your life.`,
+        actions: [{ label: "Open Riyadh detail", event: "goto-detail" }],
+        sources: 2
+      };
+    }
+
+    // Fallback
+    return null;
+  }
+
+  function handleJouleAction(ev) {
+    if (ev === "goto-detail") location.hash = "#detail";
+    if (ev === "goto-prep") location.hash = "#prep";
+    if (ev === "goto-apply") location.hash = "#apply";
+    if (ev === "goto-tracking") location.hash = "#tracking";
+    if (ev === "focus-match") { location.hash = "#detail"; setTimeout(() => document.querySelector(".data-table")?.scrollIntoView({behavior:"smooth"}), 150); }
+    if (ev === "book-chat") alert("Booking flow is not part of this simulation. In a real product this would open a calendar picker.");
+  }
+
+  function refreshBadges() {
+    const s = window.GMA.loadState();
+    let n = D.myActions.filter(a => a.state === "todo").length;
+    if (s.effectiveDate !== "2026-11-01") n += 1;
+    window.TOPBAR.setNotifBadge(n);
+  }
+
+  window.addEventListener("hashchange", renderView);
+  window.GMA.onStateChange(renderView);
+  window.GMA.loadState();
+  renderView();
+  </script>
+</body>
+</html>

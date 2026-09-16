@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Identity & Access · Global Mobility Assistant</title>
+  <link rel="stylesheet" href="shared/tokens.css" />
+  <link rel="stylesheet" href="shared/shell.css" />
+  <link rel="stylesheet" href="shared/joule.css" />
+  <style>
+    .journey-nav { display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 10px 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 8px; margin-bottom: 16px; align-items: center; }
+    .journey-nav .step { padding: 5px 10px; border-radius: 6px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; user-select: none; transition: background 0.12s, color 0.12s; }
+    .journey-nav .step:hover { background: var(--joule-purple-soft); color: var(--joule-purple); }
+    .journey-nav .step:active { transform: scale(0.98); }
+    .journey-nav .step.active { background: var(--role-it); color: #fff; font-weight: 600; }
+    .journey-nav .step.done { color: var(--status-green); }
+    .journey-nav .step.pending { opacity: 0.9; }
+    .journey-nav .step.pending:hover { opacity: 1; background: var(--joule-purple-soft); color: var(--joule-purple); }
+    .journey-nav .step .n { width: 18px; height: 18px; border-radius: 50%; background: #EEF1F4; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
+    .journey-nav .step.active .n { background: rgba(255,255,255,0.25); color: #fff; }
+    .journey-nav .step.done .n { background: var(--status-green); color: #fff; }
+    .journey-nav .sep { color: var(--border-mid); align-self: center; font-size: 11px; }
+    .breadcrumb { color: var(--text-secondary); font-size: 12px; margin-bottom: 12px; }
+    .breadcrumb a { color: var(--sap-blue); cursor: pointer; }
+    .alert-row { cursor: pointer; }
+    .alert-row.high { background: #FDF0EE; }
+    .alert-row:hover { background: #F5F7FA; }
+    .alert-row.high:hover { background: #FBE7E4; }
+    .alert-row.readonly { cursor: default; opacity: 0.75; }
+    .alert-row.readonly:hover td { background: #FAFBFC; }
+    .preview-tag { display: inline-block; background: #EEF1F4; color: var(--text-muted); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 6px; letter-spacing: 0.2px; }
+
+    .diagnosis {
+      background: #FDF6FE; border: 1px solid var(--joule-purple-border);
+      border-left: 4px solid var(--joule-purple);
+      padding: 14px 18px; border-radius: 6px; margin-bottom: 12px;
+    }
+    .diagnosis h4 { margin: 0 0 8px; color: var(--joule-purple-dark); font-size: 13px; }
+    .diagnosis ol { margin: 6px 0 0 20px; padding: 0; }
+    .diagnosis li { margin: 3px 0; font-size: 13px; }
+
+    .health-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .health-cell { background: #FAFBFC; border: 1px solid var(--border-soft); border-radius: 6px; padding: 10px; font-size: 12px; }
+    .health-cell.degraded { background: #FEF6E6; border-color: #F0D797; }
+    .health-cell .h-name { font-weight: 600; margin-bottom: 4px; }
+    .health-cell .h-state { font-size: 11px; }
+    .health-cell.degraded .h-state { color: #8A6100; font-weight: 600; }
+    .health-cell.healthy .h-state { color: var(--status-green); font-weight: 600; }
+
+    .dep-graph { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .dep-node { background: #FAFBFC; border: 1px solid var(--border-soft); border-radius: 6px; padding: 10px; font-size: 12px; position: relative; }
+    .dep-node.confirmed { background: #F1F9F3; border-color: #C5E4CE; }
+    .dep-node.failed { background: #FDECE9; border-color: #EFB4AC; }
+    .dep-node.pending-dep { background: #F5F6F7; border-color: var(--border-mid); opacity: 0.75; }
+    .dep-node .task-id { font-family: "SF Mono", Consolas, monospace; font-size: 11px; color: var(--text-muted); }
+    .dep-node .task-label { font-weight: 600; margin: 4px 0; font-size: 12.5px; }
+    .dep-node .task-meta { color: var(--text-muted); font-size: 11px; }
+  </style>
+</head>
+<body class="role-it">
+  <div id="topbarSlot"></div>
+
+  <div class="app-shell">
+    <main class="main-area joule-open" id="mainArea">
+      <div class="journey-nav" id="journeyNav"></div>
+      <div id="viewContainer"></div>
+    </main>
+  </div>
+
+  <div id="jouleSlot"></div>
+
+  <div class="global-footer">
+    非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行 &nbsp;|&nbsp; Not an SAP official product · Learning prototype · Fictional data & simulated execution
+  </div>
+
+  <script src="shared/state.js"></script>
+  <script src="shared/topbar.js"></script>
+  <script src="shared/joule.js"></script>
+  <script src="data/it-data.js"></script>
+  <script>
+  const D = window.IT_DATA;
+  document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("it");
+  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("it", "Joule · Identity & Access");
+
+  const STEPS = [
+    { id: "console",     n: 1, label: "Alert Console" },
+    { id: "alertDetail", n: 2, label: "Alert detail" },
+    { id: "queue",       n: 3, label: "Task queue" },
+    { id: "diagnose",    n: 4, label: "Diagnose & resolve" },
+    { id: "receipt",     n: 5, label: "Submit receipt" }
+  ];
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function pill(cls, text) { return `<span class="pill ${cls}">${esc(text)}</span>`; }
+  const jouleCtl = window.JOULE.bindJouleShell();
+  let jouleExtra = [];
+
+  function currentStepId() {
+    const h = (location.hash || "#console").replace("#","");
+    return STEPS.find(s => s.id === h) ? h : "console";
+  }
+
+  function stepStatus(stepId) {
+    const s = window.GMA.loadState();
+    const order = STEPS.map(x => x.id);
+    const idx = order.indexOf(stepId);
+    const cIdx = order.indexOf(currentStepId());
+    if (stepId === "diagnose" && s.iasConflictResolved) return "done";
+    if (stepId === "receipt" && s.receiptSubmitted) return "done";
+    if (idx < cIdx) return "done";
+    if (idx === cIdx) return "active";
+    return "pending";
+  }
+
+  function renderNav() {
+    const nav = document.getElementById("journeyNav");
+    nav.innerHTML = "";
+    STEPS.forEach((step, i) => {
+      const status = stepStatus(step.id);
+      const el = document.createElement("div");
+      el.className = "step " + status;
+      el.innerHTML = `<span class="n">${status === "done" ? "✓" : step.n}</span><span>${esc(step.label)}</span>`;
+      el.addEventListener("click", () => { location.hash = "#" + step.id; });
+      nav.appendChild(el);
+      if (i < STEPS.length - 1) {
+        const sep = document.createElement("span");
+        sep.className = "sep"; sep.textContent = "›";
+        nav.appendChild(sep);
+      }
+    });
+  }
+
+  // ============ Views ============
+  function view_console() {
+    const s = window.GMA.loadState();
+    const showPrimary = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved;
+    const alerts = D.alerts.filter(a => a.primary ? showPrimary : true);
+
+    return `
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Alert Console</h1>
+          <div class="page-sub">Filtered to your tenants · click a high-severity alert to open its detail</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" id="btnRefresh">🔄 Refresh</button>
+          <button class="btn outlined" id="btnResetAll">↺ Reset demo</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 1 · Alert Console.</b> Your global alert queue. New IAS conflicts appear here when HR triggers execution.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">System health</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <div class="health-grid">
+          ${D.systemHealth.map(h => {
+            const sh = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved ? h : { ...h, state: h.name === "IAS · region-me" ? "healthy" : h.state, note: h.name === "IAS · region-me" ? "no issues" : h.note };
+            return `<div class="health-cell ${sh.state}">
+              <div class="h-name">${esc(sh.name)}</div>
+              <div class="h-state">${sh.state === "degraded" ? "⚠ " : "● "}${esc(sh.state.toUpperCase())}</div>
+              <div class="muted small mt-8">${esc(sh.note)}</div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Alert queue</h2>
+          <div class="card-sub">${alerts.length} open alert${alerts.length !== 1 ? "s" : ""}</div></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Alert ID</th><th>Severity</th><th>Type</th><th>Affects</th><th>Opened</th></tr></thead>
+          <tbody>
+            ${alerts.map(a => `<tr class="alert-row ${a.severity} ${a.primary ? "" : "readonly"}" data-alert="${esc(a.id)}">
+              <td class="mono">${esc(a.id)}${a.primary ? "" : ' <span class="preview-tag">read-only preview</span>'}</td>
+              <td>${pill(a.severity === "high" ? "red" : a.severity === "medium" ? "yellow" : "grey", a.severity)}</td>
+              <td>${esc(a.type)}</td>
+              <td class="mono">${esc(a.affects)}</td>
+              <td class="muted">${esc(a.opened)}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+        ${!s.executionStarted ? `<div class="info-strip mt-16" style="margin-bottom:0"><span class="i-icon">i</span><div>Waiting for HR to trigger execution — no IAS-related work yet.</div></div>` : ""}
+      </div>
+    `;
+  }
+
+  function view_alertDetail() {
+    const s = window.GMA.loadState();
+    if (!s.executionStarted || !s.provisioningIssue || s.iasConflictResolved) {
+      return `
+        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Alert detail</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div>No active high-severity alert. This step is available once HR triggers execution.</div></div>
+      `;
+    }
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>ALT-2026-091501</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">ALT-2026-091501 · Identity mapping needs review</h1>
+          <div class="page-sub">High severity · Affects EMP-CN-2381 · Opened 2026-11-01 03:14</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#console'">← Back to console</button>
+          <button class="btn primary" onclick="location.hash='#queue'">See dependency graph →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 2 · Alert detail.</b> Context for the alert. Next step: see which move tasks are paused and review the observation before routing.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Alert context</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <ul class="kv-list">
+          <li><span class="k">Alert ID</span><span class="v mono">ALT-2026-091501</span></li>
+          <li><span class="k">Severity</span><span class="v">${pill("red","high")}</span></li>
+          <li><span class="k">Type</span><span class="v">Identity mapping needs review</span></li>
+          <li><span class="k">Affects</span><span class="v mono">EMP-CN-2381 (林晨)</span></li>
+          <li><span class="k">Related move</span><span class="v mono">${esc(s.moveRequestId)}</span></li>
+          <li><span class="k">Opened</span><span class="v">2026-11-01 03:14</span></li>
+          <li><span class="k">Origin task</span><span class="v mono">EXEC-04 · Identity provisioning · target region</span></li>
+          <li><span class="k">Downstream paused</span><span class="v mono">EXEC-05, EXEC-06, EXEC-07, EXEC-08</span></li>
+        </ul>
+      </div>
+    `;
+  }
+
+  function view_queue() {
+    const s = window.GMA.loadState();
+    const tasks = D.tasks.map(t => ({ ...t }));
+    if (!s.executionStarted) {
+      tasks.forEach(t => t.state = "pending-dep");
+    } else if (s.iasConflictResolved) {
+      // Case routed to governance — downstream stays paused pending decision + target-side verification
+      const e4 = tasks.find(t => t.id === "EXEC-04");
+      if (e4) e4.state = "pending-review";
+    } else {
+      const e4 = tasks.find(t => t.id === "EXEC-04");
+      if (e4) e4.state = "pending-review";
+    }
+
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <a onclick="location.hash='#alertDetail'">Alert</a> › <b>Task queue</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Move task queue · dependency graph</h1>
+          <div class="page-sub">Lin Chen (EMP-CN-2381) · 8 tasks · Identity / Access / SSO</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#alertDetail'">← Back</button>
+          <button class="btn primary" onclick="location.hash='#diagnose'">Review →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 3 · Task queue.</b> Submitted ≠ verified · person continuity ≠ all accounts unchanged. EXEC-04 is paused for human review; 4 downstream tasks stay paused with it.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Dependency graph</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <div class="dep-graph">
+          ${tasks.map(t => {
+            const label = { confirmed: "✓ Done", "pending-review": "⚠ Needs review", "pending-dep": "⏳ Waits on dep." }[t.state] || t.state;
+            const cls = { confirmed: "green", "pending-review": "yellow", "pending-dep": "grey" }[t.state] || "grey";
+            const badge = pill(cls, label);
+            const nodeCls = t.state === "pending-review" ? "failed" : t.state;
+            return `<div class="dep-node ${nodeCls}">
+              <div class="task-id">${esc(t.id)} · ${esc(t.system)}</div>
+              <div class="task-label">${esc(t.label)}</div>
+              <div class="task-meta">${esc(t.owner)}</div>
+              <div class="mt-8">${badge}</div>
+              ${t.deps.length ? `<div class="task-meta mt-8">deps: ${t.deps.map(esc).join(", ")}</div>` : ""}
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function view_diagnose() {
+    const s = window.GMA.loadState();
+    if (!s.executionStarted || !s.provisioningIssue) {
+      return `
+        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Diagnose</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div>No active IAS conflict to diagnose right now.</div></div>
+      `;
+    }
+    if (s.iasConflictResolved) {
+      return `
+        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Routed for governance review</b></div>
+        <div class="conclusion-banner">
+          <div class="cb-icon">→</div>
+          <div>
+            <div class="cb-title">EXEC-04 routed to Identity governance</div>
+            <div class="cb-sub">Human review requested. Downstream provisioning remains paused. This tool does not close the alert or mark the case as resolved — that determination belongs to the governance team.</div>
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-end;">
+          <button class="btn primary" onclick="location.hash='#receipt'">Log the routing action →</button>
+        </div>
+      `;
+    }
+    const d = D.diagnosis;
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <a onclick="location.hash='#queue'">Task queue</a> › <b>Review</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">EXEC-04 · Awaiting human review</h1>
+          <div class="page-sub">Observation only · this tool does not propose an operational path or resolve the case</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#queue'">← Back to queue</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 4 · Review.</b> Joule surfaces observations and pauses. The next step — whether these records represent the same person, and how to link them — is a governance decision.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Observation &amp; what to do next</h2></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="bold mb-8">What was observed</div>
+            <div class="muted" style="line-height:1.55;">${esc(d.observation)}</div>
+            <div class="bold mt-16 mb-8">Why this pauses here</div>
+            <div class="muted" style="line-height:1.55;">${esc(d.whyManual)}</div>
+          </div>
+          <div>
+            <div class="diagnosis">
+              <h4>What to do next</h4>
+              <ol>
+                ${d.whatToDoNext.map(step => `<li>${esc(step)}</li>`).join("")}
+              </ol>
+            </div>
+            <div class="muted small mt-8">
+              <b>Owners &amp; references:</b>
+              <ul style="margin:4px 0 0 18px; padding:0;">
+                ${d.references.map(r => `<li>${esc(r)}</li>`).join("")}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="info-strip warn mt-16">
+          <span class="i-icon">!</span>
+          <div><b>Downstream tasks paused:</b> <span class="mono">${D.downstream.join(", ")}</span> — will remain paused until the governance decision is recorded.</div>
+        </div>
+        <div class="row mt-16">
+          <div class="spacer"></div>
+          <button class="btn outlined" id="btnEscalate">Add context for governance team</button>
+          <button class="btn primary" id="btnResolve">Route to Identity governance team</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function view_receipt() {
+    const s = window.GMA.loadState();
+    if (!s.iasConflictResolved) {
+      return `
+        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Log routing</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div>Route EXEC-04 to Identity governance first, then come back to log the routing action.</div></div>
+      `;
+    }
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Log routing</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Log the routing action</h1>
+          <div class="page-sub">Notify HR that the case has been routed for governance review — not that it has been resolved</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#diagnose'">← Back</button>
+        </div>
+      </div>
+
+      <div class="info-strip ${s.receiptSubmitted ? "success" : ""}">
+        <span class="i-icon">${s.receiptSubmitted ? "✓" : "i"}</span>
+        <div><b>Step 5 · Log routing.</b> ${s.receiptSubmitted ? "Routing logged. HR sees the case is with the governance team, not that it is closed." : "Confirm below to log the routing action."}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Routing note · draft</h2>
+          <div class="card-sub">Joule drafted this; you sign off. Target-side verification is still pending.</div></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <ul class="kv-list">
+          <li><span class="k">Move</span><span class="v mono">${esc(s.moveRequestId)}</span></li>
+          <li><span class="k">Employee</span><span class="v">EMP-CN-2381 · 林晨</span></li>
+          <li><span class="k">EXEC-04</span><span class="v">${pill("yellow","Routed · awaiting governance decision")}</span></li>
+          <li><span class="k">Downstream (EXEC-05 to 08)</span><span class="v">${pill("grey","Paused · will resume after decision + target-side verification")}</span></li>
+          <li><span class="k">Alert</span><span class="v mono">ALT-2026-091501 · open · under review</span></li>
+          <li><span class="k">Notes for HR</span><span class="v">Case surfaced multiple candidate identity records; routed to Identity governance for human review. This tool does not determine linkage or close the alert.</span></li>
+        </ul>
+        <div class="row mt-16">
+          <div class="spacer"></div>
+          ${s.receiptSubmitted
+            ? `<button class="btn outlined" disabled>Routing logged ✓</button>`
+            : `<button class="btn primary" id="btnSubmitReceipt">Log routing to HR</button>`}
+        </div>
+      </div>
+    `;
+  }
+
+  // ============ Render + bind ============
+  function renderView() {
+    const step = currentStepId();
+    const view = { console: view_console, alertDetail: view_alertDetail, queue: view_queue, diagnose: view_diagnose, receipt: view_receipt }[step];
+    document.getElementById("viewContainer").innerHTML = view();
+    bindViewInteractions(step);
+    renderNav();
+    refreshJoule();
+    refreshBadges();
+  }
+
+  function bindViewInteractions(step) {
+    document.getElementById("btnRefresh")?.addEventListener("click", renderView);
+    document.getElementById("btnResetAll")?.addEventListener("click", () => { window.GMA.resetState(); jouleExtra = []; renderView(); });
+
+    if (step === "console") {
+      document.querySelectorAll(".alert-row").forEach(r => {
+        r.addEventListener("click", () => {
+          const id = r.getAttribute("data-alert");
+          if (id === "ALT-2026-091501") location.hash = "#alertDetail";
+          // Non-primary alerts are read-only preview — no navigation
+        });
+      });
+    }
+
+    if (step === "diagnose") {
+      document.getElementById("btnResolve")?.addEventListener("click", () => {
+        window.GMA.mutateState(x => { x.iasConflictResolved = true; x.provisioningIssue = false; }, "it-routed-to-governance");
+        jouleExtra.push({ role: "bot", html: `Case routed to the Identity governance team (simulated). This tool does not determine linkage or close the alert — awaiting their decision.`, sources: 1 });
+        renderView();
+      });
+      document.getElementById("btnEscalate")?.addEventListener("click", () => alert("Context added for the governance team (simulated). No state change in this demo path."));
+    }
+
+    if (step === "receipt") {
+      document.getElementById("btnSubmitReceipt")?.addEventListener("click", () => {
+        window.GMA.mutateState(x => { x.receiptSubmitted = true; }, "it-logged-routing");
+        jouleExtra.push({ role: "bot", html: `Routing logged. HR sees the case is with the governance team, not that it is closed.`, sources: 1 });
+        renderView();
+      });
+    }
+  }
+
+  // ============ Joule (IT) with autoplay pacing ============
+  function jouleFramesFor(step) {
+    const s = window.GMA.loadState();
+    const active = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved;
+    const overview = { role: "bot", autoplay: true, delay: 300,
+      html: `Standing by, Tom. Queue: 2 baseline alerts. ${active ? "<strong>New high-severity alert:</strong> identity mapping for Lin Chen's move needs human review — 4 downstream tasks paused." : "No high-severity alerts."}`, sources: 1 };
+
+    switch (step) {
+      case "console":
+        return [ overview ];
+      case "alertDetail":
+        if (!active) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Nothing to detail right now.`, sources: 1 } ];
+        return [ overview,
+          { role: "bot", autoplay: true, delay: 700,
+            html: `EXEC-04 needs human review. 4 downstream tasks stay paused until a governance decision is recorded.`, sources: 1 } ];
+      case "queue":
+        if (!s.executionStarted) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Queue is idle. Once HR triggers execution the graph will activate.`, sources: 1 } ];
+        return [ overview,
+          { role: "bot", autoplay: true, delay: 700,
+            html: `EXEC-04 is what's holding downstream. I'll show you what I observed — next step is a governance decision, not an operation I recommend.`, sources: 1 } ];
+      case "diagnose":
+        if (s.iasConflictResolved) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Case routed. Awaiting governance decision — I do not close it.`, sources: 1 } ];
+        if (!active) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Nothing to review right now.`, sources: 1 } ];
+        return [ overview,
+          { role: "bot", autoplay: true, delay: 600,
+            html: `Observation: automated identity mapping returned multiple candidate records. I do not conclude that they represent a conflict, or propose an operational path.`, sources: 2 },
+          { role: "bot", autoplay: false, continueLabel: "▸ Why I stop here",
+            html: `Whether the records represent the same person, and how to link them, is a <strong>governance decision</strong> — including any applicable data-protection or cross-border review by qualified specialists. I surface observations and route; I do not resolve.`, sources: 2 }];
+      case "receipt":
+        if (!s.iasConflictResolved) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Not ready — route the case for governance review first.`, sources: 1 } ];
+        return [ overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: `Routing note drafted. Review and sign off; HR sees the case is with the governance team, not that it is closed.`, sources: 1 } ];
+    }
+    return [ overview ];
+  }
+
+  function handleJouleAction() {}
+
+  function refreshJoule() {
+    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "Identity & Access");
+    const base = jouleFramesFor(currentStepId());
+    const frames = base.concat(jouleExtra.map(f => ({ ...f, autoplay: f.autoplay !== undefined ? f.autoplay : true })));
+    window.JOULE.loadSequence(frames, handleJouleAction);
+    window.JOULE.setIntentRouter(itIntentRouter);
+    window.JOULE.setSuggestions(itSuggestionsFor(currentStepId()));
+  }
+
+  function itSuggestionsFor(step) {
+    switch (step) {
+      case "console":     return ["Any high-severity alerts?", "System health status?"];
+      case "alertDetail": return ["What did I observe?", "What's paused downstream?"];
+      case "queue":       return ["Which task is paused?", "Show dependencies"];
+      case "diagnose":    return ["Can you auto-resolve?", "Who should decide?"];
+      case "receipt":     return ["What's in the routing note?"];
+      default: return [];
+    }
+  }
+
+  function itIntentRouter(userText) {
+    const t = userText.toLowerCase();
+    const s = window.GMA.loadState();
+    if (/high|severity|urgent|alert/.test(t)) {
+      if (s.provisioningIssue && !s.iasConflictResolved) return { html: `1 <strong>high</strong>: identity provisioning on Lin Chen's move (EXEC-04) needs human review — 4 downstream tasks paused. Plus 1 medium and 1 low.`, sources: 2 };
+      return { html: `No high-severity alerts. 1 medium (IPS sync lag), 1 low (SSO cert expiring).`, sources: 1 };
+    }
+    if (/system|health|tenant/.test(t)) {
+      return { html: `Identity (target region) is currently <strong>degraded</strong> with 1 case awaiting human review. All other components healthy.`, sources: 1 };
+    }
+    if (/observed|what.*happen|why.*paused|multi|candidate|record/.test(t)) {
+      return { html: `Automated identity mapping returned multiple candidate records for user 'lin.chen'. Whether they represent the same person is a determination for the Identity governance team — I don't infer that from record presence alone.`, sources: 2 };
+    }
+    if (/downstream|block|depend|graph|paused/.test(t)) {
+      return { html: `EXEC-04 is holding <span class="mono">EXEC-05, EXEC-06, EXEC-07, EXEC-08</span> — attribute sync, access role changes, and first-login verification. All resume only after the governance decision <em>and</em> target-side verification.`, sources: 1 };
+    }
+    if (/auto|automatic|resolve|for me|do it|merge/.test(t)) {
+      return { html: `<strong>I don't auto-resolve this class of case.</strong> Identity linkage across regions is a governance decision, and any cross-border implications belong to qualified specialists. I surface observations and route — I don't propose an operational path.`, sources: 2 };
+    }
+    if (/who|owner|decide|responsible/.test(t)) {
+      return { html: `The Identity governance team owns the linkage decision. Any data-protection or cross-border implications should be assessed by Legal / Privacy specialists — not by this tool.`, sources: 1 };
+    }
+    if (/receipt|submit|close|route|routing/.test(t)) {
+      if (!s.iasConflictResolved) return { html: `Not yet — route the case to governance first.`, sources: 1 };
+      return { html: `Routing note draft is ready. It records: case routed to Identity governance, downstream tasks remain paused, alert stays open pending decision + target-side verification. Sign off to log the routing to HR.`, sources: 1 };
+    }
+    return null;
+  }
+
+
+  function refreshBadges() {
+    const s = window.GMA.loadState();
+    let n = D.alerts.filter(a => !a.primary).length;
+    if (s.executionStarted && s.provisioningIssue && !s.iasConflictResolved) n += 1;
+    window.TOPBAR.setNotifBadge(n);
+  }
+
+  window.addEventListener("hashchange", renderView);
+  window.GMA.onStateChange(renderView);
+  window.GMA.loadState();
+  renderView();
+  </script>
+</body>
+</html>

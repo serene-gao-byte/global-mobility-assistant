@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talent Operations · Global Mobility Assistant</title>
+  <link rel="stylesheet" href="shared/tokens.css" />
+  <link rel="stylesheet" href="shared/shell.css" />
+  <link rel="stylesheet" href="shared/joule.css" />
+  <style>
+    .journey-nav { display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 10px 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 8px; margin-bottom: 16px; align-items: center; }
+    .journey-nav .step { padding: 5px 10px; border-radius: 6px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; user-select: none; transition: background 0.12s, color 0.12s; }
+    .journey-nav .step:hover { background: #E8F4F5; color: var(--sap-teal); }
+    .journey-nav .step:active { transform: scale(0.98); }
+    .journey-nav .step.active { background: var(--sap-teal); color: #fff; font-weight: 600; }
+    .journey-nav .step.done { color: var(--status-green); }
+    .journey-nav .step.pending { opacity: 0.9; }
+    .journey-nav .step.pending:hover { opacity: 1; background: #E8F4F5; color: var(--sap-teal); }
+    .journey-nav .step .n { width: 18px; height: 18px; border-radius: 50%; background: #EEF1F4; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
+    .journey-nav .step.active .n { background: rgba(255,255,255,0.25); color: #fff; }
+    .journey-nav .step.done .n { background: var(--status-green); color: #fff; }
+    .journey-nav .sep { color: var(--border-mid); align-self: center; font-size: 11px; }
+    .breadcrumb { color: var(--text-secondary); font-size: 12px; margin-bottom: 12px; }
+    .breadcrumb a { color: var(--sap-blue); cursor: pointer; }
+    .queue-row { cursor: pointer; }
+    .queue-row.selected { background: #E8F4F5 !important; }
+    .queue-row.readonly { cursor: default; opacity: 0.75; }
+    .queue-row.readonly:hover td { background: #FAFBFC; }
+    .queue-row .flag { background: #FBE7E4; color: var(--status-red); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 6px; }
+    .preview-tag { display: inline-block; background: #EEF1F4; color: var(--text-muted); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 6px; letter-spacing: 0.2px; }
+
+    .expert-panel {
+      background: #FDF6FE; border: 1px solid var(--joule-purple-border);
+      border-left: 4px solid var(--joule-purple);
+      border-radius: 6px; padding: 14px 16px; margin-top: 12px;
+    }
+    .expert-panel .exp-title { font-weight: 600; color: var(--joule-purple-dark); font-size: 13px; margin-bottom: 6px; }
+    .expert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(0,0,0,0.06); font-size: 13px; }
+    .expert-row:last-child { border-bottom: none; }
+    .expert-row .exp-name { font-weight: 500; }
+    .expert-row .exp-note { color: var(--text-muted); font-size: 12px; }
+    .avail-tag { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .avail-tag.available   { background: var(--status-green-bg); color: var(--status-green); }
+    .avail-tag.constrained { background: var(--status-yellow-bg); color: var(--status-yellow); }
+    .avail-tag.busy        { background: var(--status-red-bg); color: var(--status-red); }
+
+    .signal-card {
+      background: #FEF6E6; border: 1px solid #F0D797; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 16px;
+    }
+    .signal-card .s-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .signal-card .s-title { font-weight: 600; color: #6B4C00; }
+    .signal-card .s-body { font-size: 13px; color: #6B4C00; }
+  </style>
+</head>
+<body class="role-hrbp">
+  <div id="topbarSlot"></div>
+
+  <div class="app-shell">
+    <main class="main-area joule-open" id="mainArea">
+      <div class="journey-nav" id="journeyNav"></div>
+      <div id="viewContainer"></div>
+    </main>
+  </div>
+
+  <div id="jouleSlot"></div>
+
+  <div class="global-footer">
+    非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行 &nbsp;|&nbsp; Not an SAP official product · Learning prototype · Fictional data & simulated execution
+  </div>
+
+  <script src="shared/state.js"></script>
+  <script src="shared/topbar.js"></script>
+  <script src="shared/joule.js"></script>
+  <script src="data/hrbp-data.js"></script>
+  <script>
+  const D = window.HRBP_DATA;
+  document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("hrbp");
+  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("hrbp", "Joule · Talent Operations");
+
+  const STEPS = [
+    { id: "inbox",     n: 1, label: "Move requests" },
+    { id: "detail",    n: 2, label: "Request detail" },
+    { id: "impact",    n: 3, label: "Impact review" },
+    { id: "edit",      n: 4, label: "Edit request" },
+    { id: "approvals", n: 5, label: "Approvals" },
+    { id: "handoff",   n: 6, label: "Handoff" }
+  ];
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function pill(cls, text) { return `<span class="pill ${cls}">${esc(text)}</span>`; }
+  const jouleCtl = window.JOULE.bindJouleShell();
+  let jouleExtra = [];
+
+  function currentStepId() {
+    const h = (location.hash || "#inbox").replace("#","");
+    return STEPS.find(s => s.id === h) ? h : "inbox";
+  }
+
+  function stepStatus(stepId) {
+    const s = window.GMA.loadState();
+    const order = STEPS.map(x => x.id);
+    const currentIdx = order.indexOf(currentStepId());
+    const idx = order.indexOf(stepId);
+    if (stepId === "approvals" && s.approvalsSubmitted) return "done";
+    if (stepId === "handoff" && (s.iasConflictResolved || (s.executionStarted && !s.provisioningIssue))) return "done";
+    if (idx < currentIdx) return "done";
+    if (idx === currentIdx) return "active";
+    return "pending";
+  }
+
+  function renderNav() {
+    const nav = document.getElementById("journeyNav");
+    nav.innerHTML = "";
+    STEPS.forEach((step, i) => {
+      const status = stepStatus(step.id);
+      const el = document.createElement("div");
+      el.className = "step " + status;
+      el.innerHTML = `<span class="n">${status === "done" ? "✓" : step.n}</span><span>${esc(step.label)}</span>`;
+      el.addEventListener("click", () => { location.hash = "#" + step.id; });
+      nav.appendChild(el);
+      if (i < STEPS.length - 1) {
+        const sep = document.createElement("span");
+        sep.className = "sep"; sep.textContent = "›";
+        nav.appendChild(sep);
+      }
+    });
+  }
+
+  // ============ Views ============
+  function view_inbox() {
+    return `
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Move Requests · Inbox</h1>
+          <div class="page-sub">Queue view · click a request to open its detail</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" id="btnRefresh">🔄 Refresh</button>
+          <button class="btn outlined" id="btnResetAll">↺ Reset demo</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 1 · Move requests.</b> Your active queue. Joule flags anomalies — key-field changes that invalidate existing sign-offs, or specialist bottlenecks.</div>
+      </div>
+
+      ${renderSignalCards()}
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">My move request queue</h2>
+          <div class="card-sub">4 active requests · 1 high priority</div></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <table class="data-table" id="queueTable">
+          <thead><tr><th>Request ID</th><th>Employee</th><th>Route</th><th>Stage</th><th>Priority</th></tr></thead>
+          <tbody>
+            ${D.queue.map(q => `<tr class="queue-row ${q.primary ? "selected" : "readonly"}" data-req="${esc(q.id)}">
+              <td class="mono">${esc(q.id)}${q.primary ? "" : ' <span class="preview-tag">read-only preview</span>'}</td>
+              <td>${esc(q.employee)}${q.flag === "key-field-change" ? '<span class="flag">key-field change</span>' : ""}</td>
+              <td>${esc(q.route)}</td>
+              <td>${esc(q.stage)}</td>
+              <td>${pill(q.priority === "high" ? "red" : q.priority === "medium" ? "yellow" : "grey", q.priority)}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderSignalCards() {
+    const s = window.GMA.loadState();
+    const sigs = (s.signals || []).filter(sig => sig.to === "hrbp" && !sig.acked);
+    if (!sigs.length) return "";
+    return sigs.map(sig => `
+      <div class="signal-card">
+        <div class="s-header">
+          <div class="s-title">📨 Signal from employee · ${esc(sig.summary)}</div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <div class="s-body">
+          Sender: <b>${esc(sig.from === "employee" ? "林晨 (Lin Chen)" : sig.from)}</b> · Kind: <span class="chip">${esc(sig.kind)}</span>
+          <div class="mt-8 muted">The employee's exact wording is kept private in their record. This is a flag, not a commitment. Reach out to them before making any change.</div>
+          <div class="row mt-16">
+            <div class="spacer"></div>
+            <button class="btn outlined sm" data-ack-sig="${esc(sig.timestamp)}">Reach out & acknowledge</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function view_detail() {
+    const s = window.GMA.loadState();
+    const l = D.linChen;
+    const versionLabel = s.v2Generated ? "v2 · pending re-confirmation" : (s.invalidatedByEdit ? "v1 · invalidated" : "v1 · confirmed 2026-09-05");
+    const versionCls = s.v2Generated ? "yellow" : (s.invalidatedByEdit ? "red" : "green");
+
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <b>${esc(l.name)}</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">${esc(l.name)} · ${esc(l.posTitle)}</h1>
+          <div class="page-sub">${esc(l.sourceEntity)} → ${esc(l.targetEntity)} · ${pill(versionCls, versionLabel)}</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#inbox'">← Back to inbox</button>
+          <button class="btn primary" onclick="location.hash='#impact'">Impact review →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 2 · Request detail.</b> Structured Move Request. When you edit a key field, Joule flags who needs to re-confirm.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Move Request · ${esc(s.moveRequestId)}</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <ul class="kv-list">
+          <li><span class="k">Employee</span><span class="v">${esc(l.name)} · ${esc(l.empId)}</span></li>
+          <li><span class="k">Application / Requisition</span><span class="v mono">${esc(l.appId)} · ${esc(l.reqId)}</span></li>
+          <li><span class="k">Route</span><span class="v">${esc(l.sourceEntity)} → ${esc(l.targetEntity)}</span></li>
+          <li><span class="k">Current manager</span><span class="v">${esc(l.sourceManager)}</span></li>
+          <li><span class="k">Target manager</span><span class="v">${esc(l.targetManager)}</span></li>
+          <li><span class="k">Effective date</span><span class="v">${esc(s.effectiveDate)} <span class="chip">key field</span></span></li>
+          <li><span class="k">v1 approved by</span><span class="v">${l.v1ApprovedBy.map(esc).join(" · ")}</span></li>
+        </ul>
+      </div>
+    `;
+  }
+
+  function view_impact() {
+    const s = window.GMA.loadState();
+    const routed = s.specialistsRouted || {};
+    const stateMap = {
+      "verified-sim": ["green","Verified (sim)"],
+      "pending":      ["yellow","Pending"],
+      "blocked":      ["red","Blocked"],
+      "n/a":          ["grey","N/A"]
+    };
+
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Impact review</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Impact review · route specialists</h1>
+          <div class="page-sub">Cross-system checklist · assign items with pending status to specialists</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#detail'">← Back</button>
+          <button class="btn primary" onclick="location.hash='#edit'">Continue to edit request →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 3 · Impact review.</b> Nine items across systems. Joule sees who's available for each specialist type — try routing one and watch how it recommends.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Cross-system impact checklist</h2>
+          <div class="card-sub">Unknown does not default to pass · items with a specialist type have a Route button</div></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Area</th><th>Status</th><th>Owner</th><th>Action</th></tr></thead>
+          <tbody>
+            ${D.impactChecklist.map(x => {
+              const [pcls, plabel] = stateMap[x.status] || ["grey", x.status];
+              const isRouted = x.specialistKey && routed[x.specialistKey];
+              const action = x.specialistKey
+                ? (isRouted ? pill("green","Routed") : `<button class="btn outlined sm" data-route="${esc(x.specialistKey)}">Route to specialist</button>`)
+                : `<span class="muted">—</span>`;
+              return `<tr>
+                <td>${esc(x.area)}<div class="muted small mt-8">${esc(x.verify)}</div></td>
+                <td>${pill(pcls, plabel)}</td>
+                <td>${esc(x.owner)}</td>
+                <td>${action}</td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function view_edit() {
+    const s = window.GMA.loadState();
+    const alertHTML = s.invalidatedByEdit && !s.v2Generated
+      ? `<div class="info-strip danger"><span class="i-icon">!</span><div><b>v1 confirmation invalidated.</b> Use Joule (right side) to generate v2 and notify approvers.</div></div>`
+      : s.v2Generated
+      ? `<div class="info-strip warn"><span class="i-icon">!</span><div><b>Move Request v2 generated.</b> Re-confirmation requests sent to 3 approvers (simulated). Approvals will unlock after re-confirmation.</div></div>`
+      : "";
+
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Edit request</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Change key field</h1>
+          <div class="page-sub">Modifying the effective date will invalidate existing sign-offs and require re-confirmation</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#impact'">← Back</button>
+          <button class="btn primary" onclick="location.hash='#approvals'">Continue to approvals →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 4 · Edit request.</b> Changing a key field notifies Joule, which explains who's affected and proposes a re-confirmation flow.</div>
+      </div>
+
+      ${alertHTML}
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Effective date</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <div class="row wrap">
+          <span class="k" style="width:auto;">Current value:</span>
+          <input id="effDateInput" type="date" value="${esc(s.effectiveDate)}" style="padding:6px 10px; border:1px solid var(--border-mid); border-radius:4px; font-family:inherit; font-size:13px;" />
+          <button class="btn primary sm" id="applyEffDate">Apply change</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function view_approvals() {
+    const s = window.GMA.loadState();
+    const rows = D.approvals.map(a => {
+      let st = a.status;
+      let ver = a.version;
+      if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("EC")) st = "blocked — v1 invalidated";
+      if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("MDF")) st = "blocked — v1 invalidated";
+      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = "awaiting v2 re-confirmation"; }
+      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = "awaiting v2 re-confirmation"; }
+      if (s.approvalsSubmitted && a.status.startsWith("pending")) st = "submitted (sim)";
+      const cls = st.startsWith("approved") ? "green" : st.startsWith("blocked") ? "red" : st.startsWith("submitted") ? "blue" : "yellow";
+      return `<tr>
+        <td>${esc(a.flow)}</td><td>${esc(ver)}</td><td>${pill(cls, st)}</td><td class="muted">${esc(a.owners)}</td>
+      </tr>`;
+    }).join("");
+
+    const canSubmit = !s.invalidatedByEdit && !s.approvalsSubmitted;
+    const canTrigger = s.approvalsSubmitted && !s.executionStarted;
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Approvals</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Approval streams</h1>
+          <div class="page-sub">Recruiting/Offer vs EC/MDF are separate flows · Approval version is bound to Move Request version</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#edit'">← Back</button>
+          <button class="btn primary" onclick="location.hash='#handoff'">Go to handoff →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 5 · Approvals.</b> Submit approvals · trigger execution when approved · watch IT-side progress in the milestone track.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Approval streams</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Flow</th><th>Version</th><th>Status</th><th>Owners</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="row mt-16">
+          <div class="spacer"></div>
+          <button class="btn primary" id="btnSubmitApprovals" ${canSubmit ? "" : "disabled"}>Submit EC + MDF approvals</button>
+          <button class="btn outlined" id="btnTriggerExec" ${canTrigger ? "" : "disabled"}>Trigger execution →</button>
+        </div>
+        <div class="info-strip warn mt-16" style="margin-bottom:0">
+          <span class="i-icon">!</span>
+          <div>Chat confirmation ≠ approval. HR cannot one-click "confirm compliance". Specialist review outcomes come from specialists themselves.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Related · Performance Preparation Agent</h2>
+          <div class="card-sub">Reference only · not rebuilt in this prototype</div></div>
+          <span class="cap-tag ai">原生 AI 功能模拟</span>
+        </div>
+        <ul class="kv-list">
+          <li><span class="k">Used by</span><span class="v">${esc(D.performancePrepAgent.for)}</span></li>
+          <li><span class="k">Purpose</span><span class="v">${esc(D.performancePrepAgent.purpose)}</span></li>
+        </ul>
+        <div class="info-strip mt-16" style="margin-bottom:0">
+          <span class="i-icon">i</span>
+          <div>${esc(D.performancePrepAgent.note)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function view_handoff() {
+    const s = window.GMA.loadState();
+    if (!s.executionStarted) {
+      return `
+        <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Handoff</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div><b>Step 6 · Handoff.</b> Not yet available. This section unlocks after execution completes (or partially completes).</div></div>
+      `;
+    }
+    const routed = s.iasConflictResolved;   // IT case routed to governance (not resolved)
+    const stillOpen = s.provisioningIssue && !routed;
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Handoff</b></div>
+
+      <div class="conclusion-banner">
+        <div class="cb-icon">!</div>
+        <div>
+          <div class="cb-title">${stillOpen
+            ? "Handoff in progress · IT case awaiting review"
+            : "Handoff in progress · Awaiting target-side verification"}</div>
+          <div class="cb-sub">${stillOpen
+            ? `IT team has surfaced an identity case for governance review. No HR action right now — the case is with the Identity governance team.`
+            : `Some items are submitted but not yet verified on the target side. The move is not marked complete until verification is received and blocked items (e.g., country-specific retention) are resolved by qualified specialists.`}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Handoff summary</h2></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <div class="three-col">
+          <div class="handoff-col done">
+            <h4>✓ Confirmed</h4>
+            <ul>
+              <li>Source employment closed + new employment record created<span class="sub">Person link preserved</span></li>
+              <li>Position assignment<span class="sub">POS-ME-SC-14</span></li>
+              <li>Recruiting Offer approval<span class="sub">Offer v2 · approved by Hiring Manager</span></li>
+              <li>MDF supplemental records<span class="sub">Retention flags applied</span></li>
+            </ul>
+          </div>
+          <div class="handoff-col progress">
+            <h4>⏳ Submitted · awaiting verification</h4>
+            <ul>
+              ${stillOpen
+                ? `<li>Identity provisioning<span class="sub">Case with Identity governance team · not closed by this tool</span></li>`
+                : `<li>Identity provisioning<span class="sub">Routed for review · target-side verification pending</span></li>`}
+              <li>Payroll ME first cycle<span class="sub">Scheduled end of November · verification after first run</span></li>
+            </ul>
+          </div>
+          <div class="handoff-col paused">
+            <h4>📋 Awaiting others</h4>
+            <ul>
+              <li>Data-protection consent<span class="sub">Employee to sign · applicable framework to be confirmed by Legal</span></li>
+              <li>Country-specific retention<span class="sub">Blocked — qualified specialists to evaluate</span></li>
+              <li>Onboarding buddy<span class="sub">Anna in week 1</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="evidence-row" style="background:#F7F8FA; border:1px solid var(--border-soft); border-radius:6px; padding:12px 16px; font-size:12px; color:var(--text-secondary);">
+        <b>Handoff record IDs:</b>
+        <span class="mono" style="padding:0 4px;">${esc(s.applicationId)}</span> ·
+        <span class="mono" style="padding:0 4px;">${esc(s.reqId)}</span> ·
+        <span class="mono" style="padding:0 4px;">${esc(s.moveRequestId)}</span>
+      </div>
+    `;
+  }
+
+  // ============ Render + bind ============
+  function renderView() {
+    const step = currentStepId();
+    const view = { inbox: view_inbox, detail: view_detail, impact: view_impact, edit: view_edit, approvals: view_approvals, handoff: view_handoff }[step];
+    document.getElementById("viewContainer").innerHTML = view();
+    bindViewInteractions(step);
+    renderNav();
+    refreshJoule();
+    refreshBadges();
+  }
+
+  function bindViewInteractions(step) {
+    document.getElementById("btnRefresh")?.addEventListener("click", renderView);
+    document.getElementById("btnResetAll")?.addEventListener("click", () => { window.GMA.resetState(); jouleExtra = []; renderView(); });
+
+    if (step === "inbox") {
+      document.querySelectorAll(".queue-row").forEach(r => {
+        r.addEventListener("click", () => {
+          const id = r.getAttribute("data-req");
+          if (id === "DEMO-REQ-2026-MV-0071") location.hash = "#detail";
+          // Non-primary rows are read-only preview — no action, tag already shows why
+        });
+      });
+      document.querySelectorAll("[data-ack-sig]").forEach(b => {
+        b.addEventListener("click", () => {
+          const ts = b.getAttribute("data-ack-sig");
+          window.GMA.mutateState(x => {
+            const sig = x.signals.find(s => s.timestamp === ts);
+            if (sig) sig.acked = true;
+          }, "hrbp-acked-signal");
+          jouleExtra.push({ role: "bot", html: `Signal acknowledged. In a real product this would open a scheduling flow to reach out to the employee — no automated commitment on their behalf.`, sources: 1 });
+          renderView();
+        });
+      });
+    }
+
+    if (step === "impact") {
+      document.querySelectorAll("[data-route]").forEach(b => {
+        b.addEventListener("click", () => {
+          const key = b.getAttribute("data-route");
+          window.GMA.mutateState(x => { x.specialistsRouted[key] = true; }, "hrbp-routed-specialist");
+          // Recommendation follows: responsibility → qualification → authorization → capacity
+          const experts = D.experts[key];
+          if (experts) {
+            const recommended = experts.candidates.find(c => c.availability === "available") || experts.candidates[0];
+            jouleExtra.push({
+              role: "user", autoplay: true, delay: 300,
+              text: "Route this to a specialist."
+            });
+            jouleExtra.push({
+              role: "bot",
+              html: `<strong>Recommendation, not a decision.</strong> Among candidates who cover this responsibility, hold the required qualification, and are authorized for this employee's scope, I found <strong>${esc(recommended.name)}</strong>. Their current status: ${esc(recommended.availability)} · ${esc(recommended.note)}. You decide whether to send the request to them.`,
+              sources: 2
+            });
+          }
+          renderView();
+        });
+      });
+    }
+
+    if (step === "edit") {
+      document.getElementById("applyEffDate")?.addEventListener("click", () => {
+        const newVal = document.getElementById("effDateInput").value;
+        const s = window.GMA.loadState();
+        if (!newVal || newVal === s.effectiveDate) return;
+        const oldVal = s.effectiveDate;
+        window.GMA.mutateState(x => {
+          x.effectiveDate = newVal;
+          x.invalidatedByEdit = true;
+          x.v2Generated = false;
+          x.approvalsSubmitted = false;
+        }, "hrbp-changed-effective-date");
+        addEditExchange(oldVal, newVal);
+        jouleCtl.open();
+        renderView();
+      });
+    }
+
+    if (step === "approvals") {
+      document.getElementById("btnSubmitApprovals")?.addEventListener("click", () => {
+        window.GMA.mutateState(x => { x.approvalsSubmitted = true; }, "hrbp-submitted-approvals");
+        jouleExtra.push({ role: "bot", html: `Approvals submitted. Once confirmed, you can trigger execution.`, sources: 1 });
+        renderView();
+      });
+      document.getElementById("btnTriggerExec")?.addEventListener("click", () => {
+        window.GMA.mutateState(x => { x.executionStarted = true; x.provisioningIssue = true; }, "hrbp-triggered-execution");
+        jouleExtra.push({ role: "bot", html: `Execution triggered. IT team picking up provisioning. I'll notify you if they flag anything.`, sources: 1 });
+        renderView();
+      });
+    }
+  }
+
+  // ============ Joule (HRBP) with autoplay pacing ============
+  function addEditExchange(oldDate, newDate) {
+    jouleExtra.push({ role: "user", autoplay: true, delay: 400,
+      text: `Change effective date from ${oldDate} to ${newDate}.` });
+    jouleExtra.push({
+      role: "bot", autoplay: false, continueLabel: "▸ Show impact of this change",
+      html: `Detected <strong>key-field change</strong>. This invalidates Move Request v1. <strong>3 approvers</strong> need to re-confirm:<ul><li>HRBP (source · you) · v1 cleared</li><li>Payroll ME · check payroll cutoff impact on ${esc(newDate)}</li><li>Global Mobility · check relocation + visa timing impact</li></ul><strong>To check separately:</strong> Recruiting Offer v2 — whether the date change affects the Offer depends on its content and applicable flow; please confirm with the hiring manager rather than assuming no impact.<br><br>Generate <strong>Move Request v2</strong> and notify the 3 approvers?`,
+      actions: [
+        { label: "✓ Generate v2 & notify 3 approvers", kind: "primary", event: "generate-v2" },
+        { label: "✗ Cancel change · revert to " + oldDate, event: "cancel-change", meta: oldDate }
+      ],
+      sources: 3
+    });
+  }
+
+  function jouleFramesFor(step) {
+    const s = window.GMA.loadState();
+    const hasSignal = (s.signals||[]).some(x => x.to === "hrbp" && !x.acked);
+    const overview = { role: "bot", autoplay: true, delay: 300,
+      html: `Good morning, Mira. 4 open requests · 1 high priority (Lin Chen).${hasSignal ? " <strong>You have a new signal from an employee.</strong>" : ""}`, sources: 2 };
+    if (step === "inbox") {
+      const frames = [overview];
+      if (hasSignal) {
+        frames.push({ role: "bot", autoplay: false, continueLabel: "▸ Explain the signal",
+          html: `The employee flagged a possible timing adjustment. Her exact wording stays private — you see only the flag. Reach out before making any changes.`, sources: 1 });
+      }
+      return frames;
+    }
+    if (step === "detail") return [overview,
+      { role: "bot", autoplay: true, delay: 600,
+        html: `Lin Chen's Move Request is in <strong>${s.invalidatedByEdit && !s.v2Generated ? "v1 invalidated" : (s.v2Generated ? "v2 pending re-confirmation" : "v1 confirmed")}</strong>. All expected fields present.`, sources: 1 }];
+    if (step === "impact") return [overview,
+      { role: "bot", autoplay: true, delay: 700,
+        html: `9-item cross-system checklist. 3 items have specialist routing available.`, sources: 2 },
+      { role: "bot", autoplay: false, continueLabel: "▸ How I filter recommendations",
+        html: `I recommend, you decide. My filter is <strong>responsibility → qualification → authorization → capacity</strong>: first the specialist type must cover the responsibility, then hold the required qualification, then be authorized for this employee's scope; among the remaining candidates I surface current capacity as one signal. Try routing "Payroll & benefits" to see this in action.`, sources: 2 }];
+    if (step === "edit") return [overview,
+      { role: "bot", autoplay: true, delay: 500,
+        html: `Change the effective date on the left. I'll show you exactly who needs to re-sign, and who is not affected.`, sources: 1 }];
+    if (step === "approvals") return [overview,
+      { role: "bot", autoplay: true, delay: 500,
+        html: `Three separate approval streams (Recruiting/EC/MDF). I don't approve on your behalf — but I catch cases where a field change invalidates an existing sign-off.`, sources: 1 }];
+    if (step === "handoff") {
+      const delayed = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved;
+      return [overview,
+        { role: "bot", autoplay: true, delay: 500,
+          html: delayed ? `IT is working on a provisioning issue. Employee sees a soft "in progress" note only. No HR action.` : (s.executionStarted ? `Handoff complete.` : `Not yet — waiting on execution.`), sources: 1 }];
+    }
+    return [overview];
+  }
+
+  function handleJouleAction(ev, meta) {
+    if (ev === "generate-v2") {
+      window.GMA.mutateState(x => { x.v2Generated = true; }, "hrbp-generated-v2");
+      jouleExtra.push({ role: "user", autoplay: true, delay: 300, text: "Generate v2 and notify them." });
+      jouleExtra.push({ role: "bot", autoplay: true, delay: 700,
+        html: `Done. Move Request v2 draft created; re-confirmation requests sent to 3 approvers.`, sources: 2 });
+      renderView();
+    } else if (ev === "cancel-change") {
+      window.GMA.mutateState(x => { x.effectiveDate = meta; x.invalidatedByEdit = false; x.v2Generated = false; }, "hrbp-cancelled-change");
+      jouleExtra.push({ role: "bot", autoplay: true, delay: 500,
+        html: `Reverted. v1 confirmation stays valid.`, sources: 1 });
+      renderView();
+    } else if (ev === "goto-impact") { location.hash = "#impact"; }
+    else if (ev === "goto-edit") { location.hash = "#edit"; }
+    else if (ev === "goto-approvals") { location.hash = "#approvals"; }
+  }
+
+  function refreshJoule() {
+    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "Talent Ops");
+    const base = jouleFramesFor(currentStepId());
+    const frames = base.concat(jouleExtra.map(f => ({ ...f, autoplay: f.autoplay !== undefined ? f.autoplay : true })));
+    window.JOULE.loadSequence(frames, handleJouleAction);
+    window.JOULE.setIntentRouter(hrbpIntentRouter);
+    window.JOULE.setSuggestions(hrbpSuggestionsFor(currentStepId()));
+  }
+
+  function hrbpSuggestionsFor(step) {
+    switch (step) {
+      case "inbox":     return ["What's high priority today?", "Any signals from employees?"];
+      case "detail":    return ["What's the version status?", "Who signed v1?"];
+      case "impact":    return ["Who should review payroll?", "Which items are blocked?"];
+      case "edit":      return ["What happens if I change the date?"];
+      case "approvals": return ["Can I submit approvals now?", "What blocks EC workflow?"];
+      case "handoff":   return ["Any IT-side issues?", "Anything left for me?"];
+      default: return [];
+    }
+  }
+
+  function hrbpIntentRouter(userText) {
+    const t = userText.toLowerCase();
+    const s = window.GMA.loadState();
+    if (/priority|urgent|high|today/.test(t)) {
+      return { html: `<strong>Lin Chen (Shanghai → Riyadh)</strong> is your only high-priority item. 3 medium/low requests are on track. ${(s.signals||[]).some(x=>x.to==="hrbp"&&!x.acked) ? "You also have <strong>1 employee signal</strong> in your inbox." : ""}`, sources: 2 };
+    }
+    if (/signal|employee.*(note|flag|message)/.test(t)) {
+      const has = (s.signals||[]).some(x=>x.to==="hrbp"&&!x.acked);
+      return { html: has ? `Yes — Lin Chen flagged a possible timing adjustment. You'll see the yellow card on top of the inbox. <strong>Her exact wording stays private</strong>; I only show you the abstract flag.` : `No open signals right now.`, sources: 1 };
+    }
+    if (/version|v1|v2|invalidat/.test(t)) {
+      const label = s.v2Generated ? "v2 pending re-confirmation" : s.invalidatedByEdit ? "v1 invalidated" : "v1 confirmed";
+      return { html: `Move Request is currently <strong>${label}</strong>. ${s.v2Generated ? "3 approvers were re-notified." : s.invalidatedByEdit ? "You need to generate v2 before approvals can resume." : "All 3 approvers signed."}`, sources: 1 };
+    }
+    if (/payroll|route|specialist|expert|assign/.test(t)) {
+      return { html: `For Payroll &amp; benefits, my recommendation follows <strong>responsibility → qualification → authorization → capacity</strong>. Among candidates who cover the responsibility and hold authorization, Payroll ME currently has 3 items pending; Global Mobility (Nikola) is available. My suggestion is Global Mobility first — but this is a recommendation, you make the call.`, actions: [{ label: "Open Impact review", event: "goto-impact" }], sources: 2 };
+    }
+    if (/block|stuck|wait/.test(t)) {
+      return { html: `DRTM (country-specific retention) is marked <strong>Blocked</strong> — requires a Saudi-specific decision, out of demo scope. Everything else is pending or verified.`, sources: 1 };
+    }
+    if (/submit|approve|approval/.test(t)) {
+      if (s.invalidatedByEdit && !s.v2Generated) return { html: `Not yet — v1 is invalidated. Generate v2 first.`, sources: 1 };
+      if (s.approvalsSubmitted) return { html: `Already submitted. You can trigger execution when ready.`, sources: 1 };
+      return { html: `Yes — Move Request is in a submittable state. EC + MDF flows are ready.`, actions: [{ label: "Open Approvals", event: "goto-approvals" }], sources: 1 };
+    }
+    if (/it|technical|conflict|ias/.test(t)) {
+      if (s.provisioningIssue && !s.iasConflictResolved) return { html: `IT surfaced an identity mapping case for governance review. It is with the Identity governance team — no HR action while it is under review. Employee sees only a soft "awaiting verification" note.`, sources: 1 };
+      if (s.iasConflictResolved) return { html: `IT routed the identity case for governance review. Handoff is <strong>not</strong> marked complete until the governance decision is recorded and target-side verification comes back.`, sources: 1 };
+      return { html: `No IT-side issues right now.`, sources: 1 };
+    }
+    if (/change.*(date|effective)|key.*field/.test(t)) {
+      return { html: `Changing the effective date will invalidate v1 and require 3 approvers to re-confirm. I'll name exactly who is affected and what stays valid.`, actions: [{ label: "Open Edit request", event: "goto-edit" }], sources: 1 };
+    }
+    return null;
+  }
+
+
+  function refreshBadges() {
+    const s = window.GMA.loadState();
+    let n = D.queue.length;
+    if (s.invalidatedByEdit && !s.v2Generated) n += 1;
+    n += (s.signals || []).filter(x => x.to === "hrbp" && !x.acked).length;
+    window.TOPBAR.setNotifBadge(n);
+  }
+
+  window.addEventListener("hashchange", renderView);
+  window.GMA.onStateChange(renderView);
+  window.GMA.loadState();
+  renderView();
+  </script>
+</body>
+</html>

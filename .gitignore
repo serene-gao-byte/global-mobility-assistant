@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Windows Office lock files (opened .xlsx/.docx create these)
+~$*
+
+# Temporary / build artifacts
+*.log
+*.tmp
+node_modules/
+dist/
+build/
+
+# Local environment / secrets (not used in this project, but guarded by default)
+.env
+.env.local
+*.pem
+*.key

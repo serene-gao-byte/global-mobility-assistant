@@ -1,0 +1,79 @@
+/* ============================================================
+   Global Mobility Assistant — SAP Horizon design tokens
+   Extracted from SAP_SuccessFactors.potx theme (structural only).
+   Not for redistribution of SAP brand assets.
+============================================================ */
+
+:root {
+  /* ---- SAP Horizon palette ---- */
+  --sap-blue: #0070F2;          /* primary CTA / links */
+  --sap-blue-hover: #0854A0;
+  --sap-blue-2: #1B90FF;        /* sky blue accent */
+  --sap-navy: #00144A;          /* top bar */
+  --sap-navy-2: #002A86;
+  --sap-teal: #049F9A;          /* "SUCCESS MAP" tone / decorative */
+  --sap-teal-dark: #07838F;
+
+  /* Joule */
+  --joule-purple: #5D36FF;
+  --joule-purple-hover: #4B27E0;
+  --joule-purple-2: #7858FF;
+  --joule-purple-soft: #F1EDFE;
+  --joule-purple-border: #DCD0FA;
+  --joule-purple-dark: #28004A;
+
+  /* Status */
+  --status-green: #188918;
+  --status-green-2: #36A41D;
+  --status-green-bg: #E6F4E6;
+  --status-yellow: #8A6100;
+  --status-yellow-bg: #FDF3D6;
+  --status-red: #B0271A;
+  --status-red-bg: #FBE7E4;
+  --status-grey: #556677;
+  --status-grey-bg: #EEF1F4;
+
+  /* Neutrals */
+  --text-primary: #12171C;
+  --text-secondary: #556677;
+  --text-muted: #8A94A6;
+  --bg-page: #F5F6F7;
+  --bg-card: #FFFFFF;
+  --bg-strip: #EAF3FD;
+  --border-soft: #E4E7EB;
+  --border-mid: #C9CFD6;
+
+  /* Capability tag palette */
+  --tag-native: #34495E;
+  --tag-native-bg: #E7ECF1;
+  --tag-ai: var(--joule-purple);
+  --tag-ai-bg: var(--joule-purple-soft);
+  --tag-ext: #B04A0B;
+  --tag-ext-bg: #FDECDD;
+
+  /* Role accent — used to distinguish employee / HRBP / IT */
+  --role-employee: #0070F2;
+  --role-hrbp: #049F9A;
+  --role-it: #5D36FF;
+
+  --radius-card: 8px;
+  --radius-btn: 4px;
+  --shadow-card: 0 1px 2px rgba(0,20,74,0.05), 0 1px 3px rgba(0,20,74,0.04);
+
+  /* SAP 72 Brand font stack — will fall back gracefully */
+  --font-body: "72", "72 Brand", "72 Brand Medium",
+               -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  font-size: 14px;
+  line-height: 1.45;
+}
+button { font-family: inherit; cursor: pointer; }
+a { color: var(--sap-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }

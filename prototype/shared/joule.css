@@ -1,0 +1,240 @@
+/* ============================================================
+   Joule panel — matched to reference screenshot
+   Shared across all 3 roles; each role loads a different frame set
+============================================================ */
+
+.joule-panel {
+  position: fixed;
+  top: 8px; right: 8px; bottom: 8px;
+  width: 380px;
+  background: #fff;
+  border: 1px solid var(--joule-purple-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  transform: translateX(calc(100% + 16px));
+  transition: transform 0.22s ease;
+  box-shadow: 0 8px 30px rgba(93,54,255,0.18);
+}
+.joule-panel.open { transform: translateX(0); }
+
+.joule-header {
+  background: #fff;
+  border-bottom: 1px solid var(--joule-purple-border);
+  padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px;
+  border-radius: 10px 10px 0 0;
+}
+.joule-header .book-icon {
+  color: var(--joule-purple);
+  font-size: 16px;
+  width: 20px; text-align: center;
+}
+.joule-header .title {
+  color: var(--joule-purple);
+  font-weight: 600;
+  font-size: 13px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.joule-header .h-btn {
+  background: none;
+  border: none;
+  color: var(--joule-purple);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.joule-header .h-btn:hover { background: var(--joule-purple-soft); }
+
+.joule-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px 6px;
+  background: #fff;
+}
+
+.joule-msg {
+  margin-bottom: 10px;
+  max-width: 92%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--joule-purple-dark);
+}
+.joule-msg.bot {
+  background: var(--joule-purple-soft);
+  border-top-left-radius: 4px;
+}
+.joule-msg.user {
+  background: #DDD0FA;
+  margin-left: auto;
+  border-top-right-radius: 4px;
+}
+.joule-msg strong { color: var(--joule-purple-dark); }
+.joule-msg ul { margin: 6px 0 4px 0; padding-left: 18px; }
+.joule-msg li { margin: 2px 0; }
+
+.joule-feedback-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: -4px 4px 12px;
+}
+.joule-feedback-row span { cursor: pointer; }
+.joule-feedback-row .sources {
+  color: var(--joule-purple);
+  text-decoration: underline;
+  margin-left: auto;
+  font-weight: 500;
+}
+.joule-feedback-row .sources .badge-num {
+  display: inline-block;
+  background: var(--joule-purple);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0 6px;
+  font-size: 10px;
+  margin-left: 3px;
+  font-weight: 600;
+}
+
+.joule-actionrow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.joule-action-btn {
+  background: #fff;
+  border: 1px solid var(--joule-purple-border);
+  color: var(--joule-purple);
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+.joule-action-btn:hover { background: var(--joule-purple-soft); }
+.joule-action-btn.primary {
+  background: var(--joule-purple);
+  color: #fff;
+  border-color: var(--joule-purple);
+}
+.joule-action-btn.primary:hover { background: var(--joule-purple-hover); }
+
+.joule-continue-slot {
+  padding: 0 14px 8px;
+  min-height: 0;
+}
+.joule-continue-btn {
+  width: 100%;
+  background: linear-gradient(90deg, var(--joule-purple), var(--joule-purple-hover));
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(93,54,255,0.25);
+  animation: pulse-arrow 1.4s ease-in-out infinite;
+}
+.joule-continue-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(93,54,255,0.35); }
+@keyframes pulse-arrow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.joule-footer {
+  padding: 10px 12px;
+  border-top: 1px solid var(--joule-purple-border);
+}
+.joule-input-wrap {
+  border: 1.5px solid var(--joule-purple);
+  border-radius: 22px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+}
+.joule-input-wrap .plus {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--joule-purple);
+  color: var(--joule-purple);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  flex-shrink: 0;
+}
+.joule-input-wrap .at { color: var(--joule-purple); font-weight: 600; }
+.joule-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+  padding: 0;
+  min-width: 0;
+}
+.joule-input::placeholder { color: var(--text-muted); font-style: italic; }
+.joule-input-wrap .send {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--joule-purple-soft);
+  color: var(--joule-purple);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  flex-shrink: 0;
+}
+.joule-input-wrap .send:hover { background: var(--joule-purple-border); }
+
+.joule-suggestions {
+  padding: 6px 12px 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.joule-suggestion-chip {
+  background: #fff;
+  border: 1px solid var(--joule-purple-border);
+  color: var(--joule-purple);
+  padding: 5px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.joule-suggestion-chip:hover {
+  background: var(--joule-purple-soft);
+}
+.joule-verify {
+  text-align: center;
+  padding: 6px 0 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: #fff;
+  border-radius: 0 0 10px 10px;
+}
+
+/* ---------- Role-specific accent tints ---------- */
+.role-employee .joule-msg.bot { border-left: 3px solid var(--role-employee); }
+.role-hrbp .joule-msg.bot     { border-left: 3px solid var(--role-hrbp); }
+.role-it .joule-msg.bot       { border-left: 3px solid var(--role-it); }
