@@ -565,10 +565,12 @@
     document.getElementById("topbarSlot").innerHTML = topbarHTML
       .replace(">Career Opportunities<", ">Home<");
 
-    // Joule shell (kept available for continuity, but starts closed on Home)
+    // Joule shell (kept available for continuity, hidden by default on Home)
     document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Home");
+    // Force Joule closed BEFORE it can visually block anything
+    const joulePanel = document.getElementById("joulePanel");
+    joulePanel.classList.remove("open");
     const jouleCtl = window.JOULE.bindJouleShell();
-    jouleCtl.shut();
 
     // Greeting text based on time of day
     (function () {
