@@ -149,24 +149,10 @@
       position: relative;
       overflow: hidden;
     }
-    /* Abstract "building blocks" illustration in CSS */
-    .assignment-card .ac-illust::before,
-    .assignment-card .ac-illust::after {
-      content: "";
-      position: absolute;
-    }
-    .assignment-card .ac-illust::before {
-      width: 18px; height: 18px;
-      background: #FFB03A;
-      left: 14px; bottom: 14px;
-      border-radius: 3px;
-      box-shadow: 22px 0 0 #E88C0A, 0 -22px 0 #FFCA5E;
-    }
-    .assignment-card .ac-illust::after {
-      width: 12px; height: 12px;
-      background: #FFA033;
-      right: 12px; top: 12px;
-      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    .assignment-card .ac-illust svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     .assignment-card .ac-text .ac-label {
       font-size: 15px;
@@ -231,62 +217,17 @@
     }
     .org-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,20,74,0.1); }
     .org-card-media {
-      height: 140px;
+      height: 150px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    /* Four abstract "photo" placeholders — pure CSS scenes */
-    .org-card-media.m1 {
-      background: linear-gradient(135deg, #3C4B5C 0%, #556677 60%, #7A8A9E 100%);
-    }
-    .org-card-media.m1::after {
-      content: "📱";
-      position: absolute;
-      right: 24px; bottom: 20px;
-      font-size: 56px;
-      opacity: 0.9;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-    }
-    .org-card-media.m2 {
-      background: linear-gradient(135deg, #C4382E 0%, #A02D22 60%, #E85A4B 100%);
-    }
-    .org-card-media.m2::before,
-    .org-card-media.m2::after {
-      content: "";
-      position: absolute;
-      border-radius: 50%;
-    }
-    .org-card-media.m2::before {
-      width: 60px; height: 60px;
-      background: rgba(255,255,255,0.25);
-      right: 20px; bottom: -20px;
-    }
-    .org-card-media.m2::after {
-      width: 100px; height: 100px;
-      background: rgba(255,255,255,0.15);
-      left: -30px; top: -30px;
-    }
-    .org-card-media.m3 {
-      background: linear-gradient(135deg, #B58A5D 0%, #8F6942 60%, #D4A876 100%);
-    }
-    .org-card-media.m3::after {
-      content: "💼";
-      position: absolute;
-      right: 22px; bottom: 18px;
-      font-size: 52px;
-      opacity: 0.95;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
-    }
-    .org-card-media.m4 {
-      background: linear-gradient(135deg, #F4C6B0 0%, #E8A98A 60%, #C87A5A 100%);
-    }
-    .org-card-media.m4::after {
-      content: "💬";
-      position: absolute;
-      right: 22px; bottom: 18px;
-      font-size: 52px;
-      opacity: 0.95;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+    .org-card-media svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .org-card-body {
@@ -343,26 +284,11 @@
     .explore-card-media {
       position: relative;
       overflow: hidden;
-      background: linear-gradient(120deg, #F4A57A 0%, #E88860 30%, #D4623E 70%, #A73E1F 100%);
     }
-    /* Abstract mountain scene */
-    .explore-card-media::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.15) 100%),
-        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(255,220,180,0.3), transparent 60%);
-    }
-    .explore-card-media::after {
-      content: "";
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 70%;
-      background:
-        linear-gradient(160deg, transparent 40%, rgba(60,20,10,0.35) 100%),
-        polygon(0 100%, 30% 45%, 55% 70%, 80% 30%, 100% 60%, 100% 100%);
-      clip-path: polygon(0 100%, 25% 55%, 45% 75%, 65% 40%, 85% 60%, 100% 45%, 100% 100%);
+    .explore-card-media svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     .explore-card-badge {
       position: absolute;
@@ -484,7 +410,30 @@
       </div>
 
       <div class="assignment-card" id="assignmentCard">
-        <div class="ac-illust"></div>
+        <div class="ac-illust">
+          <svg viewBox="0 0 76 76" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background subtle gradient -->
+            <defs>
+              <linearGradient id="ac-bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#FFF3D6"/>
+                <stop offset="1" stop-color="#F5E6C9"/>
+              </linearGradient>
+            </defs>
+            <rect width="76" height="76" fill="url(#ac-bg)"/>
+            <!-- Base block (dark orange) -->
+            <rect x="14" y="44" width="20" height="20" rx="3" fill="#E88C0A"/>
+            <rect x="16" y="46" width="16" height="3" rx="1" fill="#FFCA5E" opacity="0.6"/>
+            <!-- Middle block (bright orange) -->
+            <rect x="36" y="44" width="20" height="20" rx="3" fill="#FFB03A"/>
+            <rect x="38" y="46" width="16" height="3" rx="1" fill="#FFDDA8" opacity="0.6"/>
+            <!-- Top block (light) -->
+            <rect x="25" y="22" width="20" height="20" rx="3" fill="#FFCA5E"/>
+            <rect x="27" y="24" width="16" height="3" rx="1" fill="#FFF3D6" opacity="0.7"/>
+            <!-- Star sparkle -->
+            <path d="M 56 20 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFA033"/>
+            <path d="M 18 18 l 1 2.5 l 2.5 1 l -2.5 1 l -1 2.5 l -1 -2.5 l -2.5 -1 l 2.5 -1 z" fill="#FFA033"/>
+          </svg>
+        </div>
         <div class="ac-text">
           <div class="ac-label">New Assignment Opportunity!</div>
           <div class="ac-title">Senior Solution Consultant — Middle East (Riyadh)</div>
@@ -500,28 +449,140 @@
     </div>
     <div class="org-updates-grid">
       <div class="org-card">
-        <div class="org-card-media m1"></div>
+        <div class="org-card-media">
+          <!-- Illustration 1: Mobile Toolkit — phone with app icons -->
+          <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#5B7CBF"/>
+                <stop offset="1" stop-color="#3A5590"/>
+              </linearGradient>
+            </defs>
+            <rect width="300" height="150" fill="url(#bg1)"/>
+            <!-- Decorative bubbles -->
+            <circle cx="40" cy="30" r="22" fill="#FFFFFF" opacity="0.08"/>
+            <circle cx="260" cy="115" r="30" fill="#FFFFFF" opacity="0.1"/>
+            <!-- Phone body -->
+            <rect x="115" y="24" width="70" height="110" rx="10" fill="#FFFFFF"/>
+            <rect x="121" y="34" width="58" height="86" rx="4" fill="#E9F0FB"/>
+            <!-- App icon grid on the phone screen -->
+            <rect x="128" y="42" width="14" height="14" rx="3" fill="#0070F2"/>
+            <rect x="147" y="42" width="14" height="14" rx="3" fill="#36A41D"/>
+            <rect x="166" y="42" width="14" height="14" rx="3" fill="#FFB03A"/>
+            <rect x="128" y="61" width="14" height="14" rx="3" fill="#E85A4B"/>
+            <rect x="147" y="61" width="14" height="14" rx="3" fill="#7858FF"/>
+            <rect x="166" y="61" width="14" height="14" rx="3" fill="#049F9A"/>
+            <rect x="128" y="80" width="14" height="14" rx="3" fill="#B58A5D"/>
+            <rect x="147" y="80" width="14" height="14" rx="3" fill="#0070F2"/>
+            <rect x="166" y="80" width="14" height="14" rx="3" fill="#FFB03A"/>
+            <!-- Home indicator -->
+            <rect x="140" y="126" width="20" height="3" rx="1.5" fill="#B7C6D8"/>
+            <!-- Sparkles -->
+            <path d="M 78 55 l 2 6 l 6 2 l -6 2 l -2 6 l -2 -6 l -6 -2 l 6 -2 z" fill="#FFD97D"/>
+            <path d="M 220 40 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFD97D"/>
+          </svg>
+        </div>
         <div class="org-card-body">
           <div class="org-card-title">Upgrade Your Mobile Toolkit!</div>
           <div class="org-card-sub">Apps for employees</div>
         </div>
       </div>
       <div class="org-card">
-        <div class="org-card-media m2"></div>
+        <div class="org-card-media">
+          <!-- Illustration 2: Gig Opportunities — people around a table -->
+          <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#E85A4B"/>
+                <stop offset="1" stop-color="#B02D22"/>
+              </linearGradient>
+            </defs>
+            <rect width="300" height="150" fill="url(#bg2)"/>
+            <!-- Background shapes -->
+            <circle cx="30" cy="120" r="40" fill="#FFFFFF" opacity="0.1"/>
+            <circle cx="270" cy="30" r="35" fill="#FFFFFF" opacity="0.08"/>
+            <!-- Round table (top-down view) -->
+            <ellipse cx="150" cy="115" rx="72" ry="20" fill="#8A2318"/>
+            <ellipse cx="150" cy="110" rx="72" ry="20" fill="#C4392C"/>
+            <!-- 3 people around table (simplified silhouettes) -->
+            <!-- Left person -->
+            <circle cx="90" cy="65" r="12" fill="#F4C6B0"/>
+            <rect x="76" y="76" width="28" height="30" rx="6" fill="#FFD97D"/>
+            <!-- Center person -->
+            <circle cx="150" cy="55" r="12" fill="#D4A876"/>
+            <rect x="136" y="66" width="28" height="30" rx="6" fill="#5B7CBF"/>
+            <!-- Right person -->
+            <circle cx="210" cy="65" r="12" fill="#F4C6B0"/>
+            <rect x="196" y="76" width="28" height="30" rx="6" fill="#36A41D"/>
+            <!-- Table items -->
+            <rect x="120" y="105" width="20" height="4" rx="1" fill="#FFFFFF" opacity="0.85"/>
+            <rect x="160" y="102" width="16" height="10" rx="2" fill="#FFFFFF" opacity="0.85"/>
+            <circle cx="150" cy="118" r="3" fill="#FFB03A"/>
+          </svg>
+        </div>
         <div class="org-card-body">
           <div class="org-card-title">Explore Gig Opportunities</div>
           <div class="org-card-sub">in Opportunity Marketplace</div>
         </div>
       </div>
       <div class="org-card">
-        <div class="org-card-media m3"></div>
+        <div class="org-card-media">
+          <!-- Illustration 3: Communications — envelope with notification dots -->
+          <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#D4A876"/>
+                <stop offset="1" stop-color="#8F6942"/>
+              </linearGradient>
+            </defs>
+            <rect width="300" height="150" fill="url(#bg3)"/>
+            <circle cx="40" cy="30" r="25" fill="#FFFFFF" opacity="0.1"/>
+            <circle cx="260" cy="120" r="35" fill="#FFFFFF" opacity="0.08"/>
+            <!-- Envelope body -->
+            <rect x="90" y="45" width="120" height="75" rx="6" fill="#FFFFFF"/>
+            <!-- Envelope flap -->
+            <path d="M 90 51 L 150 90 L 210 51 L 210 45 L 90 45 Z" fill="#F2E4CE"/>
+            <!-- Content lines inside -->
+            <rect x="105" y="98" width="70" height="3" rx="1.5" fill="#D4A876" opacity="0.6"/>
+            <rect x="105" y="106" width="50" height="3" rx="1.5" fill="#D4A876" opacity="0.4"/>
+            <!-- Notification dot -->
+            <circle cx="205" cy="50" r="12" fill="#E85A4B"/>
+            <text x="205" y="55" font-family="sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+            <!-- Floating message bubbles -->
+            <rect x="35" y="70" width="30" height="18" rx="4" fill="#FFFFFF" opacity="0.85"/>
+            <rect x="235" y="90" width="34" height="20" rx="4" fill="#FFFFFF" opacity="0.7"/>
+          </svg>
+        </div>
         <div class="org-card-body">
           <div class="org-card-title">Access Your Communications</div>
           <div class="org-card-sub">Find all your personalized updates in one place</div>
         </div>
       </div>
       <div class="org-card">
-        <div class="org-card-media m4"></div>
+        <div class="org-card-media">
+          <!-- Illustration 4: Conversation — chat bubbles -->
+          <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#F4C6B0"/>
+                <stop offset="1" stop-color="#C87A5A"/>
+              </linearGradient>
+            </defs>
+            <rect width="300" height="150" fill="url(#bg4)"/>
+            <circle cx="35" cy="35" r="28" fill="#FFFFFF" opacity="0.15"/>
+            <circle cx="265" cy="115" r="35" fill="#FFFFFF" opacity="0.12"/>
+            <!-- Left bubble -->
+            <path d="M 70 50 L 70 90 Q 70 100 80 100 L 130 100 L 138 108 L 140 100 L 155 100 Q 165 100 165 90 L 165 50 Q 165 40 155 40 L 80 40 Q 70 40 70 50 Z" fill="#FFFFFF"/>
+            <circle cx="90" cy="70" r="3" fill="#C87A5A"/>
+            <circle cx="105" cy="70" r="3" fill="#C87A5A"/>
+            <circle cx="120" cy="70" r="3" fill="#C87A5A"/>
+            <!-- Right bubble -->
+            <path d="M 175 70 L 175 110 Q 175 118 183 118 L 215 118 L 218 124 L 222 118 L 235 118 Q 245 118 245 110 L 245 78 Q 245 68 235 68 L 183 68 Q 175 68 175 76 Z" fill="#8F4A2F"/>
+            <rect x="185" y="82" width="50" height="3" rx="1.5" fill="#FFFFFF" opacity="0.8"/>
+            <rect x="185" y="90" width="38" height="3" rx="1.5" fill="#FFFFFF" opacity="0.6"/>
+            <rect x="185" y="98" width="42" height="3" rx="1.5" fill="#FFFFFF" opacity="0.6"/>
+          </svg>
+        </div>
         <div class="org-card-body">
           <div class="org-card-title">Start a Conversation</div>
           <div class="org-card-sub">Reach out to your HR team anytime</div>
@@ -537,6 +598,56 @@
         <p class="explore-card-body">Use the Growth Portfolio experience to share more about your abilities and aspirations — and discover the opportunities that fit them.</p>
       </div>
       <div class="explore-card-media">
+        <!-- Illustration: mountain landscape with sunset and hiker silhouettes -->
+        <svg viewBox="0 0 500 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FFC48A"/>
+              <stop offset="0.5" stop-color="#F08A5D"/>
+              <stop offset="1" stop-color="#C4552C"/>
+            </linearGradient>
+            <linearGradient id="mtn-far" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#8B3E22"/>
+              <stop offset="1" stop-color="#6B2C18"/>
+            </linearGradient>
+            <linearGradient id="mtn-mid" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5C2814"/>
+              <stop offset="1" stop-color="#3D1A0C"/>
+            </linearGradient>
+            <linearGradient id="mtn-near" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2A130A"/>
+              <stop offset="1" stop-color="#150905"/>
+            </linearGradient>
+          </defs>
+          <!-- Sky background -->
+          <rect width="500" height="220" fill="url(#sky)"/>
+          <!-- Sun -->
+          <circle cx="360" cy="90" r="38" fill="#FFDDA8" opacity="0.85"/>
+          <circle cx="360" cy="90" r="26" fill="#FFEBC4"/>
+          <!-- Distant mountain layer -->
+          <path d="M 0 155 L 60 115 L 110 140 L 170 95 L 230 130 L 290 105 L 360 135 L 430 110 L 500 140 L 500 220 L 0 220 Z" fill="url(#mtn-far)"/>
+          <!-- Mid mountain layer -->
+          <path d="M 0 180 L 80 145 L 150 170 L 220 130 L 300 165 L 380 140 L 450 170 L 500 155 L 500 220 L 0 220 Z" fill="url(#mtn-mid)"/>
+          <!-- Near mountain layer + ground -->
+          <path d="M 0 200 L 100 175 L 200 195 L 300 170 L 400 190 L 500 180 L 500 220 L 0 220 Z" fill="url(#mtn-near)"/>
+          <!-- Two hiker silhouettes on the near ridge -->
+          <g fill="#0A0402">
+            <!-- Hiker 1 -->
+            <circle cx="180" cy="180" r="3"/>
+            <rect x="178.5" y="183" width="3" height="8" rx="1"/>
+            <rect x="177" y="191" width="2" height="6" rx="1"/>
+            <rect x="181" y="191" width="2" height="6" rx="1"/>
+            <line x1="184" y1="184" x2="188" y2="180" stroke="#0A0402" stroke-width="1"/>
+            <!-- Hiker 2 (slightly ahead + higher) -->
+            <circle cx="205" cy="175" r="3"/>
+            <rect x="203.5" y="178" width="3" height="8" rx="1"/>
+            <rect x="202" y="186" width="2" height="6" rx="1"/>
+            <rect x="206" y="186" width="2" height="6" rx="1"/>
+            <line x1="209" y1="179" x2="213" y2="175" stroke="#0A0402" stroke-width="1"/>
+          </g>
+          <!-- Soft haze overlay -->
+          <rect width="500" height="220" fill="url(#sky)" opacity="0.05"/>
+        </svg>
         <div class="explore-card-badge">Learning</div>
       </div>
     </div>
