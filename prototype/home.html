@@ -89,6 +89,27 @@
       border-radius: 10px;
       padding: 28px 32px;
       box-shadow: 0 1px 3px rgba(0,20,74,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .greeting-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    .greeting-card .greeting-bg {
+      position: absolute;
+      right: -20px;
+      bottom: -30px;
+      width: 260px;
+      height: 200px;
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .greeting-card .greeting-bg svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     .greeting-card h1 {
       font-size: 30px;
@@ -392,6 +413,47 @@
     <!-- Good afternoon + New Assignment -->
     <div class="greeting-row">
       <div class="greeting-card">
+        <div class="greeting-bg">
+          <svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sun-warm" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#FFDDA8"/>
+                <stop offset="1" stop-color="#FFB47A"/>
+              </linearGradient>
+              <linearGradient id="leaf-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#7BC97E"/>
+                <stop offset="1" stop-color="#4A9A4E"/>
+              </linearGradient>
+              <linearGradient id="pot-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#D4A876"/>
+                <stop offset="1" stop-color="#B58A5D"/>
+              </linearGradient>
+            </defs>
+            <!-- Soft sun/circle in the top-right -->
+            <circle cx="210" cy="50" r="45" fill="url(#sun-warm)" opacity="0.6"/>
+            <circle cx="210" cy="50" r="32" fill="#FFEBC4" opacity="0.5"/>
+            <!-- Coffee cup on the desk -->
+            <ellipse cx="80" cy="155" rx="24" ry="6" fill="#B58A5D" opacity="0.35"/>
+            <path d="M 62 130 L 62 148 Q 62 154 68 154 L 92 154 Q 98 154 98 148 L 98 130 Z" fill="#FFFFFF"/>
+            <ellipse cx="80" cy="130" rx="18" ry="4" fill="#6B4423"/>
+            <path d="M 98 134 Q 108 134 108 142 Q 108 150 98 150" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+            <!-- Steam wisps -->
+            <path d="M 72 118 Q 76 112 72 106 Q 68 100 72 94" stroke="#B7C6D8" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M 84 118 Q 88 112 84 106 Q 80 100 84 94" stroke="#B7C6D8" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <!-- Plant in pot on the right -->
+            <path d="M 170 155 L 178 190 L 218 190 L 226 155 Z" fill="url(#pot-grad)"/>
+            <rect x="170" y="152" width="56" height="8" rx="2" fill="#8F6942"/>
+            <!-- Leaves (layered) -->
+            <ellipse cx="185" cy="130" rx="10" ry="22" fill="url(#leaf-grad)" transform="rotate(-25 185 130)"/>
+            <ellipse cx="198" cy="118" rx="12" ry="26" fill="url(#leaf-grad)"/>
+            <ellipse cx="212" cy="130" rx="10" ry="22" fill="url(#leaf-grad)" transform="rotate(25 212 130)"/>
+            <!-- Leaf veins (subtle) -->
+            <line x1="198" y1="95" x2="198" y2="140" stroke="#2E6B32" stroke-width="0.8" opacity="0.5"/>
+            <!-- Sparkles for morning freshness -->
+            <path d="M 140 60 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFB47A"/>
+            <path d="M 40 90 l 1 2.5 l 2.5 1 l -2.5 1 l -1 2.5 l -1 -2.5 l -2.5 -1 l 2.5 -1 z" fill="#FFB47A"/>
+          </svg>
+        </div>
         <h1 id="greetingText">Good afternoon</h1>
         <div class="greeting-actions">
           <button class="greeting-btn">View My Growth Portfolio</button>
