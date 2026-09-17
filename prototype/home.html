@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home · Global Mobility Assistant</title>
+  <link rel="stylesheet" href="shared/tokens.css" />
+  <link rel="stylesheet" href="shared/shell.css" />
+  <link rel="stylesheet" href="shared/joule.css" />
+  <style>
+    /* ============ Home-specific layout ============ */
+    body {
+      background: linear-gradient(180deg, #DCEEF9 0%, #E9F3FB 40%, #F5F9FC 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+    /* Faint cloud texture — soft radial gradients */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 30% at 20% 20%, rgba(255,255,255,0.55), transparent 60%),
+        radial-gradient(ellipse 40% 25% at 80% 50%, rgba(255,255,255,0.35), transparent 60%),
+        radial-gradient(ellipse 55% 30% at 30% 85%, rgba(255,255,255,0.4), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Teal divider below topbar */
+    .topbar-divider {
+      height: 6px;
+      background: linear-gradient(90deg, #A4E0DE 0%, #7DD1CE 50%, #A4E0DE 100%);
+    }
+
+    .home-main {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px 100px;
+    }
+
+    /* --- Top action buttons: Manage My Data / Reminders --- */
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin: 8px 0 24px;
+    }
+    .top-action-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 130px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,20,74,0.04);
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .top-action-card:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,20,74,0.08); }
+    .top-action-card .tac-icon {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--sap-blue);
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .top-action-card .tac-label {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    /* --- Good afternoon card + New Assignment side card --- */
+    .greeting-row {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .greeting-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 10px;
+      padding: 28px 32px;
+      box-shadow: 0 1px 3px rgba(0,20,74,0.05);
+    }
+    .greeting-card h1 {
+      font-size: 30px;
+      font-weight: 700;
+      margin: 0 0 24px;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    .greeting-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .greeting-btn {
+      background: #fff;
+      color: var(--sap-blue);
+      border: 1px solid #B7D5F8;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .greeting-btn:hover { background: #EAF3FD; border-color: var(--sap-blue); }
+    .greeting-btn.edit-icon {
+      padding: 8px 10px;
+      color: var(--text-secondary);
+      border-color: #DBE1E8;
+    }
+    .greeting-btn.edit-icon svg { width: 14px; height: 14px; }
+
+    /* --- New Assignment Opportunity card --- */
+    .assignment-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 10px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0,20,74,0.05);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      height: fit-content;
+    }
+    .assignment-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,112,242,0.12); }
+    .assignment-card .ac-illust {
+      width: 76px; height: 76px;
+      background: linear-gradient(135deg, #FFF3D6 0%, #F5E6C9 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Abstract "building blocks" illustration in CSS */
+    .assignment-card .ac-illust::before,
+    .assignment-card .ac-illust::after {
+      content: "";
+      position: absolute;
+    }
+    .assignment-card .ac-illust::before {
+      width: 18px; height: 18px;
+      background: #FFB03A;
+      left: 14px; bottom: 14px;
+      border-radius: 3px;
+      box-shadow: 22px 0 0 #E88C0A, 0 -22px 0 #FFCA5E;
+    }
+    .assignment-card .ac-illust::after {
+      width: 12px; height: 12px;
+      background: #FFA033;
+      right: 12px; top: 12px;
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    }
+    .assignment-card .ac-text .ac-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .assignment-card .ac-text .ac-title {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    .assignment-card .ac-text .ac-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* --- Organizational Updates section --- */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 14px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .view-more-btn {
+      background: #fff;
+      color: var(--sap-blue);
+      border: 1px solid var(--sap-blue);
+      border-radius: 6px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .view-more-btn:hover { background: #EAF3FD; }
+
+    .org-updates-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    .org-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,20,74,0.05);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .org-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,20,74,0.1); }
+    .org-card-media {
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Four abstract "photo" placeholders — pure CSS scenes */
+    .org-card-media.m1 {
+      background: linear-gradient(135deg, #3C4B5C 0%, #556677 60%, #7A8A9E 100%);
+    }
+    .org-card-media.m1::after {
+      content: "📱";
+      position: absolute;
+      right: 24px; bottom: 20px;
+      font-size: 56px;
+      opacity: 0.9;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    }
+    .org-card-media.m2 {
+      background: linear-gradient(135deg, #C4382E 0%, #A02D22 60%, #E85A4B 100%);
+    }
+    .org-card-media.m2::before,
+    .org-card-media.m2::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+    }
+    .org-card-media.m2::before {
+      width: 60px; height: 60px;
+      background: rgba(255,255,255,0.25);
+      right: 20px; bottom: -20px;
+    }
+    .org-card-media.m2::after {
+      width: 100px; height: 100px;
+      background: rgba(255,255,255,0.15);
+      left: -30px; top: -30px;
+    }
+    .org-card-media.m3 {
+      background: linear-gradient(135deg, #B58A5D 0%, #8F6942 60%, #D4A876 100%);
+    }
+    .org-card-media.m3::after {
+      content: "💼";
+      position: absolute;
+      right: 22px; bottom: 18px;
+      font-size: 52px;
+      opacity: 0.95;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+    }
+    .org-card-media.m4 {
+      background: linear-gradient(135deg, #F4C6B0 0%, #E8A98A 60%, #C87A5A 100%);
+    }
+    .org-card-media.m4::after {
+      content: "💬";
+      position: absolute;
+      right: 22px; bottom: 18px;
+      font-size: 52px;
+      opacity: 0.95;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+    }
+
+    .org-card-body {
+      padding: 16px 18px;
+    }
+    .org-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    .org-card-sub {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* --- Explore More section --- */
+    .explore-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 8px 0 14px;
+    }
+    .explore-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      box-shadow: 0 1px 3px rgba(0,20,74,0.06);
+      min-height: 220px;
+    }
+    .explore-card-content {
+      padding: 32px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .explore-card-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 12px;
+      letter-spacing: -0.3px;
+    }
+    .explore-card-body {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .explore-card-media {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(120deg, #F4A57A 0%, #E88860 30%, #D4623E 70%, #A73E1F 100%);
+    }
+    /* Abstract mountain scene */
+    .explore-card-media::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.15) 100%),
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(255,220,180,0.3), transparent 60%);
+    }
+    .explore-card-media::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 70%;
+      background:
+        linear-gradient(160deg, transparent 40%, rgba(60,20,10,0.35) 100%),
+        polygon(0 100%, 30% 45%, 55% 70%, 80% 30%, 100% 60%, 100% 100%);
+      clip-path: polygon(0 100%, 25% 55%, 45% 75%, 65% 40%, 85% 60%, 100% 45%, 100% 100%);
+    }
+    .explore-card-badge {
+      position: absolute;
+      right: 18px; top: 16px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* --- Bottom personalize bar --- */
+    .personalize-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 24px;
+      padding: 8px 8px 8px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 16px rgba(0,20,74,0.12);
+      z-index: 20;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    .personalize-bar .pb-btn {
+      background: var(--sap-blue);
+      color: #fff;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .personalize-bar .pb-btn:hover { background: var(--sap-blue-hover); }
+    .personalize-bar .pb-dismiss {
+      background: transparent;
+      border: none;
+      color: var(--sap-blue);
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .personalize-bar .pb-dismiss:hover { text-decoration: underline; }
+    .personalize-bar.hidden { display: none; }
+
+    /* Override footer color to match Home theme */
+    .global-footer {
+      background: rgba(254, 246, 230, 0.9);
+      backdrop-filter: blur(3px);
+    }
+
+    /* Responsive-lite: fall back single column on narrow screens */
+    @media (max-width: 960px) {
+      .greeting-row { grid-template-columns: 1fr; }
+      .org-updates-grid { grid-template-columns: repeat(2, 1fr); }
+      .explore-card { grid-template-columns: 1fr; }
+      .explore-card-media { min-height: 180px; }
+    }
+  </style>
+</head>
+<body class="role-employee">
+  <div id="topbarSlot"></div>
+  <div class="topbar-divider"></div>
+
+  <main class="home-main">
+
+    <!-- Top action buttons -->
+    <div class="top-actions">
+      <div class="top-action-card" title="Manage My Data (demo)">
+        <div class="tac-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3 v18 M3 12 h18"/>
+          </svg>
+        </div>
+        <div class="tac-label">Manage<br>My Data</div>
+      </div>
+      <div class="top-action-card" title="Reminders (demo)">
+        <div class="tac-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7 v5 l3 2"/>
+          </svg>
+        </div>
+        <div class="tac-label">Reminders</div>
+      </div>
+    </div>
+
+    <!-- Good afternoon + New Assignment -->
+    <div class="greeting-row">
+      <div class="greeting-card">
+        <h1 id="greetingText">Good afternoon</h1>
+        <div class="greeting-actions">
+          <button class="greeting-btn">View My Growth Portfolio</button>
+          <button class="greeting-btn">Employee File</button>
+          <button class="greeting-btn">Appreciate a Colleague</button>
+          <button class="greeting-btn">My Payslips</button>
+          <button class="greeting-btn">Activate Mobile App</button>
+          <button class="greeting-btn">Pending Workflows</button>
+          <button class="greeting-btn edit-icon" title="Customize">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="assignment-card" id="assignmentCard">
+        <div class="ac-illust"></div>
+        <div class="ac-text">
+          <div class="ac-label">New Assignment Opportunity!</div>
+          <div class="ac-title">Senior Solution Consultant — Middle East (Riyadh)</div>
+          <div class="ac-sub">Aurora Middle East LLC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Organizational Updates -->
+    <div class="section-header">
+      <h2 class="section-title">Organizational Updates</h2>
+      <button class="view-more-btn">View More</button>
+    </div>
+    <div class="org-updates-grid">
+      <div class="org-card">
+        <div class="org-card-media m1"></div>
+        <div class="org-card-body">
+          <div class="org-card-title">Upgrade Your Mobile Toolkit!</div>
+          <div class="org-card-sub">Apps for employees</div>
+        </div>
+      </div>
+      <div class="org-card">
+        <div class="org-card-media m2"></div>
+        <div class="org-card-body">
+          <div class="org-card-title">Explore Gig Opportunities</div>
+          <div class="org-card-sub">in Opportunity Marketplace</div>
+        </div>
+      </div>
+      <div class="org-card">
+        <div class="org-card-media m3"></div>
+        <div class="org-card-body">
+          <div class="org-card-title">Access Your Communications</div>
+          <div class="org-card-sub">Find all your personalized updates in one place</div>
+        </div>
+      </div>
+      <div class="org-card">
+        <div class="org-card-media m4"></div>
+        <div class="org-card-body">
+          <div class="org-card-title">Start a Conversation</div>
+          <div class="org-card-sub">Reach out to your HR team anytime</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Explore More -->
+    <div class="explore-title">Explore More</div>
+    <div class="explore-card">
+      <div class="explore-card-content">
+        <h3 class="explore-card-title">Explore your Growth Portfolio</h3>
+        <p class="explore-card-body">Use the Growth Portfolio experience to share more about your abilities and aspirations — and discover the opportunities that fit them.</p>
+      </div>
+      <div class="explore-card-media">
+        <div class="explore-card-badge">Learning</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Personalize bar -->
+  <div class="personalize-bar" id="personalizeBar">
+    Did you know you can personalize your home page?
+    <button class="pb-btn">View Settings</button>
+    <button class="pb-dismiss" id="pbDismiss">Dismiss</button>
+  </div>
+
+  <div id="jouleSlot"></div>
+
+  <div class="global-footer">
+    非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行 &nbsp;|&nbsp; Not an SAP official product · Learning prototype · Fictional data & simulated execution
+  </div>
+
+  <script src="shared/state.js"></script>
+  <script src="shared/topbar.js"></script>
+  <script src="shared/joule.js"></script>
+  <script>
+    // Render topbar with "Home" app label (override default "Career Opportunities")
+    const topbarHTML = window.TOPBAR.renderTopbar("employee");
+    document.getElementById("topbarSlot").innerHTML = topbarHTML
+      .replace(">Career Opportunities<", ">Home<");
+
+    // Joule shell (kept available for continuity, but starts closed on Home)
+    document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Home");
+    const jouleCtl = window.JOULE.bindJouleShell();
+    jouleCtl.shut();
+
+    // Greeting text based on time of day
+    (function () {
+      const h = new Date().getHours();
+      let greet = "Good afternoon";
+      if (h < 12) greet = "Good morning";
+      else if (h >= 18) greet = "Good evening";
+      document.getElementById("greetingText").textContent = greet;
+    })();
+
+    // Assignment card → jump to Assignment Detail (Evaluate step in employee.html)
+    document.getElementById("assignmentCard").addEventListener("click", () => {
+      location.href = "employee.html#detail";
+    });
+
+    // Dismiss personalize bar
+    document.getElementById("pbDismiss").addEventListener("click", () => {
+      document.getElementById("personalizeBar").classList.add("hidden");
+    });
+
+    // Joule minimal frame for Home (informational only)
+    window.JOULE.loadSequence([
+      { role: "bot", autoplay: true, delay: 300,
+        html: `Welcome to your Home. Your latest assignment opportunity is on the right — click through to see details.`,
+        sources: 1 }
+    ], () => {});
+    window.JOULE.setSuggestions(["Show my open assignments", "How does the marketplace work?"]);
+    window.JOULE.setIntentRouter((text) => {
+      const t = text.toLowerCase();
+      if (/assignment|open|opportunity|marketplace/.test(t)) {
+        return { html: `You have <strong>1 new assignment opportunity</strong> — Senior Solution Consultant, Middle East (Riyadh). Click the card on the right, or open the Opportunity Marketplace to browse more.`,
+                 actions: [{ label: "Open the Opportunity", event: "goto-detail" }], sources: 1 };
+      }
+      return null;
+    });
+    // Handler for action buttons in Joule
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".joule-action-btn")) {
+        const label = e.target.closest(".joule-action-btn").textContent;
+        if (/Opportunity/i.test(label)) location.href = "employee.html#detail";
+      }
+    });
+  </script>
+</body>
+</html>
