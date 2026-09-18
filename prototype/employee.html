@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
   <link rel="stylesheet" href="shared/joule.css" />
+  <link rel="stylesheet" href="shared/guide.css" />
   <style>
     /* --------- Journey nav --------- */
     .journey-nav {
@@ -846,11 +847,47 @@
   <script src="shared/state.js"></script>
   <script src="shared/topbar.js"></script>
   <script src="shared/joule.js"></script>
+  <script src="shared/guide.js"></script>
   <script src="data/employee-data.js"></script>
   <script>
   const D = window.EMPLOYEE_DATA;
   document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("employee");
   document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Career");
+
+  // Mount guidance layers
+  window.GUIDE.injectGuideButton();
+  window.GUIDE.mountGuideOverlay({ suppressAutoShow: true });
+  window.GUIDE.mountRoleRibbon("employee");
+
+  // Show step-appropriate hints as the user navigates
+  function showStepHint(step) {
+    if (step === "detail") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "detail-ask-joule",
+        title: "Try this — Pause #1",
+        body: "Open Joule (💎 icon) and ask it to analyze this role for your career development. Watch how it compares strengths, gaps, trade-offs — but names what only you can weigh.",
+        anchor: "top-right"
+      }), 800);
+    } else if (step === "tracking") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "tracking-switch-hrbp",
+        title: "Application submitted — now switch role",
+        body: "Open the HRBP view (from Landing page) to see how HR handles the request. State syncs across tabs — you'll see the same case from Mira's perspective.",
+        anchor: "bottom-right"
+      }), 600);
+    } else if (step === "mymove") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "mymove-notice-status",
+        title: "Notice what's not here",
+        body: "No 'complete' badge. The banner says <b>awaiting target-side verification</b>. This is intentional — submitted ≠ verified.",
+        anchor: "top-right"
+      }), 600);
+    }
+  }
+  // Hook into hash changes
+  window.addEventListener("hashchange", () => showStepHint((location.hash || "#browse").replace("#","")));
+  document.addEventListener("DOMContentLoaded", () => showStepHint((location.hash || "#browse").replace("#","")));
+  showStepHint((location.hash || "#browse").replace("#",""));
 
   const STEPS = [
     { id: "browse",   n: 1, label: "Discover" },

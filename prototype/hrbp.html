@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
   <link rel="stylesheet" href="shared/joule.css" />
+  <link rel="stylesheet" href="shared/guide.css" />
   <style>
     .journey-nav { display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 10px 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 8px; margin-bottom: 16px; align-items: center; }
     .journey-nav .step { padding: 5px 10px; border-radius: 6px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; user-select: none; transition: background 0.12s, color 0.12s; }
@@ -87,11 +88,52 @@
   <script src="shared/state.js"></script>
   <script src="shared/topbar.js"></script>
   <script src="shared/joule.js"></script>
+  <script src="shared/guide.js"></script>
   <script src="data/hrbp-data.js"></script>
   <script>
   const D = window.HRBP_DATA;
   document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("hrbp");
   document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("hrbp", "Joule · Talent Operations");
+
+  // Mount guidance layers
+  window.GUIDE.injectGuideButton();
+  window.GUIDE.mountGuideOverlay({ suppressAutoShow: true });
+  window.GUIDE.mountRoleRibbon("hrbp");
+
+  // Step-appropriate hints
+  function showStepHintHRBP(step) {
+    if (step === "inbox") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "hrbp-open-lin-chen",
+        title: "Try this — start here",
+        body: "Click <b>Lin Chen</b> (the high-priority row) to open her move request. Then walk through Impact review — that's where Pause #2 lives.",
+        anchor: "bottom-right"
+      }), 900);
+    } else if (step === "impact") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "hrbp-route-specialist",
+        title: "Try this — Pause #2",
+        body: "Click <b>Route to specialist</b> on the Payroll &amp; benefits row. Joule recommends by responsibility → qualification → authorization → capacity — but you decide.",
+        anchor: "top-right"
+      }), 700);
+    } else if (step === "edit") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "hrbp-edit-date",
+        title: "Try this — a key-field change",
+        body: "Change the effective date. Joule names who needs to re-sign, and flags the Offer as an item to check separately — never asserts 'unaffected'.",
+        anchor: "top-right"
+      }), 700);
+    } else if (step === "approvals") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "hrbp-trigger-execution",
+        title: "Trigger execution",
+        body: "Submit approvals, then trigger execution. Then switch to the IT tab to see Pause #3 — an identity case that Joule refuses to auto-resolve.",
+        anchor: "bottom-right"
+      }), 700);
+    }
+  }
+  window.addEventListener("hashchange", () => showStepHintHRBP((location.hash || "#inbox").replace("#","")));
+  showStepHintHRBP((location.hash || "#inbox").replace("#",""));
 
   const STEPS = [
     { id: "inbox",     n: 1, label: "Move requests" },

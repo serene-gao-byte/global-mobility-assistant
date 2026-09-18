@@ -1,0 +1,313 @@
+/* ============================================================
+   Guidance layers · CSS
+   Layer 2 · role-context ribbon
+   Layer 3 · hint bubbles
+   Layer 4 · Joule onboarding (styled via existing joule.css)
+   Layer 5 · Guide button + step diagram overlay
+============================================================ */
+
+/* ---- Layer 2 · Role context ribbon (below topbar) ---- */
+.role-ribbon {
+  background: linear-gradient(90deg, #FFF9E6 0%, #FFF3D1 50%, #FFF9E6 100%);
+  border-bottom: 1px solid #F0D797;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.5px;
+  color: #6B4C00;
+  position: relative;
+  z-index: 25;
+}
+.role-ribbon .rr-icon {
+  width: 22px; height: 22px;
+  background: #D4991B;
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px;
+  flex-shrink: 0;
+}
+.role-ribbon .rr-text { flex: 1; line-height: 1.4; }
+.role-ribbon .rr-text b { color: #6B4C00; }
+.role-ribbon .rr-close {
+  background: transparent;
+  border: none;
+  color: #6B4C00;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 4px;
+  opacity: 0.6;
+}
+.role-ribbon .rr-close:hover { opacity: 1; }
+.role-ribbon.hidden { display: none; }
+@media (max-width: 768px) {
+  .role-ribbon { padding: 8px 12px; font-size: 11.5px; gap: 8px; }
+}
+
+/* ---- Layer 3 · Hint bubble (page-level tooltip) ---- */
+.hint-bubble {
+  position: fixed;
+  background: #1B2A3D;
+  color: #fff;
+  padding: 12px 16px 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 320px;
+  box-shadow: 0 8px 24px rgba(0,20,74,0.25);
+  z-index: 60;
+  animation: hint-bubble-pop 0.3s ease-out;
+}
+@keyframes hint-bubble-pop {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hint-bubble::before {
+  content: "💡";
+  margin-right: 6px;
+}
+.hint-bubble .hb-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: block;
+}
+.hint-bubble .hb-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  font-size: 14px;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  padding: 2px 4px;
+}
+.hint-bubble .hb-close:hover { color: #fff; }
+.hint-bubble.hidden { display: none; }
+.hint-bubble .hb-arrow {
+  position: absolute;
+  width: 0; height: 0;
+  border: 8px solid transparent;
+}
+.hint-bubble .hb-arrow.up {
+  top: -16px; left: 24px;
+  border-bottom-color: #1B2A3D;
+}
+.hint-bubble .hb-arrow.right {
+  right: -16px; top: 20px;
+  border-left-color: #1B2A3D;
+}
+
+/* ---- Layer 5 · Guide overlay ---- */
+.guide-trigger {
+  cursor: pointer;
+  position: relative;
+}
+.guide-trigger .guide-trigger-dot {
+  position: absolute;
+  top: -2px; right: -4px;
+  width: 8px; height: 8px;
+  background: #FFB03A;
+  border-radius: 50%;
+  border: 2px solid var(--sap-navy, #00144A);
+  animation: guide-pulse 2s ease-in-out infinite;
+}
+@keyframes guide-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+.guide-trigger.seen .guide-trigger-dot { display: none; }
+
+.guide-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 74, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: guide-fade-in 0.25s ease-out;
+}
+@keyframes guide-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.guide-overlay.hidden { display: none; }
+
+.guide-panel {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 920px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  position: relative;
+}
+.guide-panel-header {
+  padding: 24px 32px 12px;
+  border-bottom: 1px solid #E4E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.guide-panel-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+.guide-panel-header .guide-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+.guide-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 22px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.guide-close:hover { background: #F5F7FA; color: var(--text-primary); }
+
+.guide-panel-body {
+  padding: 24px 32px 32px;
+}
+
+/* Step diagram: 5 numbered steps with connectors */
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  position: relative;
+  margin-bottom: 28px;
+}
+.guide-step {
+  background: #F7F8FA;
+  border: 1px solid #E4E7EB;
+  border-radius: 10px;
+  padding: 16px 14px 14px;
+  position: relative;
+  text-align: center;
+}
+.guide-step-num {
+  width: 32px; height: 32px;
+  background: var(--sap-blue);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0 auto 10px;
+  box-shadow: 0 2px 6px rgba(0,112,242,0.3);
+}
+.guide-step.pause .guide-step-num {
+  background: #D4991B;
+  box-shadow: 0 2px 6px rgba(212,153,27,0.35);
+}
+.guide-step h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.guide-step p {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.guide-step .guide-step-role {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.guide-step .guide-step-role.employee { background: #EAF3FD; color: var(--sap-blue); }
+.guide-step .guide-step-role.hrbp { background: #E8F4F5; color: var(--sap-teal); }
+.guide-step .guide-step-role.it { background: var(--joule-purple-soft); color: var(--joule-purple); }
+
+/* Arrows between steps */
+.guide-step::after {
+  content: "→";
+  position: absolute;
+  right: -12px;
+  top: 24px;
+  color: var(--sap-blue);
+  font-weight: 700;
+  font-size: 18px;
+  z-index: 2;
+}
+.guide-step:last-child::after { display: none; }
+
+/* Pauses callout */
+.guide-pauses {
+  background: #FFF9E6;
+  border: 1px solid #F0D797;
+  border-left: 4px solid #D4991B;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 8px;
+}
+.guide-pauses h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #6B4C00;
+}
+.guide-pauses ol {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 12.5px;
+  color: #6B4C00;
+  line-height: 1.65;
+}
+.guide-pauses ol li strong { color: #4A3400; }
+
+.guide-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 16px 32px;
+  border-top: 1px solid #E4E7EB;
+  background: #FAFBFC;
+  border-radius: 0 0 12px 12px;
+}
+.guide-btn {
+  border: 1px solid #C9CFD6;
+  background: #fff;
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+.guide-btn.primary {
+  background: var(--sap-blue);
+  color: #fff;
+  border-color: var(--sap-blue);
+}
+.guide-btn.primary:hover { background: var(--sap-blue-hover); }
+.guide-btn:hover:not(.primary) { background: #F5F7FA; }
+
+@media (max-width: 768px) {
+  .guide-panel-header { padding: 18px 18px 10px; }
+  .guide-panel-header h2 { font-size: 18px; }
+  .guide-panel-body { padding: 18px; }
+  .guide-steps { grid-template-columns: 1fr; gap: 10px; }
+  .guide-step::after { display: none; }
+  .guide-step { text-align: left; display: flex; gap: 12px; align-items: flex-start; }
+  .guide-step-num { margin: 0; flex-shrink: 0; }
+  .guide-step-content { flex: 1; }
+  .guide-actions { padding: 14px 18px; }
+}

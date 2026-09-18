@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
   <link rel="stylesheet" href="shared/joule.css" />
+  <link rel="stylesheet" href="shared/guide.css" />
   <style>
     /* ============ Home-specific layout ============ */
     body {
@@ -767,11 +768,26 @@
   <script src="shared/state.js"></script>
   <script src="shared/topbar.js"></script>
   <script src="shared/joule.js"></script>
+  <script src="shared/guide.js"></script>
   <script>
     // Render topbar with "Home" app label (override default "Career Opportunities")
     const topbarHTML = window.TOPBAR.renderTopbar("employee");
     document.getElementById("topbarSlot").innerHTML = topbarHTML
       .replace(">Career Opportunities<", ">Home<");
+
+    // Mount guidance layers
+    window.GUIDE.injectGuideButton();
+    window.GUIDE.mountGuideOverlay({ suppressAutoShow: true });
+    window.GUIDE.mountRoleRibbon("employee");
+    // Hint: nudge user to open the Assignment card
+    setTimeout(() => {
+      window.GUIDE.showHint({
+        id: "home-open-assignment",
+        title: "Try this next",
+        body: "Click the yellow <b>New Assignment Opportunity</b> card to open the role details. Then try asking Joule to analyze it for your career development.",
+        anchor: "bottom-right"
+      });
+    }, 1200);
 
     // Joule shell (kept available for continuity, hidden by default on Home)
     document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Home");

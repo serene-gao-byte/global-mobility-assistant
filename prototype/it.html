@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
   <link rel="stylesheet" href="shared/joule.css" />
+  <link rel="stylesheet" href="shared/guide.css" />
   <style>
     .journey-nav { display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 10px 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 8px; margin-bottom: 16px; align-items: center; }
     .journey-nav .step { padding: 5px 10px; border-radius: 6px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; user-select: none; transition: background 0.12s, color 0.12s; }
@@ -90,11 +91,45 @@
   <script src="shared/state.js"></script>
   <script src="shared/topbar.js"></script>
   <script src="shared/joule.js"></script>
+  <script src="shared/guide.js"></script>
   <script src="data/it-data.js"></script>
   <script>
   const D = window.IT_DATA;
   document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("it");
   document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("it", "Joule · Identity & Access");
+
+  // Mount guidance layers
+  window.GUIDE.injectGuideButton();
+  window.GUIDE.mountGuideOverlay({ suppressAutoShow: true });
+  window.GUIDE.mountRoleRibbon("it");
+
+  // Step-appropriate hints
+  function showStepHintIT(step) {
+    if (step === "console") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "it-see-alert",
+        title: "Waiting for HR to trigger execution?",
+        body: "The high-severity alert appears once HR triggers execution on Lin Chen's move. If you don't see it, go to the HRBP tab → Approvals → Trigger execution.",
+        anchor: "bottom-right"
+      }), 900);
+    } else if (step === "diagnose") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "it-pause-3",
+        title: "This is Pause #3",
+        body: "Joule <b>could</b> auto-merge these records. It doesn't — because linkage is a governance decision, and any cross-border implications belong to Legal / Privacy specialists. It observes and routes.",
+        anchor: "top-right"
+      }), 700);
+    } else if (step === "receipt") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "it-log-routing",
+        title: "Notice the wording",
+        body: "The button says <b>Log routing to HR</b> — not 'Close alert' or 'Mark resolved'. This tool doesn't close the case; the governance team does.",
+        anchor: "top-right"
+      }), 700);
+    }
+  }
+  window.addEventListener("hashchange", () => showStepHintIT((location.hash || "#console").replace("#","")));
+  showStepHintIT((location.hash || "#console").replace("#",""));
 
   const STEPS = [
     { id: "console",     n: 1, label: "Alert Console" },

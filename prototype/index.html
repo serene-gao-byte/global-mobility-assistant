@@ -6,6 +6,7 @@
   <title>Global Mobility Assistant · Role Selector</title>
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
+  <link rel="stylesheet" href="shared/guide.css" />
   <style>
     body { background: linear-gradient(180deg, #00144A 0%, #002A86 100%); min-height: 100vh; color: #fff; }
     .landing { max-width: 1080px; margin: 0 auto; padding: 60px 32px 100px; }
@@ -41,6 +42,42 @@
     .role-card .steps b { display: block; color: var(--text-primary); margin-bottom: 4px; }
     .role-card .role-open { margin-top: 8px; color: var(--sap-blue); font-weight: 600; font-size: 13px; }
     .landing-footer { text-align: center; margin-top: 40px; color: #7A94BE; font-size: 12px; }
+
+    .landing-how-to {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 20px;
+      color: #E3ECFA;
+    }
+    .landing-how-to .how-to-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .landing-how-to h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: #fff;
+    }
+    .landing-how-to p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #B4C6DF;
+      max-width: 640px;
+    }
+    .landing-how-to .btn.primary {
+      flex-shrink: 0;
+      padding: 10px 18px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    @media (max-width: 768px) {
+      .landing-how-to .how-to-header { flex-direction: column; align-items: flex-start; }
+    }
 
     /* ============ Mobile adaptation · < 768px ============ */
     @media (max-width: 768px) {
@@ -115,10 +152,27 @@
       </a>
     </div>
 
+    <div class="landing-how-to">
+      <div class="how-to-header">
+        <div>
+          <h3>How this demo works</h3>
+          <p>Follow along as a Chinese renewables group moves an employee from Shanghai to Riyadh. Three roles, three intentional pauses where AI stops and hands the next step to a human.</p>
+        </div>
+        <button class="btn primary" id="learnMoreBtn">See the full walkthrough</button>
+      </div>
+    </div>
+
     <div class="landing-footer">
       非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行<br>
       Not an SAP official product · Learning prototype · Fictional data & simulated execution
     </div>
   </div>
+
+  <script src="shared/guide.js"></script>
+  <script>
+    // Mount the guide overlay; auto-shows on first visit (once per session)
+    const guide = window.GUIDE.mountGuideOverlay();
+    document.getElementById("learnMoreBtn").addEventListener("click", () => guide.show());
+  </script>
 </body>
 </html>
