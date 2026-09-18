@@ -470,8 +470,12 @@
 ============================================================ */
 @media (max-width: 768px) {
   /* ---- Root: prevent any accidental horizontal overflow ---- */
-  html, body { overflow-x: hidden; max-width: 100vw; }
+  /* NOTE: Do NOT set overflow-x on <html> / <body> — that would break
+     position: sticky on descendants (topbar). Instead, clip at the layout
+     root and force sub-elements to respect the viewport width. */
+  html, body { max-width: 100vw; }
   body { -webkit-text-size-adjust: 100%; }
+  .app-shell, .main-area { max-width: 100vw; overflow-x: clip; }
 
   /* ---- Top bar ---- */
   .topbar {
