@@ -96,7 +96,7 @@
   <script>
   const D = window.IT_DATA;
   document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("it");
-  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("it", "Joule · Identity & Access");
+  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("it", "Joule · 身份与访问");
 
   // Mount guidance layers
   window.GUIDE.injectGuideButton();
@@ -108,22 +108,22 @@
     if (step === "console") {
       setTimeout(() => window.GUIDE.showHint({
         id: "it-see-alert",
-        title: "Waiting for HR to trigger execution?",
-        body: "The high-severity alert appears once HR triggers execution on Lin Chen's move. If you don't see it, go to the HRBP tab → Approvals → Trigger execution.",
+        title: "在等 HR 触发执行吗?",
+        body: "高优告警会在 HR 触发林晨调动的执行后出现。如果你还没看到,请前往 HRBP 标签页 → 审批流 → 触发执行。",
         anchor: "bottom-right"
       }), 900);
     } else if (step === "diagnose") {
       setTimeout(() => window.GUIDE.showHint({
         id: "it-pause-3",
-        title: "This is Pause #3",
-        body: "Joule <b>could</b> auto-merge these records. It doesn't — because linkage is a governance decision, and any cross-border implications belong to Legal / Privacy specialists. It observes and routes.",
+        title: "这就是第 3 处暂停",
+        body: "Joule <b>本可以</b> 自动合并这些记录。但它没有 —— 因为账户关联属于治理决定,任何跨境影响都应交给法务 / 隐私专业人员判断。它只是观察,并做路由。",
         anchor: "top-right"
       }), 700);
     } else if (step === "receipt") {
       setTimeout(() => window.GUIDE.showHint({
         id: "it-log-routing",
-        title: "Notice the wording",
-        body: "The button says <b>Log routing to HR</b> — not 'Close alert' or 'Mark resolved'. This tool doesn't close the case; the governance team does.",
+        title: "注意这里的措辞",
+        body: "按钮写的是 <b>把路由结果回执给 HR</b> —— 不是 “关闭告警” 或 “标为已解决”。本工具不会关闭这个案例;那是治理团队的事。",
         anchor: "top-right"
       }), 700);
     }
@@ -135,8 +135,8 @@
     { id: "console",     n: 1, label: "告警控制台" },
     { id: "alertDetail", n: 2, label: "告警详情" },
     { id: "queue",       n: 3, label: "任务队列" },
-    { id: "diagnose",    n: 4, label: "Diagnose & resolve" },
-    { id: "receipt",     n: 5, label: "Submit receipt" }
+    { id: "diagnose",    n: 4, label: "诊断与处置" },
+    { id: "receipt",     n: 5, label: "提交回执" }
   ];
 
   function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -188,8 +188,8 @@
     return `
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">Alert Console</h1>
-          <div class="page-sub">Filtered to your tenants · click a high-severity alert to open its detail</div>
+          <h1 class="page-title">告警控制台</h1>
+          <div class="page-sub">已按你的租户过滤 · 点击高优告警打开详情</div>
         </div>
         <div class="page-actions">
           <button class="btn outlined" id="btnRefresh">🔄 刷新</button>
@@ -199,20 +199,21 @@
 
       <div class="info-strip">
         <span class="i-icon">i</span>
-        <div><b>Step 1 · Alert Console.</b> Your global alert queue. New IAS conflicts appear here when HR triggers execution.</div>
+        <div><b>第 1 步 · 告警控制台。</b>你的全球告警队列。HR 触发执行后,新的 IAS 冲突会出现在这里。</div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">System health</h2></div>
+          <div><h2 class="card-title">系统健康</h2></div>
           <span class="cap-tag native">标准业务功能模拟</span>
         </div>
         <div class="health-grid">
           ${D.systemHealth.map(h => {
-            const sh = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved ? h : { ...h, state: h.name === "IAS · region-me" ? "healthy" : h.state, note: h.name === "IAS · region-me" ? "no issues" : h.note };
+            const sh = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved ? h : { ...h, state: h.name === "身份服务 · 目标区域" ? "healthy" : h.state, note: h.name === "身份服务 · 目标区域" ? "无异常" : h.note };
+            const stateLabel = sh.state === "degraded" ? "受影响" : sh.state === "healthy" ? "正常" : sh.state;
             return `<div class="health-cell ${sh.state}">
               <div class="h-name">${esc(sh.name)}</div>
-              <div class="h-state">${sh.state === "degraded" ? "⚠ " : "● "}${esc(sh.state.toUpperCase())}</div>
+              <div class="h-state">${sh.state === "degraded" ? "⚠ " : "● "}${esc(stateLabel)}</div>
               <div class="muted small mt-8">${esc(sh.note)}</div>
             </div>`;
           }).join("")}
@@ -221,23 +222,23 @@
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Alert queue</h2>
-          <div class="card-sub">${alerts.length} open alert${alerts.length !== 1 ? "s" : ""}</div></div>
+          <div><h2 class="card-title">告警队列</h2>
+          <div class="card-sub">${alerts.length} 条未处理告警</div></div>
           <span class="cap-tag native">标准业务功能模拟</span>
         </div>
         <table class="data-table">
-          <thead><tr><th>Alert ID</th><th>Severity</th><th>Type</th><th>Affects</th><th>Opened</th></tr></thead>
+          <thead><tr><th>告警编号</th><th>严重级别</th><th>类型</th><th>影响对象</th><th>创建时间</th></tr></thead>
           <tbody>
             ${alerts.map(a => `<tr class="alert-row ${a.severity} ${a.primary ? "" : "readonly"}" data-alert="${esc(a.id)}">
-              <td class="mono">${esc(a.id)}${a.primary ? "" : ' <span class="preview-tag">read-only preview</span>'}</td>
-              <td>${pill(a.severity === "high" ? "red" : a.severity === "medium" ? "yellow" : "grey", a.severity)}</td>
+              <td class="mono">${esc(a.id)}${a.primary ? "" : ' <span class="preview-tag">只读预览</span>'}</td>
+              <td>${pill(a.severity === "high" ? "red" : a.severity === "medium" ? "yellow" : "grey", a.severity === "high" ? "高" : a.severity === "medium" ? "中" : "低")}</td>
               <td>${esc(a.type)}</td>
               <td class="mono">${esc(a.affects)}</td>
               <td class="muted">${esc(a.opened)}</td>
             </tr>`).join("")}
           </tbody>
         </table>
-        ${!s.executionStarted ? `<div class="info-strip mt-16" style="margin-bottom:0"><span class="i-icon">i</span><div>Waiting for HR to trigger execution — no IAS-related work yet.</div></div>` : ""}
+        ${!s.executionStarted ? `<div class="info-strip mt-16" style="margin-bottom:0"><span class="i-icon">i</span><div>等待 HR 触发执行 —— 当前没有 IAS 相关工作。</div></div>` : ""}
       </div>
     `;
   }
@@ -246,43 +247,43 @@
     const s = window.GMA.loadState();
     if (!s.executionStarted || !s.provisioningIssue || s.iasConflictResolved) {
       return `
-        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Alert detail</b></div>
-        <div class="info-strip warn"><span class="i-icon">!</span><div>No active high-severity alert. This step is available once HR triggers execution.</div></div>
+        <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <b>告警详情</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div>当前没有高优告警。HR 触发执行后,此步骤会开放。</div></div>
       `;
     }
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>ALT-2026-091501</b></div>
+      <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <b>ALT-2026-091501</b></div>
 
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">ALT-2026-091501 · Identity mapping needs review</h1>
-          <div class="page-sub">High severity · Affects EMP-CN-2381 · Opened 2026-11-01 03:14</div>
+          <h1 class="page-title">ALT-2026-091501 · 身份映射待复核</h1>
+          <div class="page-sub">高优 · 影响 EMP-CN-2381 · 2026-11-01 03:14 开启</div>
         </div>
         <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#console'">← Back to console</button>
-          <button class="btn primary" onclick="location.hash='#queue'">See dependency graph →</button>
+          <button class="btn outlined" onclick="location.hash='#console'">← 返回控制台</button>
+          <button class="btn primary" onclick="location.hash='#queue'">查看依赖图 →</button>
         </div>
       </div>
 
       <div class="info-strip">
         <span class="i-icon">i</span>
-        <div><b>Step 2 · Alert detail.</b> Context for the alert. Next step: see which move tasks are paused and review the observation before routing.</div>
+        <div><b>第 2 步 · 告警详情。</b>告警的上下文。下一步:查看哪些调动任务被暂停,并在路由前先看清观察结论。</div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Alert context</h2></div>
+          <div><h2 class="card-title">告警上下文</h2></div>
           <span class="cap-tag native">标准业务功能模拟</span>
         </div>
         <ul class="kv-list">
-          <li><span class="k">Alert ID</span><span class="v mono">ALT-2026-091501</span></li>
-          <li><span class="k">Severity</span><span class="v">${pill("red","high")}</span></li>
-          <li><span class="k">Type</span><span class="v">Identity mapping needs review</span></li>
-          <li><span class="k">Affects</span><span class="v mono">EMP-CN-2381 (林晨)</span></li>
-          <li><span class="k">Related move</span><span class="v mono">${esc(s.moveRequestId)}</span></li>
-          <li><span class="k">Opened</span><span class="v">2026-11-01 03:14</span></li>
-          <li><span class="k">Origin task</span><span class="v mono">EXEC-04 · Identity provisioning · target region</span></li>
-          <li><span class="k">Downstream paused</span><span class="v mono">EXEC-05, EXEC-06, EXEC-07, EXEC-08</span></li>
+          <li><span class="k">告警编号</span><span class="v mono">ALT-2026-091501</span></li>
+          <li><span class="k">严重级别</span><span class="v">${pill("red","高")}</span></li>
+          <li><span class="k">类型</span><span class="v">身份映射待复核</span></li>
+          <li><span class="k">影响对象</span><span class="v mono">EMP-CN-2381(林晨)</span></li>
+          <li><span class="k">关联调动</span><span class="v mono">${esc(s.moveRequestId)}</span></li>
+          <li><span class="k">开启时间</span><span class="v">2026-11-01 03:14</span></li>
+          <li><span class="k">源任务</span><span class="v mono">EXEC-04 · 身份供应 · 目标区域</span></li>
+          <li><span class="k">下游被暂停</span><span class="v mono">EXEC-05, EXEC-06, EXEC-07, EXEC-08</span></li>
         </ul>
       </div>
     `;
@@ -294,7 +295,6 @@
     if (!s.executionStarted) {
       tasks.forEach(t => t.state = "pending-dep");
     } else if (s.iasConflictResolved) {
-      // Case routed to governance — downstream stays paused pending decision + target-side verification
       const e4 = tasks.find(t => t.id === "EXEC-04");
       if (e4) e4.state = "pending-review";
     } else {
@@ -303,32 +303,32 @@
     }
 
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <a onclick="location.hash='#alertDetail'">Alert</a> › <b>Task queue</b></div>
+      <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <a onclick="location.hash='#alertDetail'">告警</a> › <b>任务队列</b></div>
 
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">Move task queue · dependency graph</h1>
-          <div class="page-sub">Lin Chen (EMP-CN-2381) · 8 tasks · Identity / Access / SSO</div>
+          <h1 class="page-title">调动任务队列 · 依赖图</h1>
+          <div class="page-sub">林晨(EMP-CN-2381)· 8 个任务 · 身份 / 访问 / SSO</div>
         </div>
         <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#alertDetail'">← Back</button>
-          <button class="btn primary" onclick="location.hash='#diagnose'">Review →</button>
+          <button class="btn outlined" onclick="location.hash='#alertDetail'">← 返回</button>
+          <button class="btn primary" onclick="location.hash='#diagnose'">审查 →</button>
         </div>
       </div>
 
       <div class="info-strip">
         <span class="i-icon">i</span>
-        <div><b>Step 3 · Task queue.</b> Submitted ≠ verified · person continuity ≠ all accounts unchanged. EXEC-04 is paused for human review; 4 downstream tasks stay paused with it.</div>
+        <div><b>第 3 步 · 任务队列。</b>已提交 ≠ 已核实 · 主体连续性 ≠ 所有账户不变。EXEC-04 暂停等待人工复核;下游 4 个任务随之暂停。</div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Dependency graph</h2></div>
+          <div><h2 class="card-title">依赖图</h2></div>
           <span class="cap-tag native">标准业务功能模拟</span>
         </div>
         <div class="dep-graph">
           ${tasks.map(t => {
-            const label = { confirmed: "✓ Done", "pending-review": "⚠ Needs review", "pending-dep": "⏳ Waits on dep." }[t.state] || t.state;
+            const label = { confirmed: "✓ 已完成", "pending-review": "⚠ 待复核", "pending-dep": "⏳ 等待依赖" }[t.state] || t.state;
             const cls = { confirmed: "green", "pending-review": "yellow", "pending-dep": "grey" }[t.state] || "grey";
             const badge = pill(cls, label);
             const nodeCls = t.state === "pending-review" ? "failed" : t.state;
@@ -337,7 +337,7 @@
               <div class="task-label">${esc(t.label)}</div>
               <div class="task-meta">${esc(t.owner)}</div>
               <div class="mt-8">${badge}</div>
-              ${t.deps.length ? `<div class="task-meta mt-8">deps: ${t.deps.map(esc).join(", ")}</div>` : ""}
+              ${t.deps.length ? `<div class="task-meta mt-8">依赖:${t.deps.map(esc).join(", ")}</div>` : ""}
             </div>`;
           }).join("")}
         </div>
@@ -349,65 +349,65 @@
     const s = window.GMA.loadState();
     if (!s.executionStarted || !s.provisioningIssue) {
       return `
-        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Diagnose</b></div>
-        <div class="info-strip warn"><span class="i-icon">!</span><div>No active IAS conflict to diagnose right now.</div></div>
+        <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <b>诊断</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div>当前没有需要诊断的 IAS 冲突。</div></div>
       `;
     }
     if (s.iasConflictResolved) {
       return `
-        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Routed for governance review</b></div>
+        <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <b>已路由至治理复核</b></div>
         <div class="conclusion-banner">
           <div class="cb-icon">→</div>
           <div>
-            <div class="cb-title">EXEC-04 routed to Identity governance</div>
-            <div class="cb-sub">Human review requested. Downstream provisioning remains paused. This tool does not close the alert or mark the case as resolved — that determination belongs to the governance team.</div>
+            <div class="cb-title">EXEC-04 已路由至身份治理团队</div>
+            <div class="cb-sub">已请求人工复核。下游供应仍处于暂停状态。本工具不会关闭告警、也不会将案例标为已解决 —— 结论由治理团队做出。</div>
           </div>
         </div>
         <div class="row" style="justify-content:flex-end;">
-          <button class="btn primary" onclick="location.hash='#receipt'">Log the routing action →</button>
+          <button class="btn primary" onclick="location.hash='#receipt'">记录本次路由操作 →</button>
         </div>
       `;
     }
     const d = D.diagnosis;
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <a onclick="location.hash='#queue'">Task queue</a> › <b>Review</b></div>
+      <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <a onclick="location.hash='#queue'">任务队列</a> › <b>审查</b></div>
 
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">EXEC-04 · Awaiting human review</h1>
-          <div class="page-sub">Observation only · this tool does not propose an operational path or resolve the case</div>
+          <h1 class="page-title">EXEC-04 · 等待人工复核</h1>
+          <div class="page-sub">仅供观察 · 本工具不提议操作路径,也不解决该案例</div>
         </div>
         <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#queue'">← Back to queue</button>
+          <button class="btn outlined" onclick="location.hash='#queue'">← 返回队列</button>
         </div>
       </div>
 
       <div class="info-strip">
         <span class="i-icon">i</span>
-        <div><b>Step 4 · Review.</b> Joule surfaces observations and pauses. The next step — whether these records represent the same person, and how to link them — is a governance decision.</div>
+        <div><b>第 4 步 · 审查。</b>Joule 呈现观察结论并暂停。下一步 —— 这些记录是否属于同一个人、以及如何关联 —— 属于治理决定。</div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Observation &amp; what to do next</h2></div>
+          <div><h2 class="card-title">观察结论 · 下一步该做什么</h2></div>
           <span class="cap-tag ext">项目扩展设计</span>
         </div>
         <div class="two-col">
           <div>
-            <div class="bold mb-8">What was observed</div>
+            <div class="bold mb-8">观察到的情况</div>
             <div class="muted" style="line-height:1.55;">${esc(d.observation)}</div>
-            <div class="bold mt-16 mb-8">Why this pauses here</div>
+            <div class="bold mt-16 mb-8">为什么在这里暂停</div>
             <div class="muted" style="line-height:1.55;">${esc(d.whyManual)}</div>
           </div>
           <div>
             <div class="diagnosis">
-              <h4>What to do next</h4>
+              <h4>下一步该做什么</h4>
               <ol>
                 ${d.whatToDoNext.map(step => `<li>${esc(step)}</li>`).join("")}
               </ol>
             </div>
             <div class="muted small mt-8">
-              <b>Owners &amp; references:</b>
+              <b>负责人 · 参考:</b>
               <ul style="margin:4px 0 0 18px; padding:0;">
                 ${d.references.map(r => `<li>${esc(r)}</li>`).join("")}
               </ul>
@@ -416,12 +416,12 @@
         </div>
         <div class="info-strip warn mt-16">
           <span class="i-icon">!</span>
-          <div><b>Downstream tasks paused:</b> <span class="mono">${D.downstream.join(", ")}</span> — will remain paused until the governance decision is recorded.</div>
+          <div><b>下游任务暂停:</b><span class="mono">${D.downstream.join(", ")}</span> —— 在治理决定被记录之前,将保持暂停。</div>
         </div>
         <div class="row mt-16">
           <div class="spacer"></div>
-          <button class="btn outlined" id="btnEscalate">Add context for governance team</button>
-          <button class="btn primary" id="btnResolve">Route to Identity governance team</button>
+          <button class="btn outlined" id="btnEscalate">为治理团队补充上下文</button>
+          <button class="btn primary" id="btnResolve">路由至身份治理团队</button>
         </div>
       </div>
     `;
@@ -431,47 +431,47 @@
     const s = window.GMA.loadState();
     if (!s.iasConflictResolved) {
       return `
-        <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Log routing</b></div>
-        <div class="info-strip warn"><span class="i-icon">!</span><div>Route EXEC-04 to Identity governance first, then come back to log the routing action.</div></div>
+        <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <b>记录路由</b></div>
+        <div class="info-strip warn"><span class="i-icon">!</span><div>请先把 EXEC-04 路由到身份治理团队,然后回到此处记录本次路由操作。</div></div>
       `;
     }
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#console'">Alert Console</a> › <b>Log routing</b></div>
+      <div class="breadcrumb"><a onclick="location.hash='#console'">告警控制台</a> › <b>记录路由</b></div>
 
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">Log the routing action</h1>
-          <div class="page-sub">Notify HR that the case has been routed for governance review — not that it has been resolved</div>
+          <h1 class="page-title">记录本次路由操作</h1>
+          <div class="page-sub">通知 HR:该案例已被路由至治理复核 —— 并非已被解决</div>
         </div>
         <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#diagnose'">← Back</button>
+          <button class="btn outlined" onclick="location.hash='#diagnose'">← 返回</button>
         </div>
       </div>
 
       <div class="info-strip ${s.receiptSubmitted ? "success" : ""}">
         <span class="i-icon">${s.receiptSubmitted ? "✓" : "i"}</span>
-        <div><b>Step 5 · Log routing.</b> ${s.receiptSubmitted ? "Routing logged. HR sees the case is with the governance team, not that it is closed." : "Confirm below to log the routing action."}</div>
+        <div><b>第 5 步 · 记录路由。</b>${s.receiptSubmitted ? "路由已记录。HR 看到的是案例在治理团队处 —— 而不是已关闭。" : "在下方确认,以记录本次路由操作。"}</div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Routing note · draft</h2>
-          <div class="card-sub">Joule drafted this; you sign off. Target-side verification is still pending.</div></div>
+          <div><h2 class="card-title">路由说明 · 草稿</h2>
+          <div class="card-sub">由 Joule 起草,由你签署。目标侧核实仍未到位。</div></div>
           <span class="cap-tag ext">项目扩展设计</span>
         </div>
         <ul class="kv-list">
-          <li><span class="k">Move</span><span class="v mono">${esc(s.moveRequestId)}</span></li>
-          <li><span class="k">Employee</span><span class="v">EMP-CN-2381 · 林晨</span></li>
-          <li><span class="k">EXEC-04</span><span class="v">${pill("yellow","Routed · awaiting governance decision")}</span></li>
-          <li><span class="k">Downstream (EXEC-05 to 08)</span><span class="v">${pill("grey","Paused · will resume after decision + target-side verification")}</span></li>
-          <li><span class="k">Alert</span><span class="v mono">ALT-2026-091501 · open · under review</span></li>
-          <li><span class="k">Notes for HR</span><span class="v">Case surfaced multiple candidate identity records; routed to Identity governance for human review. This tool does not determine linkage or close the alert.</span></li>
+          <li><span class="k">调动</span><span class="v mono">${esc(s.moveRequestId)}</span></li>
+          <li><span class="k">员工</span><span class="v">EMP-CN-2381 · 林晨</span></li>
+          <li><span class="k">EXEC-04</span><span class="v">${pill("yellow","已路由 · 等待治理决定")}</span></li>
+          <li><span class="k">下游(EXEC-05 至 08)</span><span class="v">${pill("grey","暂停 · 决定 + 目标侧核实后恢复")}</span></li>
+          <li><span class="k">告警</span><span class="v mono">ALT-2026-091501 · 开启中 · 审查中</span></li>
+          <li><span class="k">给 HR 的说明</span><span class="v">案例出现多个候选身份记录;已路由至身份治理团队进行人工复核。本工具不做关联判断,也不关闭告警。</span></li>
         </ul>
         <div class="row mt-16">
           <div class="spacer"></div>
           ${s.receiptSubmitted
-            ? `<button class="btn outlined" disabled>Routing logged ✓</button>`
-            : `<button class="btn primary" id="btnSubmitReceipt">Log routing to HR</button>`}
+            ? `<button class="btn outlined" disabled>路由已记录 ✓</button>`
+            : `<button class="btn primary" id="btnSubmitReceipt">把路由结果回执给 HR</button>`}
         </div>
       </div>
     `;
@@ -505,54 +505,54 @@
     if (step === "diagnose") {
       document.getElementById("btnResolve")?.addEventListener("click", () => {
         window.GMA.mutateState(x => { x.iasConflictResolved = true; x.provisioningIssue = false; }, "it-routed-to-governance");
-        jouleExtra.push({ role: "bot", html: `Case routed to the Identity governance team (simulated). This tool does not determine linkage or close the alert — awaiting their decision.`, sources: 1 });
+        jouleExtra.push({ role: "bot", html: `案例已路由至身份治理团队(模拟)。本工具不做关联判断、也不关闭告警 —— 等待治理团队的决定。`, sources: 1 });
         renderView();
       });
-      document.getElementById("btnEscalate")?.addEventListener("click", () => alert("Context added for the governance team (simulated). No state change in this demo path."));
+      document.getElementById("btnEscalate")?.addEventListener("click", () => alert("已为治理团队补充上下文(模拟)。本演示路径中不改变状态。"));
     }
 
     if (step === "receipt") {
       document.getElementById("btnSubmitReceipt")?.addEventListener("click", () => {
         window.GMA.mutateState(x => { x.receiptSubmitted = true; }, "it-logged-routing");
-        jouleExtra.push({ role: "bot", html: `Routing logged. HR sees the case is with the governance team, not that it is closed.`, sources: 1 });
+        jouleExtra.push({ role: "bot", html: `路由已记录。HR 看到的是案例在治理团队处 —— 而不是已关闭。`, sources: 1 });
         renderView();
       });
     }
   }
 
-  // ============ Joule (IT) with autoplay pacing ============
+  // ============ Joule(IT)· 支持自动播放节奏 ============
   function jouleFramesFor(step) {
     const s = window.GMA.loadState();
     const active = s.executionStarted && s.provisioningIssue && !s.iasConflictResolved;
     const overview = { role: "bot", autoplay: true, delay: 300,
-      html: `Standing by, Tom. Queue: 2 baseline alerts. ${active ? "<strong>New high-severity alert:</strong> identity mapping for Lin Chen's move needs human review — 4 downstream tasks paused." : "No high-severity alerts."}`, sources: 1 };
+      html: `准备就绪,Tom。队列:2 条常规告警。${active ? "<strong>新的高优告警:</strong>林晨调动中的身份映射需要人工复核 —— 4 个下游任务被暂停。" : "当前没有高优告警。"}`, sources: 1 };
 
     switch (step) {
       case "console":
         return [ overview ];
       case "alertDetail":
-        if (!active) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Nothing to detail right now.`, sources: 1 } ];
+        if (!active) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `当前没有需要展开的告警。`, sources: 1 } ];
         return [ overview,
           { role: "bot", autoplay: true, delay: 700,
-            html: `EXEC-04 needs human review. 4 downstream tasks stay paused until a governance decision is recorded.`, sources: 1 } ];
+            html: `EXEC-04 需要人工复核。在治理决定被记录之前,4 个下游任务保持暂停。`, sources: 1 } ];
       case "queue":
-        if (!s.executionStarted) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Queue is idle. Once HR triggers execution the graph will activate.`, sources: 1 } ];
+        if (!s.executionStarted) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `队列空闲。HR 触发执行后,依赖图会激活。`, sources: 1 } ];
         return [ overview,
           { role: "bot", autoplay: true, delay: 700,
-            html: `EXEC-04 is what's holding downstream. I'll show you what I observed — next step is a governance decision, not an operation I recommend.`, sources: 1 } ];
+            html: `是 EXEC-04 卡住了下游。我会告诉你我观察到什么 —— 下一步是治理决定,不是我建议的操作。`, sources: 1 } ];
       case "diagnose":
-        if (s.iasConflictResolved) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Case routed. Awaiting governance decision — I do not close it.`, sources: 1 } ];
-        if (!active) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Nothing to review right now.`, sources: 1 } ];
+        if (s.iasConflictResolved) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `案例已路由。等待治理决定 —— 我不会关闭它。`, sources: 1 } ];
+        if (!active) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `当前没有需要审查的案例。`, sources: 1 } ];
         return [ overview,
           { role: "bot", autoplay: true, delay: 600,
-            html: `Observation: automated identity mapping returned multiple candidate records. I do not conclude that they represent a conflict, or propose an operational path.`, sources: 2 },
-          { role: "bot", autoplay: false, continueLabel: "▸ Why I stop here",
-            html: `Whether the records represent the same person, and how to link them, is a <strong>governance decision</strong> — including any applicable data-protection or cross-border review by qualified specialists. I surface observations and route; I do not resolve.`, sources: 2 }];
+            html: `观察结论:自动身份映射返回了多条候选记录。我不会断言它们代表冲突,也不会提议操作路径。`, sources: 2 },
+          { role: "bot", autoplay: false, continueLabel: "▸ 为什么我在这里停下",
+            html: `这些记录是否属于同一个人、以及如何关联,属于 <strong>治理决定</strong> —— 其中任何数据保护或跨境合规审查,应由有资质的专业人员评估。我呈现观察并做路由;我不做处置。`, sources: 2 }];
       case "receipt":
-        if (!s.iasConflictResolved) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `Not ready — route the case for governance review first.`, sources: 1 } ];
+        if (!s.iasConflictResolved) return [ overview, { role: "bot", autoplay: true, delay: 400, html: `还没到时候 —— 请先把案例路由给治理复核。`, sources: 1 } ];
         return [ overview,
           { role: "bot", autoplay: true, delay: 500,
-            html: `Routing note drafted. Review and sign off; HR sees the case is with the governance team, not that it is closed.`, sources: 1 } ];
+            html: `路由说明已起草。请核对并签署;HR 看到的是案例在治理团队处 —— 而不是已关闭。`, sources: 1 } ];
     }
     return [ overview ];
   }
@@ -560,7 +560,7 @@
   function handleJouleAction() {}
 
   function refreshJoule() {
-    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "Identity & Access");
+    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "身份与访问");
     const base = jouleFramesFor(currentStepId());
     const frames = base.concat(jouleExtra.map(f => ({ ...f, autoplay: f.autoplay !== undefined ? f.autoplay : true })));
     window.JOULE.loadSequence(frames, handleJouleAction);
@@ -570,11 +570,11 @@
 
   function itSuggestionsFor(step) {
     switch (step) {
-      case "console":     return ["Any high-severity alerts?", "System health status?"];
-      case "alertDetail": return ["What did I observe?", "What's paused downstream?"];
-      case "queue":       return ["Which task is paused?", "Show dependencies"];
-      case "diagnose":    return ["Can you auto-resolve?", "Who should decide?"];
-      case "receipt":     return ["What's in the routing note?"];
+      case "console":     return ["有高优告警吗?", "系统健康状态如何?"];
+      case "alertDetail": return ["观察到了什么?", "下游哪些任务被暂停?"];
+      case "queue":       return ["哪个任务被暂停了?", "看依赖关系"];
+      case "diagnose":    return ["你能自动处理吗?", "由谁来决定?"];
+      case "receipt":     return ["路由说明里都写了什么?"];
       default: return [];
     }
   }
@@ -582,28 +582,28 @@
   function itIntentRouter(userText) {
     const t = userText.toLowerCase();
     const s = window.GMA.loadState();
-    if (/high|severity|urgent|alert/.test(t)) {
-      if (s.provisioningIssue && !s.iasConflictResolved) return { html: `1 <strong>high</strong>: identity provisioning on Lin Chen's move (EXEC-04) needs human review — 4 downstream tasks paused. Plus 1 medium and 1 low.`, sources: 2 };
-      return { html: `No high-severity alerts. 1 medium (IPS sync lag), 1 low (SSO cert expiring).`, sources: 1 };
+    if (/high|severity|urgent|alert|高优|严重|告警/.test(t)) {
+      if (s.provisioningIssue && !s.iasConflictResolved) return { html: `1 条 <strong>高优</strong>:林晨调动中的身份供应(EXEC-04)需要人工复核 —— 4 个下游任务被暂停。另有 1 条中优、1 条低优。`, sources: 2 };
+      return { html: `没有高优告警。1 条中优(IPS 同步延迟),1 条低优(SSO 证书临近到期)。`, sources: 1 };
     }
-    if (/system|health|tenant/.test(t)) {
-      return { html: `Identity (target region) is currently <strong>degraded</strong> with 1 case awaiting human review. All other components healthy.`, sources: 1 };
+    if (/system|health|tenant|系统|健康|租户/.test(t)) {
+      return { html: `身份服务(目标区域)当前处于 <strong>受影响</strong> 状态,有 1 个案例等待人工复核。其余组件正常。`, sources: 1 };
     }
-    if (/observed|what.*happen|why.*paused|multi|candidate|record/.test(t)) {
-      return { html: `Automated identity mapping returned multiple candidate records for user 'lin.chen'. Whether they represent the same person is a determination for the Identity governance team — I don't infer that from record presence alone.`, sources: 2 };
+    if (/observed|what.*happen|why.*paused|multi|candidate|record|观察|多条|候选|记录/.test(t)) {
+      return { html: `自动身份映射对用户 'lin.chen' 返回了多条候选记录。它们是否属于同一个人,应由身份治理团队判断 —— 我不会仅凭记录存在就下结论。`, sources: 2 };
     }
-    if (/downstream|block|depend|graph|paused/.test(t)) {
-      return { html: `EXEC-04 is holding <span class="mono">EXEC-05, EXEC-06, EXEC-07, EXEC-08</span> — attribute sync, access role changes, and first-login verification. All resume only after the governance decision <em>and</em> target-side verification.`, sources: 1 };
+    if (/downstream|block|depend|graph|paused|下游|阻塞|依赖|暂停/.test(t)) {
+      return { html: `EXEC-04 卡住了 <span class="mono">EXEC-05, EXEC-06, EXEC-07, EXEC-08</span> —— 属性同步、访问角色变更、首次登录核实。这些只会在治理决定 <em>且</em> 目标侧核实回执到位后才恢复。`, sources: 1 };
     }
-    if (/auto|automatic|resolve|for me|do it|merge/.test(t)) {
-      return { html: `<strong>I don't auto-resolve this class of case.</strong> Identity linkage across regions is a governance decision, and any cross-border implications belong to qualified specialists. I surface observations and route — I don't propose an operational path.`, sources: 2 };
+    if (/auto|automatic|resolve|for me|do it|merge|自动|合并|替我/.test(t)) {
+      return { html: `<strong>这一类案例我不会自动处理。</strong>跨区域的身份关联是治理决定,任何跨境影响都属于有资质的专业人员的判断范围。我呈现观察并做路由 —— 我不提议操作路径。`, sources: 2 };
     }
-    if (/who|owner|decide|responsible/.test(t)) {
-      return { html: `The Identity governance team owns the linkage decision. Any data-protection or cross-border implications should be assessed by Legal / Privacy specialists — not by this tool.`, sources: 1 };
+    if (/who|owner|decide|responsible|谁|决定|负责/.test(t)) {
+      return { html: `身份治理团队拥有关联决定。任何数据保护或跨境影响,应由法务 / 隐私专业人员评估 —— 而不是由本工具处理。`, sources: 1 };
     }
-    if (/receipt|submit|close|route|routing/.test(t)) {
-      if (!s.iasConflictResolved) return { html: `Not yet — route the case to governance first.`, sources: 1 };
-      return { html: `Routing note draft is ready. It records: case routed to Identity governance, downstream tasks remain paused, alert stays open pending decision + target-side verification. Sign off to log the routing to HR.`, sources: 1 };
+    if (/receipt|submit|close|route|routing|回执|提交|关闭|路由/.test(t)) {
+      if (!s.iasConflictResolved) return { html: `还没到时候 —— 请先把案例路由到治理团队。`, sources: 1 };
+      return { html: `路由说明草稿已就绪。它记录:案例已路由至身份治理、下游任务保持暂停、告警在决定 + 目标侧核实到位前保持开启。请签署以把路由结果回执给 HR。`, sources: 1 };
     }
     return null;
   }

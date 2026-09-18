@@ -8,16 +8,17 @@
   <link rel="stylesheet" href="shared/shell.css" />
   <link rel="stylesheet" href="shared/guide.css" />
   <style>
-    body { background: linear-gradient(180deg, #00144A 0%, #002A86 100%); min-height: 100vh; color: #fff; }
-    .landing { max-width: 1080px; margin: 0 auto; padding: 60px 32px 100px; }
-    .landing-header { text-align: center; margin-bottom: 40px; }
-    .landing-header .logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-    .landing-header h1 { font-size: 34px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.4px; }
-    .landing-header .subtitle { color: #B4C6DF; font-size: 15px; max-width: 640px; margin: 0 auto; line-height: 1.6; }
-    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+    html, body { background: #00144A; }
+    body { background: linear-gradient(180deg, #00144A 0%, #002A86 100%); background-attachment: fixed; min-height: 100vh; color: #fff; }
+    .landing { max-width: 1080px; margin: 0 auto; padding: 32px 32px 40px; }
+    .landing-header { text-align: center; margin-bottom: 24px; }
+    .landing-header .logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .landing-header h1 { font-size: 28px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.4px; }
+    .landing-header .subtitle { color: #B4C6DF; font-size: 13.5px; max-width: 720px; margin: 0 auto; line-height: 1.55; }
+    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
     .role-card {
       background: #fff; color: var(--text-primary);
-      border-radius: 12px; padding: 28px 24px; text-decoration: none;
+      border-radius: 12px; padding: 20px 20px; text-decoration: none;
       box-shadow: 0 10px 32px rgba(0,0,0,0.25);
       transition: transform 0.15s, box-shadow 0.15s;
       display: flex; flex-direction: column;
@@ -28,27 +29,27 @@
     .role-card.hrbp { border-top-color: var(--role-hrbp); }
     .role-card.it { border-top-color: var(--role-it); }
     .role-card .role-avatar {
-      width: 52px; height: 52px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 700; font-size: 18px; margin-bottom: 16px;
+      color: #fff; font-weight: 700; font-size: 16px; margin-bottom: 12px;
     }
     .role-card.employee .role-avatar { background: linear-gradient(135deg, #F1B6A7, #C74A3A); }
     .role-card.hrbp .role-avatar     { background: linear-gradient(135deg, #A4E0C0, #049F9A); }
     .role-card.it .role-avatar       { background: linear-gradient(135deg, #B894FF, #5D36FF); }
-    .role-card h2 { margin: 0 0 4px; font-size: 18px; }
-    .role-card .role-person { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
-    .role-card .role-desc { color: var(--text-primary); font-size: 13px; line-height: 1.55; margin-bottom: 14px; flex: 1; }
-    .role-card .steps { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
-    .role-card .steps b { display: block; color: var(--text-primary); margin-bottom: 4px; }
-    .role-card .role-open { margin-top: 8px; color: var(--sap-blue); font-weight: 600; font-size: 13px; }
-    .landing-footer { text-align: center; margin-top: 40px; color: #7A94BE; font-size: 12px; }
+    .role-card h2 { margin: 0 0 4px; font-size: 16px; }
+    .role-card .role-person { color: var(--text-muted); font-size: 12px; margin-bottom: 8px; }
+    .role-card .role-desc { color: var(--text-primary); font-size: 12.5px; line-height: 1.5; margin-bottom: 10px; flex: 1; }
+    .role-card .steps { font-size: 11.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 8px; }
+    .role-card .steps b { display: block; color: var(--text-primary); margin-bottom: 3px; }
+    .role-card .role-open { margin-top: 6px; color: var(--sap-blue); font-weight: 600; font-size: 12.5px; }
+    .landing-footer { text-align: center; margin-top: 20px; color: #7A94BE; font-size: 11px; }
 
     .landing-how-to {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.14);
       border-radius: 12px;
-      padding: 20px 24px;
-      margin-top: 20px;
+      padding: 14px 18px;
+      margin-top: 12px;
       color: #E3ECFA;
     }
     .landing-how-to .how-to-header {
@@ -58,21 +59,21 @@
       gap: 20px;
     }
     .landing-how-to h3 {
-      margin: 0 0 6px;
-      font-size: 16px;
+      margin: 0 0 4px;
+      font-size: 14px;
       color: #fff;
     }
     .landing-how-to p {
       margin: 0;
-      font-size: 13px;
-      line-height: 1.55;
+      font-size: 12px;
+      line-height: 1.5;
       color: #B4C6DF;
-      max-width: 640px;
+      max-width: 720px;
     }
     .landing-how-to .btn.primary {
       flex-shrink: 0;
-      padding: 10px 18px;
-      font-size: 13px;
+      padding: 8px 16px;
+      font-size: 12.5px;
       white-space: nowrap;
     }
     @media (max-width: 768px) {
@@ -81,16 +82,16 @@
 
     /* ============ Mobile adaptation · < 768px ============ */
     @media (max-width: 768px) {
-      .landing { padding: 30px 16px 80px; }
-      .landing-header { margin-bottom: 24px; }
-      .landing-header h1 { font-size: 26px; }
-      .landing-header .subtitle { font-size: 13px; padding: 0 8px; }
-      .role-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 24px; }
-      .role-card { padding: 20px 18px; }
-      .role-card h2 { font-size: 16px; }
-      .role-card .role-avatar { width: 44px; height: 44px; font-size: 16px; margin-bottom: 12px; }
-      .role-card .steps { font-size: 11.5px; }
-      .landing-footer { font-size: 11px; margin-top: 24px; }
+      .landing { padding: 24px 16px 40px; }
+      .landing-header { margin-bottom: 20px; }
+      .landing-header h1 { font-size: 22px; }
+      .landing-header .subtitle { font-size: 12.5px; padding: 0 8px; }
+      .role-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px; }
+      .role-card { padding: 16px 16px; }
+      .role-card h2 { font-size: 15px; }
+      .role-card .role-avatar { width: 40px; height: 40px; font-size: 14px; margin-bottom: 10px; }
+      .role-card .steps { font-size: 11px; }
+      .landing-footer { font-size: 10.5px; margin-top: 16px; }
     }
   </style>
 </head>
@@ -157,7 +158,7 @@
       <div class="how-to-header">
         <div>
           <h3>How this demo works</h3>
-          <p>Follow along as a Chinese renewables group moves an employee from Shanghai to Riyadh. Three roles, three intentional pauses where AI stops and hands the next step to a human.</p>
+          <p>Follow Joule Global Mobility Assistant through an employee relocation from Shanghai to Riyadh. See how the Agent coordinates the process, flags risks, and moves tasks forward, while leaving key decisions and approvals to the right people.</p>
         </div>
         <button class="btn primary" id="learnMoreBtn">See the full walkthrough</button>
       </div>
