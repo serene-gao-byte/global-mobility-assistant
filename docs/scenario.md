@@ -34,18 +34,18 @@ Joule auto-plays: "I surfaced 4 opportunities..."
 
 **Click Riyadh card → Step 2 (Evaluate).**
 
-Joule auto-plays two info messages, then pauses on **▸ Ask Joule a hard question**.
+Joule auto-plays two info messages, then pauses on **▸ Ask Joule for a personal analysis**.
 
-> "现在,关键一刻。她要问 AI 每个员工都会想问的问题。"
+> "现在关键一刻。员工不会直接问 AI '我该接吗' —— 她更可能问的是 '帮我基于我的经验和长处 · 分析这个岗位对我发展有什么优劣势'。这是员工在职场里真实会问的问题。"
 
-**Option A** · Click ▸ Ask Joule a hard question — the user bubble appears.
-**Option B** · Type into Joule input: `Should I take this role?` → Enter.
+**Option A** · Click ▸ Ask Joule for a personal analysis — the user bubble appears.
+**Option B** · Type into Joule input: `Analyze this role for my development` → Enter.
 
 Joule auto-plays the response (900ms delay).
 
 **⚠ Hold the shot for 3 seconds after the response appears.** Let the audience read it.
 
-> "**这是第一次停下**。Joule 不拒绝对话 —— 它给她比较工具、给她反问问题、给她数据来源。但**是否接受这份岗位**,涉及她的家庭、成长方向、生活规划 —— 这不是 AI 该给结论的。**下一步归她自己**,可以和经理、导师聊聊。这不是拒绝谈话,是明确边界。"
+> "**这是第一次停下**。Joule **具体地帮她比较** · 列出了三样东西:她的**匹配优势**(方案顾问经验 · BESS 认证)、**待关注的差距**(阿拉伯语是自述项 · 不是系统记录)、**Trade-offs**(区域视野 vs 搬迁适应)。但它明确说 · '只有你能判断的 —— 家庭、人生阶段、对新市场的胃口 —— **这些不在我的数据里 · 我不会猜**' · 引导她去和经理或导师聊。**帮到位 · 但不越界**。"
 
 ## 0:55 – 1:15 · Employee · Apply → Track
 
@@ -125,13 +125,13 @@ Fast three-way switch — no narration on each, just show:
 
 Return to any tab. Point at the compliance footer.
 
-> "同一件事。三种视角。三次故意的停下 —— 员工问『我该接吗』时不代替她决定、HR 分派专家时给推荐不下决定、IT 遇身份异常时停下等治理判断。**没有一个视图声称『完成』**,因为治理决策和目标端验证都还没回读。这就是设计原点:**帮你推进,在证据、权限或批准缺失时停下,并明确下一步归谁**。虚构公司,学习原型,虚构数据。"
+> "同一件事。三种视角。三次故意的停下 —— 员工问『帮我分析发展前景』时给对比不代替她决定、HR 分派专家时给推荐不下决定、IT 遇身份异常时停下等治理判断。**没有一个视图声称『完成』**,因为治理决策和目标端验证都还没回读。这就是设计原点:**帮你推进,在证据、权限或批准缺失时停下,并明确下一步归谁**。虚构公司,学习原型,虚构数据。"
 
 ---
 
 ## The three pauses — the theme in one line
 
-1. **Employee "Should I?"** — AI helps her compare; the decision is hers
+1. **Employee "Analyze this role for my development"** — AI compares strengths/gaps/trade-offs; the growth judgment is hers
 2. **HRBP Route by responsibility → qualification → authorization → capacity** — AI recommends; HR decides
 3. **IT identity case** — AI observes and routes; governance team decides, target-side verification confirms
 

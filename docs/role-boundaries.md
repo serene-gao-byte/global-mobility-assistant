@@ -64,7 +64,7 @@ The design thesis: **AI-assisted is not "one copilot for everyone".** Each role 
 
 The demo doesn't try to show "an AI that says no". It shows an AI that **helps advance a task, and stops when evidence, authority, or approval is missing — always naming who does the next step**.
 
-1. **Employee Step 2 · Career decision belongs to the employee** — when asked "should I take this role?", Joule offers comparison tools, source-tagged evidence, and reverse questions. It doesn't produce a recommendation on the personal decision itself. Next step: the employee (with her manager / mentor / own reflection).
+1. **Employee Step 2 · Career decision belongs to the employee** — when asked to analyze the role for personal development, Joule offers concrete comparison (aligned strengths, gaps to consider, trade-offs) and names what only the employee can weigh (family, life stage, appetite for a new market). It doesn't produce a recommendation on the personal decision itself. Next step: the employee (with her manager / mentor / own reflection).
 
 2. **HRBP Step 3 · Recommendation, not decision** — for specialist routing, Joule filters candidates by responsibility → qualification → authorization → capacity, then surfaces the top match with its current status. HRBP retains the decision.
 
