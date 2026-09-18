@@ -92,6 +92,392 @@
       background: #F7F8FA; border: 1px solid var(--border-soft);
       border-radius: 8px; padding: 14px 16px; margin-top: 14px;
     }
+
+    /* ============ Assignment Detail (SF Opportunity Marketplace style) ============ */
+    .assignment-detail {
+      background: #F5F6F7;
+      margin: -22px -32px -80px;
+      padding: 20px 32px 80px;
+      min-height: 100vh;
+    }
+    .ad-breadcrumb {
+      color: var(--sap-blue);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+    .ad-breadcrumb a {
+      color: var(--sap-blue);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .ad-breadcrumb a:hover { text-decoration: underline; }
+    .ad-breadcrumb .sep { color: var(--text-secondary); margin: 0 4px; }
+    .ad-breadcrumb .current { color: var(--text-secondary); }
+
+    .ad-header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .ad-header .ad-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #FFF3D6 0%, #F5E6C9 100%);
+      border-radius: 10px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .ad-header .ad-icon svg { width: 100%; height: 100%; display: block; }
+    .ad-header .ad-title-area { flex: 1; }
+    .ad-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+      letter-spacing: -0.3px;
+      display: inline;
+    }
+    .ad-header .ad-badges {
+      display: inline-flex;
+      gap: 8px;
+      margin-left: 12px;
+      vertical-align: middle;
+    }
+    .ad-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .ad-badge.ongoing {
+      background: #DDF3E1;
+      color: #256F3A;
+    }
+    .ad-badge.hiring-closed {
+      background: #fff;
+      color: var(--text-secondary);
+      border: 1px solid #C9CFD6;
+    }
+    .ad-period {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .ad-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .ad-icon-btn {
+      width: 36px; height: 36px;
+      border: 1px solid #C9CFD6;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--sap-blue);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ad-icon-btn:hover { background: #EAF3FD; }
+    .ad-icon-btn svg { width: 16px; height: 16px; }
+
+    .ad-tabs {
+      display: flex;
+      gap: 24px;
+      border-bottom: 1px solid #E4E7EB;
+      margin-bottom: 20px;
+    }
+    .ad-tab {
+      padding: 10px 4px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .ad-tab.active {
+      color: var(--sap-blue);
+      font-weight: 600;
+      border-bottom-color: var(--sap-blue);
+    }
+
+    .ad-body {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+    }
+    .ad-main-col > .card,
+    .ad-side-col > .card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      box-shadow: none;
+    }
+    .ad-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 14px;
+    }
+    .ad-section-title.mt {
+      margin-top: 22px;
+    }
+    .ad-desc-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .ad-desc-body {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    .ad-desc-body strong { font-weight: 700; }
+    .ad-show-more {
+      color: var(--sap-blue);
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 10px;
+      display: inline-block;
+      font-weight: 500;
+    }
+    .ad-show-more:hover { text-decoration: underline; }
+    .ad-show-more::before { content: "› "; }
+    .ad-show-more.open::before { content: "⌄ "; }
+
+    .ad-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #F0F2F5;
+    }
+    .ad-meta-item .ad-meta-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ad-meta-item .ad-meta-label .q {
+      width: 14px; height: 14px;
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      cursor: help;
+    }
+    .ad-meta-item .ad-meta-value {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* Attributes cards with skill progress bars */
+    .ad-attributes-header {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .ad-attributes-header strong {
+      color: var(--text-primary);
+    }
+    .ad-attr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .ad-attr-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 16px 18px;
+      position: relative;
+    }
+    .ad-attr-card .ad-attr-heart {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      cursor: pointer;
+      color: #E4E7EB;
+      font-size: 18px;
+    }
+    .ad-attr-card .ad-attr-heart.filled {
+      color: #E85A4B;
+    }
+    .ad-attr-card .ad-attr-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      padding-right: 26px;
+    }
+    .ad-attr-card .ad-attr-type {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .ad-attr-card .ad-attr-current {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .ad-attr-card .ad-attr-current strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    /* Skill progress bar with markers */
+    .ad-skill-bar {
+      position: relative;
+      height: 6px;
+      background: #E4E7EB;
+      border-radius: 3px;
+      margin: 20px 0 6px;
+    }
+    .ad-skill-bar .ad-skill-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: linear-gradient(90deg, var(--sap-blue) 0%, #1B90FF 100%);
+      border-radius: 3px;
+    }
+    .ad-skill-bar .ad-skill-marker {
+      position: absolute;
+      top: -2px;
+      width: 10px; height: 10px;
+      background: var(--sap-blue);
+      border-radius: 50%;
+      transform: translateX(-50%);
+    }
+    .ad-skill-bar .ad-skill-marker.expected {
+      top: 8px;
+      width: 0; height: 0;
+      background: transparent;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 8px solid #36A41D;
+      transform: translateX(-50%);
+    }
+    .ad-skill-tick {
+      position: absolute;
+      top: 1px;
+      width: 1px;
+      height: 4px;
+      background: #8A94A6;
+    }
+    .ad-expected-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    .ad-expected-label strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Side column · Assignment Owner + Co-Owners */
+    .ad-side-col .card { padding: 20px 22px; }
+    .ad-side-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 14px;
+    }
+    .ad-owner-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    .ad-owner-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .ad-owner-name {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .ad-owner-card-icon {
+      color: var(--sap-blue);
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 15px;
+    }
+    .ad-owner-card-icon:hover { opacity: 1; }
+    .ad-owner-email {
+      padding: 8px 0 4px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-top: 1px solid #F0F2F5;
+      margin-top: 8px;
+    }
+    .ad-owner-email strong {
+      color: var(--sap-blue);
+    }
+    .ad-coowners-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 18px 0 8px;
+    }
+
+    /* Sticky apply bar for Detail page */
+    .ad-apply-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 24px;
+      padding: 8px 8px 8px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(0,20,74,0.12);
+      z-index: 30;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    .ad-apply-bar .apply-btn {
+      background: var(--sap-blue);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .ad-apply-bar .apply-btn:hover { background: var(--sap-blue-hover); }
+    .ad-apply-bar .prep-btn {
+      background: transparent;
+      color: var(--sap-blue);
+      border: none;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .ad-apply-bar .prep-btn:hover { text-decoration: underline; }
     .signal-form textarea {
       width: 100%; min-height: 60px; padding: 8px 10px;
       border: 1px solid var(--border-mid); border-radius: 4px;
@@ -235,69 +621,204 @@
   function view_detail() {
     const s = window.GMA.loadState();
     const job = D.opportunities.find(o => o.id === "JOB-ME-SC-14");
+    const applied = s.employeeApplied;
+
+    // Skill attributes (mapped from evidence) — for the SF-style Attributes cards
+    const attributes = [
+      { title: "Solution Consulting", type: "Skill", current: 4, currentLabel: "Advanced", expected: 3, expectedLabel: "Practitioner", favorited: true },
+      { title: "Energy Storage Domain", type: "Skill", current: 3, currentLabel: "Practitioner", expected: 3, expectedLabel: "Practitioner", favorited: true },
+      { title: "Cross-Cultural Communication", type: "Skill", current: 2, currentLabel: "Novice", expected: 2, expectedLabel: "Novice", favorited: false }
+    ];
+    const skillLevels = 5;   // 1..5 with tick marks
+    function skillBar(a) {
+      const currentPct = ((a.current - 1) / (skillLevels - 1)) * 100;
+      const expectedPct = ((a.expected - 1) / (skillLevels - 1)) * 100;
+      const ticks = [];
+      for (let i = 1; i <= skillLevels; i++) {
+        const pct = ((i - 1) / (skillLevels - 1)) * 100;
+        ticks.push(`<div class="ad-skill-tick" style="left: ${pct}%;"></div>`);
+      }
+      return `
+        <div class="ad-skill-bar">
+          <div class="ad-skill-fill" style="width: ${currentPct}%;"></div>
+          ${ticks.join("")}
+          <div class="ad-skill-marker" style="left: ${currentPct}%;"></div>
+          <div class="ad-skill-marker expected" style="left: ${expectedPct}%;"></div>
+        </div>
+      `;
+    }
+
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#browse'">Career Opportunities</a> › <b>${esc(job.title)}</b></div>
-
-      <div class="page-header">
-        <div class="page-title-wrap">
-          <h1 class="page-title">${esc(job.title)}</h1>
-          <div class="page-sub">${esc(job.location)} · ${esc(job.entity)}</div>
+      <div class="assignment-detail">
+        <div class="ad-breadcrumb">
+          <a onclick="location.href='home.html'">Opportunity Marketplace</a>
+          <span class="sep">/</span>
+          <a onclick="location.hash='#browse'">Broaden Your Experience</a>
+          <span class="sep">/</span>
+          <span class="current">Assignment Details</span>
         </div>
-        <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#prep'">Prepare for interview →</button>
-          <button class="btn primary" id="btnApply">Apply for this role</button>
-        </div>
-      </div>
 
-      <div class="info-strip">
-        <span class="i-icon">i</span>
-        <div><b>Step 2 · Evaluate.</b> Review the role, then check how your experience matches. Joule pulls from authorized records only.</div>
-      </div>
-
-      <div class="two-col">
-        <div class="card">
-          <div class="card-header">
-            <div><h2 class="card-title">Role summary</h2></div>
-            <span class="cap-tag native">标准业务功能模拟</span>
+        <div class="ad-header">
+          <div class="ad-icon">
+            <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="ad-icon-bg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#FFF3D6"/>
+                  <stop offset="1" stop-color="#F5E6C9"/>
+                </linearGradient>
+              </defs>
+              <rect width="72" height="72" fill="url(#ad-icon-bg)"/>
+              <!-- Magnifying glass -->
+              <circle cx="30" cy="30" r="14" fill="none" stroke="#E88C0A" stroke-width="4"/>
+              <circle cx="30" cy="30" r="10" fill="#FFEBC4"/>
+              <line x1="40" y1="40" x2="54" y2="54" stroke="#E88C0A" stroke-width="4" stroke-linecap="round"/>
+              <!-- Sparkles -->
+              <path d="M 18 12 l 1.2 3 l 3 1.2 l -3 1.2 l -1.2 3 l -1.2 -3 l -3 -1.2 l 3 -1.2 z" fill="#FFB03A"/>
+              <path d="M 52 22 l 1 2.5 l 2.5 1 l -2.5 1 l -1 2.5 l -1 -2.5 l -2.5 -1 l 2.5 -1 z" fill="#FFA033"/>
+            </svg>
           </div>
-          <div class="mb-16">${esc(job.summary || "")}</div>
-          <div class="bold mb-8">Key requirements</div>
-          <ul style="margin:0 0 12px 18px; padding:0;">
-            ${(job.requirements||[]).map(r => `<li style="margin:3px 0;">${esc(r)}</li>`).join("")}
-          </ul>
-          <div class="bold mb-8">Responsibilities</div>
-          <ul style="margin:0 0 4px 18px; padding:0;">
-            ${(job.responsibilities||[]).map(r => `<li style="margin:3px 0;">${esc(r)}</li>`).join("")}
-          </ul>
+          <div class="ad-title-area">
+            <h1>${esc(job.title)}</h1>
+            <span class="ad-badges">
+              <span class="ad-badge ongoing">Ongoing</span>
+              <span class="ad-badge hiring-closed">${applied ? "Applied" : "Open to Apply"}</span>
+            </span>
+            <div class="ad-period">Period: Sep 2, 2026 - Feb 28, 2027</div>
+          </div>
+          <div class="ad-header-actions">
+            <button class="ad-icon-btn" title="Save">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+            <button class="ad-icon-btn" title="Share">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <div><h2 class="card-title">How your experience matches</h2>
-            <div class="card-sub">Sourced from authorized data · self-reported items labeled</div></div>
-            <span class="cap-tag ext">项目扩展设计</span>
+        <div class="ad-tabs">
+          <div class="ad-tab active">Assignment Details</div>
+        </div>
+
+        <div class="ad-body">
+          <div class="ad-main-col">
+            <div class="card">
+              <h2 class="ad-section-title">About This Assignment</h2>
+              <div class="ad-desc-label">Description:</div>
+              <div class="ad-desc-body">
+                <div style="font-weight:600; margin-bottom:6px;">About the Role</div>
+                We are looking for a <strong>Senior Solution Consultant</strong> to join the <strong>Aurora Middle East</strong> team in Riyadh and support the rollout of utility-scale energy-storage projects across the Kingdom...
+              </div>
+              <span class="ad-show-more" id="adShowMore">Show More</span>
+              <div class="ad-desc-more" id="adDescMore" style="display:none; margin-top:10px; font-size:13px; color:var(--text-primary); line-height:1.6;">
+                <p>You'll partner with regional Business Development to design and present technical solutions for BESS deployments (100–300 MWh), lead pre-sales workshops with Saudi utilities and industrial prospects, and contribute product feedback back to the Shanghai HQ team.</p>
+                <p>This is a <strong>full relocation</strong> under the target legal entity (Aurora Middle East LLC), not an expatriate assignment. Comfort with a multicultural, regulated workforce environment is a plus.</p>
+              </div>
+
+              <div class="ad-meta-grid">
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Type: <span class="q">?</span></div>
+                  <div class="ad-meta-value">Internal Transfer</div>
+                </div>
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Openings: <span class="q">?</span></div>
+                  <div class="ad-meta-value">1/1</div>
+                </div>
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Participation:</div>
+                  <div class="ad-meta-value">Full-Time</div>
+                </div>
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Work Mode:</div>
+                  <div class="ad-meta-value">Onsite · Riyadh</div>
+                </div>
+              </div>
+
+              <div class="ad-meta-grid" style="border-top:none; padding-top:0; margin-top:14px;">
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Last Edited On:</div>
+                  <div class="ad-meta-value">Sep 2, 2026</div>
+                </div>
+                <div class="ad-meta-item" style="grid-column: span 2;">
+                  <div class="ad-meta-label">Last Edited By:</div>
+                  <div class="ad-meta-value">Mira Klein</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="ad-section-title">Attributes</h2>
+              <div class="ad-attributes-header">
+                <strong>Required Attributes (3/3 Matched)</strong>
+              </div>
+              <div class="ad-attr-grid">
+                ${attributes.map(a => `
+                  <div class="ad-attr-card">
+                    <span class="ad-attr-heart ${a.favorited ? "filled" : ""}">${a.favorited ? "♥" : "♡"}</span>
+                    <div class="ad-attr-title">${esc(a.title)}</div>
+                    <div class="ad-attr-type">${esc(a.type)}</div>
+                    <div class="ad-attr-current">Current: <strong>${a.current} - ${esc(a.currentLabel)}</strong></div>
+                    ${skillBar(a)}
+                    <div class="ad-expected-label">Expected: <strong>${a.expected} - ${esc(a.expectedLabel)}</strong></div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="ad-section-title">How Your Experience Matches</h2>
+              <div class="ad-attributes-header">Sourced from authorized data · self-reported items are labeled. <span class="cap-tag ext" style="margin-left:6px;">项目扩展设计</span></div>
+              <table class="data-table" style="margin-top:8px;">
+                <thead><tr><th>Requirement</th><th>Your match</th></tr></thead>
+                <tbody>
+                  ${D.evidence.map(e => `
+                    <tr>
+                      <td>${esc(e.req)}<div style="margin-top:4px;"><span class="src-tag ${esc(e.source)}">${esc(e.srcLabel)}</span></div></td>
+                      <td>${esc(e.match)}${e.note ? `<div class="muted mt-8" style="font-size:11px;">${esc(e.note)}</div>` : ""}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
           </div>
-          <table class="data-table">
-            <thead><tr><th>Requirement</th><th>Your match</th></tr></thead>
-            <tbody>
-              ${D.evidence.map(e => `
-                <tr>
-                  <td>${esc(e.req)}<div><span class="src-tag ${esc(e.source)}">${esc(e.srcLabel)}</span></div></td>
-                  <td>${esc(e.match)}${e.note ? `<div class="muted mt-8" style="font-size:11px;">${esc(e.note)}</div>` : ""}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
+
+          <div class="ad-side-col">
+            <div class="card">
+              <h3 class="ad-side-title">Assignment Owner</h3>
+              <div class="ad-owner-row">
+                <div class="ad-owner-avatar" style="background: linear-gradient(135deg, #A4E0C0, #049F9A);">MK</div>
+                <div class="ad-owner-name">Mira Klein</div>
+                <span class="ad-owner-card-icon" title="View profile">👤</span>
+              </div>
+              <div class="ad-owner-email">Email: <strong>mira.klein@aurora-me.example</strong></div>
+
+              <h4 class="ad-coowners-header">Co-Owners</h4>
+              <div class="ad-owner-row">
+                <div class="ad-owner-avatar" style="background: linear-gradient(135deg, #B7D5F8, #0070F2);">AB</div>
+                <div class="ad-owner-name">Anna Becker</div>
+                <span class="ad-owner-card-icon" title="View profile">👤</span>
+              </div>
+              <div class="ad-owner-row">
+                <div class="ad-owner-avatar" style="background: linear-gradient(135deg, #FFCA5E, #E88C0A);">TW</div>
+                <div class="ad-owner-name">Tim Weiss</div>
+                <span class="ad-owner-card-icon" title="View profile">👤</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div><h2 class="card-title">Should you apply?</h2>
-          <div class="card-sub">Joule can help you compare — but this decision is yours.</div></div>
-          <span class="cap-tag ext">项目扩展设计</span>
-        </div>
-        <div class="muted">Ask Joule anything on the right — including hard questions like "should I take this role?". You'll see how Joule handles decisions that shouldn't be automated.</div>
+      <div class="ad-apply-bar">
+        <span>Interested? Prepare, then apply.</span>
+        <button class="prep-btn" onclick="location.hash='#prep'">Prepare for interview</button>
+        <button class="apply-btn" id="btnApply">${applied ? "Continue to Track" : "Apply for this role"}</button>
       </div>
     `;
   }
@@ -539,6 +1060,20 @@
     renderNav();
     refreshJoule();
     refreshBadges();
+    // Dynamic topbar app label based on step
+    const appLabelMap = {
+      browse: "Opportunity Marketplace",
+      detail: "Opportunity Marketplace",
+      prep:   "Opportunity Marketplace",
+      apply:  "Opportunity Marketplace",
+      tracking: "My Applications",
+      mymove: "My Move"
+    };
+    const appLabelEl = document.querySelector(".app-selector span:first-child");
+    if (appLabelEl) appLabelEl.textContent = appLabelMap[step] || "Career Opportunities";
+    // Hide journey nav on detail step (匹配 SF 原生页,不显示流程 nav)
+    const nav = document.getElementById("journeyNav");
+    if (nav) nav.style.display = (step === "detail") ? "none" : "";
   }
 
   function bindViewInteractions(step) {
@@ -556,7 +1091,25 @@
     }
 
     if (step === "detail") {
-      document.getElementById("btnApply")?.addEventListener("click", () => { location.hash = "#apply"; });
+      document.getElementById("btnApply")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        location.hash = s.employeeApplied ? "#tracking" : "#apply";
+      });
+      // Show More toggle for the description
+      document.getElementById("adShowMore")?.addEventListener("click", (e) => {
+        const more = document.getElementById("adDescMore");
+        const btn = e.currentTarget;
+        if (more.style.display === "none") {
+          more.style.display = "block";
+          btn.textContent = "Show Less";
+          btn.classList.add("open");
+        } else {
+          more.style.display = "none";
+          btn.textContent = "Show More";
+          btn.classList.remove("open");
+        }
+      });
+    }
     }
 
     if (step === "apply") {
