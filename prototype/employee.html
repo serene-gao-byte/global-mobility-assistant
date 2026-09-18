@@ -475,6 +475,275 @@
       font-family: inherit;
     }
     .ad-apply-bar .prep-btn:hover { text-decoration: underline; }
+
+    /* ============ Broaden Your Experience (SF listing page) ============ */
+    .bye-breadcrumb {
+      color: var(--sap-blue);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .bye-breadcrumb a { color: var(--sap-blue); cursor: pointer; text-decoration: none; }
+    .bye-breadcrumb a:hover { text-decoration: underline; }
+    .bye-breadcrumb .sep { color: var(--text-secondary); margin: 0 4px; }
+    .bye-breadcrumb .current { color: var(--text-secondary); }
+
+    .bye-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .bye-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+    .bye-header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .bye-dropdown-btn {
+      background: #fff;
+      color: var(--sap-blue);
+      border: 1px solid var(--sap-blue);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bye-dropdown-btn:hover { background: #EAF3FD; }
+    .bye-dropdown-btn .caret { font-size: 10px; margin-left: 2px; }
+
+    .bye-filters {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 260px repeat(4, 1fr);
+      gap: 16px;
+      align-items: end;
+    }
+    .bye-filter-item .filter-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .bye-filter-item .filter-input,
+    .bye-filter-item .filter-select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #C9CFD6;
+      border-radius: 4px;
+      padding: 0 32px 0 10px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-primary);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23556677' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+    }
+    .bye-filter-item.search .filter-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='5' stroke='%23556677' stroke-width='1.5' fill='none'/%3E%3Cline x1='11' y1='11' x2='14' y2='14' stroke='%23556677' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-position: right 10px center;
+      background-size: 14px;
+      background-repeat: no-repeat;
+    }
+    .bye-filter-toggle {
+      display: flex;
+      justify-content: center;
+      margin: -14px 0 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .bye-filter-toggle .bye-toggle-btn {
+      width: 32px; height: 32px;
+      background: #fff;
+      border: 1px solid #C9CFD6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--sap-blue);
+      box-shadow: 0 1px 3px rgba(0,20,74,0.06);
+    }
+    .bye-filter-toggle .bye-toggle-btn:hover { background: #EAF3FD; }
+
+    /* Interested-in chips row */
+    .bye-interested {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .bye-interested-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .bye-interested-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bye-interested-title .info-i {
+      width: 16px; height: 16px;
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-style: italic;
+    }
+    .bye-view-all {
+      color: var(--sap-blue);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .bye-view-all:hover { text-decoration: underline; }
+    .bye-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .bye-chip {
+      background: #fff;
+      color: var(--sap-blue);
+      border: 1px solid var(--sap-blue);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+    .bye-chip:hover { background: #EAF3FD; }
+    .bye-chip .heart { color: #E85A4B; }
+    .bye-show-more {
+      color: var(--sap-blue);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    .bye-show-more::before { content: "› "; }
+    .bye-show-more:hover { text-decoration: underline; }
+
+    /* Opportunity card grid */
+    .bye-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1280px) { .bye-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 1024px) { .bye-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 720px)  { .bye-grid { grid-template-columns: repeat(2, 1fr); } }
+    .bye-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .bye-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,20,74,0.1); }
+    .bye-card.readonly { cursor: default; opacity: 0.75; }
+    .bye-card.readonly:hover { transform: none; box-shadow: none; }
+    .bye-card-media {
+      height: 130px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bye-card-media svg { width: 100%; height: 100%; display: block; }
+    .bye-card-bookmark {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px; height: 28px;
+      background: #fff;
+      border: 1px solid var(--sap-blue);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sap-blue);
+      cursor: pointer;
+      z-index: 2;
+    }
+    .bye-card-bookmark svg { width: 14px; height: 14px; }
+    .bye-card-body {
+      padding: 14px 16px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .bye-card-tag {
+      color: var(--text-secondary);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+    .bye-card-tag svg { width: 12px; height: 12px; }
+    .bye-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .bye-card-type {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .bye-card-date {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .bye-preview-tag {
+      display: inline-block;
+      background: #EEF1F4;
+      color: var(--text-muted);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
     .signal-form textarea {
       width: 100%; min-height: 60px; padding: 8px 10px;
       border: 1px solid var(--border-mid); border-radius: 4px;
@@ -571,46 +840,190 @@
   // ============ Views ============
   function view_browse() {
     const s = window.GMA.loadState();
+
+    // SVG illustration for each opportunity card top (original geometric designs)
+    const cardIllustration = (i) => {
+      const illustrations = [
+        // 0 · Magnifier / Discovery (yellow bg)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <circle cx="90" cy="60" r="24" fill="none" stroke="#E88C0A" stroke-width="6"/>
+          <circle cx="90" cy="60" r="18" fill="#FFEBC4"/>
+          <line x1="107" y1="77" x2="130" y2="100" stroke="#E88C0A" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 160 30 l 2 5 l 5 2 l -5 2 l -2 5 l -2 -5 l -5 -2 l 5 -2 z" fill="#FFB03A"/>
+          <path d="M 190 70 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFA033"/>
+          <path d="M 50 100 l 1 3 l 3 1 l -3 1 l -1 3 l -1 -3 l -3 -1 l 3 -1 z" fill="#FFB03A"/>
+        </svg>`,
+        // 1 · Notebook / Documents (yellow bg with paper)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <rect x="85" y="30" width="70" height="80" rx="4" fill="#FFFFFF" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="50" x2="146" y2="47" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="60" x2="140" y2="57" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="70" x2="146" y2="67" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="80" x2="130" y2="77" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <circle cx="170" cy="40" r="8" fill="#FFB03A"/>
+          <circle cx="60" cy="90" r="10" fill="#FFCA5E"/>
+          <path d="M 195 90 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFA033"/>
+        </svg>`,
+        // 2 · Rocket / Launch (yellow bg)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <path d="M 120 25 Q 135 55 135 80 L 135 95 L 105 95 L 105 80 Q 105 55 120 25 Z" fill="#FFFFFF" stroke="#E88C0A" stroke-width="2"/>
+          <circle cx="120" cy="60" r="6" fill="#FFB03A"/>
+          <path d="M 105 85 L 90 100 L 105 95 Z" fill="#FFB03A"/>
+          <path d="M 135 85 L 150 100 L 135 95 Z" fill="#FFB03A"/>
+          <path d="M 115 95 L 110 110 L 120 105 L 130 110 L 125 95 Z" fill="#E88C0A"/>
+          <circle cx="60" cy="40" r="3" fill="#FFB03A"/>
+          <circle cx="180" cy="50" r="3" fill="#FFB03A"/>
+          <path d="M 195 30 l 1 3 l 3 1 l -3 1 l -1 3 l -1 -3 l -3 -1 l 3 -1 z" fill="#FFA033"/>
+        </svg>`,
+        // 3 · Lightbulb / Ideas (yellow bg)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <circle cx="120" cy="55" r="24" fill="#FFFFFF" stroke="#E88C0A" stroke-width="3"/>
+          <path d="M 108 75 L 108 90 Q 108 96 114 96 L 126 96 Q 132 96 132 90 L 132 75 Z" fill="#FFCA5E"/>
+          <line x1="112" y1="86" x2="128" y2="86" stroke="#E88C0A" stroke-width="1"/>
+          <line x1="120" y1="20" x2="120" y2="28" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="90" y1="30" x2="95" y2="35" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="150" y1="30" x2="145" y2="35" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="80" y1="55" x2="88" y2="55" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="160" y1="55" x2="152" y2="55" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+        </svg>`,
+        // 4 · Bird / Freedom (dark navy - for one alt card)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#1B2A3D"/>
+          <path d="M 100 55 Q 110 45 130 50 Q 145 45 155 60 Q 145 65 135 65 L 130 80 L 125 70 Q 115 68 100 55 Z" fill="#4A9EFF"/>
+          <circle cx="150" cy="55" r="2" fill="#FFF"/>
+          <path d="M 70 40 Q 78 35 85 42" stroke="#4A9EFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 170 80 Q 178 75 185 82" stroke="#4A9EFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="200" cy="30" r="1.5" fill="#FFF"/>
+          <circle cx="40" cy="70" r="1.5" fill="#FFF"/>
+          <circle cx="210" cy="100" r="1.5" fill="#FFF"/>
+        </svg>`
+      ];
+      return illustrations[i % illustrations.length];
+    };
+
+    // Sample additional opportunities to fill the grid (in addition to D.opportunities)
+    const sampleOpps = [
+      { id: "OPP-PT-01", title: "1st Rotation STAR Portugal – Cohort SEP26 - Trainee in Logistics & Digital",   type: "STAR",             period: "Sep 14, 2026 - Mar 17, 2027" },
+      { id: "OPP-PT-02", title: "1st Rotation STAR Portugal – Cohort SEP26 - Trainee in Logistics & Digital 2", type: "STAR",             period: "Sep 14, 2026 - Mar 17, 2027" },
+      { id: "OPP-GG-01", title: "Customer Engagement Fellowship at Aurora Community (North America)",           type: "Gig Exchange (GGX) – Deep Dive", period: "Jan 1, 2027 - Jun 30, 2027" },
+      { id: "OPP-CN-01", title: "Cloud (Backend) Software Engineer for Kyma",                                   type: "STAR",             period: "Sep 16, 2026 - Mar 31, 2028" },
+      { id: "OPP-DE-01", title: "STAR - Cloud Native Developer - GCO CLEO",                                     type: "STAR",             period: "Oct 1, 2026 - Mar 31, 2027" }
+    ];
+
     return `
-      <div class="page-header">
-        <div class="page-title-wrap">
-          <h1 class="page-title">Career Opportunities</h1>
-          <div class="page-sub">Recommended for you · based on your role, skills, and career profile</div>
-        </div>
-        <div class="page-actions">
-          <button class="btn outlined" id="btnRefresh">🔄 Refresh</button>
-          <button class="btn outlined" id="btnResetAll">↺ Reset demo</button>
+      <div class="bye-breadcrumb">
+        <a onclick="location.href='home.html'">Opportunity Marketplace</a>
+        <span class="sep">/</span>
+        <span class="current">Broaden Your Experience</span>
+      </div>
+
+      <div class="bye-header">
+        <h1 class="bye-title">Broaden Your Experience</h1>
+        <div class="bye-header-actions">
+          <button class="bye-dropdown-btn">Track My Opportunities <span class="caret">▾</span></button>
+          <button class="bye-dropdown-btn">Manage Opportunity Offerings <span class="caret">▾</span></button>
         </div>
       </div>
 
-      <div class="info-strip">
-        <span class="i-icon">i</span>
-        <div>
-          <b>Step 1 · Discover.</b> Joule surfaces roles that match your profile. Click a card to see the full detail.
+      <div class="bye-filters">
+        <div class="bye-filter-item search">
+          <div class="filter-label">&nbsp;</div>
+          <input type="text" class="filter-input" placeholder="Search for opportunities" />
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Type:</div>
+          <select class="filter-select"><option>All</option><option>STAR</option><option>Gig Exchange</option><option>Internal Transfer</option></select>
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Location:</div>
+          <select class="filter-select"><option>All</option><option>Riyadh, Saudi Arabia</option><option>Munich, Germany</option><option>Singapore</option></select>
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Work Mode:</div>
+          <select class="filter-select"><option>All</option><option>Onsite</option><option>Remote</option><option>Hybrid</option></select>
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Participation:</div>
+          <select class="filter-select"><option>All</option><option>Full-Time</option><option>Part-Time</option></select>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="card-title">Recommended opportunities</h2>
-            <div class="card-sub">Sourced from Opportunity Marketplace · matched to your Career Profile</div>
+      <div class="bye-filter-toggle">
+        <button class="bye-toggle-btn" title="Collapse filters">
+          <svg viewBox="0 0 12 12" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8l4-4 4 4"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="bye-interested">
+        <div class="bye-interested-header">
+          <div class="bye-interested-title">
+            I'm interested in… <span class="info-i">i</span>
           </div>
-          <span class="cap-tag ai">原生 AI 功能模拟</span>
+          <a class="bye-view-all">View All in Growth Portfolio</a>
         </div>
-        <div class="opp-grid">
-          ${D.opportunities.map(o => `
-            <div class="opp-card ${o.highlight ? "highlighted" : "readonly"}" data-job="${esc(o.id)}">
-              <div class="opp-title">${esc(o.title)}${o.highlight ? "" : ' <span class="preview-tag">read-only preview</span>'}</div>
-              <div class="opp-meta">${esc(o.location)} · ${esc(o.entity)} · ${esc(o.type)}</div>
-              <div class="opp-summary">${esc(o.summary || "")}</div>
-              <div class="opp-footer">
-                <span class="match ${o.matchColor}">${esc(o.matchScore)}</span>
-                <span class="muted" style="font-size:11px;">Posted ${esc(o.posted)}</span>
-              </div>
+        <div class="bye-chips">
+          <button class="bye-chip">Solution Consulting</button>
+          <button class="bye-chip">Energy Storage <span class="heart">♥</span></button>
+          <button class="bye-chip">BESS Platform</button>
+          <button class="bye-chip">Cross-Cultural Communication</button>
+          <button class="bye-chip">Renewable Energy <span class="heart">♥</span></button>
+          <button class="bye-chip">Presales</button>
+          <button class="bye-chip">Middle East Region</button>
+          <button class="bye-chip">Technical Sales</button>
+          <button class="bye-chip">Data Analysis</button>
+        </div>
+        <span class="bye-show-more">Show More</span>
+      </div>
+
+      <div class="bye-grid">
+        <!-- Primary card: Lin Chen's target role (from D.opportunities) -->
+        <div class="bye-card" data-job="JOB-ME-SC-14">
+          <div class="bye-card-media">
+            ${cardIllustration(0)}
+            <button class="bye-card-bookmark" title="Save">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="bye-card-body">
+            <div class="bye-card-tag">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10M10 3v10"/></svg>
+              Assignment
             </div>
-          `).join("")}
+            <div class="bye-card-title">Senior Solution Consultant — Middle East (Riyadh)</div>
+            <div class="bye-card-type">Internal Transfer</div>
+            <div class="bye-card-date">Nov 1, 2026 - Ongoing</div>
+          </div>
         </div>
+
+        ${sampleOpps.map((o, i) => `
+          <div class="bye-card readonly" data-job="${esc(o.id)}">
+            <div class="bye-card-media">
+              ${cardIllustration(i + 1)}
+              <button class="bye-card-bookmark" title="Save">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="bye-card-body">
+              <div class="bye-card-tag">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10M10 3v10"/></svg>
+                Assignment <span class="bye-preview-tag">preview</span>
+              </div>
+              <div class="bye-card-title">${esc(o.title)}</div>
+              <div class="bye-card-type">${esc(o.type)}</div>
+              <div class="bye-card-date">${esc(o.period)}</div>
+            </div>
+          </div>
+        `).join("")}
       </div>
     `;
   }
@@ -1078,8 +1491,10 @@
     document.getElementById("btnResetAll")?.addEventListener("click", () => { window.GMA.resetState(); jouleExtra = []; renderView(); });
 
     if (step === "browse") {
-      document.querySelectorAll(".opp-card").forEach(c => {
-        c.addEventListener("click", () => {
+      document.querySelectorAll(".bye-card, .opp-card").forEach(c => {
+        c.addEventListener("click", (e) => {
+          // Ignore clicks on bookmark button
+          if (e.target.closest(".bye-card-bookmark")) { e.stopPropagation(); return; }
           const id = c.getAttribute("data-job");
           if (id === "JOB-ME-SC-14") location.hash = "#detail";
           // Non-primary opportunities are read-only preview — no navigation
