@@ -200,9 +200,41 @@ function bindJouleShell() {
   const input = document.getElementById("jouleInput");
   const send = document.getElementById("jouleSend");
 
-  function open() { panel.classList.add("open"); main.classList.add("joule-open"); trigger.classList.add("joule-active"); }
-  function shut() { panel.classList.remove("open"); main.classList.remove("joule-open"); trigger.classList.remove("joule-active"); }
+  function isMobile() { return window.matchMedia("(max-width: 768px)").matches; }
+
+  function open() {
+    panel.classList.add("open");
+    trigger.classList.add("joule-active");
+    // On desktop, offset the main area so content isn't hidden under the panel
+    if (!isMobile() && main) main.classList.add("joule-open");
+    // On mobile, lock body scroll while the bottom sheet is open
+    if (isMobile()) document.body.style.overflow = "hidden";
+  }
+  function shut() {
+    panel.classList.remove("open");
+    trigger.classList.remove("joule-active");
+    if (main) main.classList.remove("joule-open");
+    document.body.style.overflow = "";
+  }
   function toggle() { panel.classList.contains("open") ? shut() : open(); }
+
+  // On mobile, ensure the panel starts closed (regardless of initial HTML class)
+  if (isMobile()) {
+    panel.classList.remove("open");
+    if (main) main.classList.remove("joule-open");
+  }
+  // Re-evaluate on resize/orientation change
+  window.addEventListener("resize", () => {
+    if (isMobile()) {
+      // If switching to mobile while panel is desktop-open, close it
+      main && main.classList.remove("joule-open");
+    } else {
+      document.body.style.overflow = "";
+      // Restore desktop offset if panel is currently open
+      if (panel.classList.contains("open") && main) main.classList.add("joule-open");
+    }
+  });
+
   trigger.addEventListener("click", toggle);
   close.addEventListener("click", shut);
 

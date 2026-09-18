@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Talent Operations · Global Mobility Assistant</title>
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
@@ -51,6 +51,21 @@
     .signal-card .s-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .signal-card .s-title { font-weight: 600; color: #6B4C00; }
     .signal-card .s-body { font-size: 13px; color: #6B4C00; }
+
+    /* ============ Mobile adaptation · < 768px ============ */
+    @media (max-width: 768px) {
+      .journey-nav { padding: 8px 10px; gap: 4px; }
+      .journey-nav .step { padding: 4px 8px; font-size: 11px; }
+      .journey-nav .step .n { width: 16px; height: 16px; font-size: 10px; }
+      .journey-nav .sep { display: none; }
+      .breadcrumb { font-size: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .queue-row .flag { display: block; margin-left: 0; margin-top: 2px; }
+      .expert-panel { padding: 12px; }
+      .expert-row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 0; }
+      .avail-tag { font-size: 10px; padding: 2px 6px; }
+      .signal-card { padding: 12px; }
+      .signal-card .s-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    }
   </style>
 </head>
 <body class="role-hrbp">

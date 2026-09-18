@@ -238,3 +238,48 @@
 .role-employee .joule-msg.bot { border-left: 3px solid var(--role-employee); }
 .role-hrbp .joule-msg.bot     { border-left: 3px solid var(--role-hrbp); }
 .role-it .joule-msg.bot       { border-left: 3px solid var(--role-it); }
+
+/* ============================================================
+   Mobile: Joule becomes a bottom sheet
+   Slides up from the bottom, ~85% height, with a drag handle.
+============================================================ */
+@media (max-width: 768px) {
+  .joule-panel {
+    /* Convert to bottom sheet */
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 85vh;
+    max-height: 85vh;
+    border-radius: 16px 16px 0 0;
+    border: none;
+    border-top: 1px solid var(--joule-purple-border);
+    transform: translateY(100%);
+    box-shadow: 0 -8px 30px rgba(93,54,255,0.2);
+  }
+  .joule-panel.open { transform: translateY(0); }
+
+  /* Drag handle at the very top */
+  .joule-panel::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: #C9CFD6;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .joule-header {
+    padding-top: 22px;   /* room for the drag handle */
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* Joule verify + footer stick to bottom of sheet */
+  .joule-verify { border-radius: 0; }
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Global Mobility Assistant · Role Selector</title>
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
@@ -41,6 +41,20 @@
     .role-card .steps b { display: block; color: var(--text-primary); margin-bottom: 4px; }
     .role-card .role-open { margin-top: 8px; color: var(--sap-blue); font-weight: 600; font-size: 13px; }
     .landing-footer { text-align: center; margin-top: 40px; color: #7A94BE; font-size: 12px; }
+
+    /* ============ Mobile adaptation · < 768px ============ */
+    @media (max-width: 768px) {
+      .landing { padding: 30px 16px 80px; }
+      .landing-header { margin-bottom: 24px; }
+      .landing-header h1 { font-size: 26px; }
+      .landing-header .subtitle { font-size: 13px; padding: 0 8px; }
+      .role-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 24px; }
+      .role-card { padding: 20px 18px; }
+      .role-card h2 { font-size: 16px; }
+      .role-card .role-avatar { width: 44px; height: 44px; font-size: 16px; margin-bottom: 12px; }
+      .role-card .steps { font-size: 11.5px; }
+      .landing-footer { font-size: 11px; margin-top: 24px; }
+    }
   </style>
 </head>
 <body>

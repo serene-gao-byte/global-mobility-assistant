@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Home · Global Mobility Assistant</title>
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
@@ -379,6 +379,41 @@
       .org-updates-grid { grid-template-columns: repeat(2, 1fr); }
       .explore-card { grid-template-columns: 1fr; }
       .explore-card-media { min-height: 180px; }
+    }
+    /* Mobile phones */
+    @media (max-width: 768px) {
+      .topbar-divider { height: 4px; }
+      .home-main { padding: 12px 14px 96px; }
+      .top-actions { gap: 8px; margin: 4px 0 16px; }
+      .top-action-card { padding: 10px 14px; min-width: 0; flex: 1; }
+      .top-action-card .tac-icon { width: 26px; height: 26px; font-size: 18px; }
+      .top-action-card .tac-label { font-size: 12px; }
+      .greeting-row { gap: 12px; margin-bottom: 20px; }
+      .greeting-card { padding: 20px 18px; }
+      .greeting-card h1 { font-size: 22px; margin-bottom: 16px; }
+      .greeting-card .greeting-bg { width: 180px; height: 140px; right: -20px; bottom: -20px; opacity: 0.55; }
+      .greeting-btn { padding: 7px 12px; font-size: 12px; }
+      .assignment-card { padding: 14px 16px; }
+      .assignment-card .ac-illust { width: 58px; height: 58px; }
+      .assignment-card .ac-text .ac-label { font-size: 14px; }
+      .assignment-card .ac-text .ac-title { font-size: 12px; }
+      .section-header { flex-direction: row; gap: 8px; }
+      .section-title { font-size: 17px; }
+      .org-updates-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 28px; }
+      .org-card-media { height: 130px; }
+      .explore-card { min-height: 0; }
+      .explore-card-content { padding: 20px 22px; }
+      .explore-card-title { font-size: 20px; }
+      .explore-card-media { min-height: 150px; }
+      .personalize-bar {
+        left: 12px; right: 12px; transform: none;
+        border-radius: 14px;
+        padding: 10px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .personalize-bar .pb-btn, .personalize-bar .pb-dismiss { padding: 6px 12px; font-size: 12px; }
     }
   </style>
 </head>

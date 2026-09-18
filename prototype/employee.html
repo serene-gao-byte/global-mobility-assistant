@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Career Opportunities · Global Mobility Assistant</title>
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
@@ -753,6 +753,74 @@
       background: #fff; border: 1px dashed var(--joule-purple-border);
       padding: 8px 10px; border-radius: 4px; margin-top: 10px;
       font-size: 12px; color: var(--joule-purple-dark);
+    }
+
+    /* ============ Mobile adaptation · < 768px ============ */
+    @media (max-width: 768px) {
+      /* Journey nav — smaller pills, wrap tightly */
+      .journey-nav { padding: 8px 10px; gap: 4px 4px; }
+      .journey-nav .step { padding: 4px 8px; font-size: 11px; }
+      .journey-nav .step .n { width: 16px; height: 16px; font-size: 10px; }
+      .journey-nav .sep { display: none; }
+
+      /* Assignment Detail — collapse to single column */
+      .ad-body { grid-template-columns: 1fr; gap: 12px; }
+      .ad-side-col { order: 2; }
+      .ad-header { flex-wrap: wrap; gap: 12px; }
+      .ad-header .ad-icon { width: 56px; height: 56px; }
+      .ad-header h1 { font-size: 20px; display: block; margin-bottom: 6px; }
+      .ad-header .ad-badges { margin-left: 0; margin-top: 4px; display: flex; }
+      .ad-header-actions { width: 100%; justify-content: flex-end; }
+      .ad-period { font-size: 12px; }
+      .ad-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .ad-main-col > .card, .ad-side-col > .card { padding: 16px 16px; }
+      .ad-meta-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .ad-attr-grid { grid-template-columns: 1fr; }
+      .ad-breadcrumb { font-size: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+
+      /* Apply Bar — pin to bottom edge, full width */
+      .ad-apply-bar {
+        left: 12px; right: 12px; transform: none;
+        bottom: 40px;   /* above global-footer */
+        border-radius: 12px;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .ad-apply-bar > span { flex-basis: 100%; text-align: center; }
+      .ad-apply-bar .apply-btn, .ad-apply-bar .prep-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; }
+
+      /* Broaden Your Experience — mobile listing */
+      .bye-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .bye-title { font-size: 20px; }
+      .bye-header-actions { flex-wrap: wrap; width: 100%; }
+      .bye-header-actions .bye-dropdown-btn { flex: 1; padding: 7px 12px; font-size: 12px; }
+      .bye-filters {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px;
+      }
+      .bye-filters .bye-filter-item.search { grid-column: 1; }
+      .bye-filter-toggle { margin: -10px 0 10px; }
+      .bye-interested { padding: 14px 16px; }
+      .bye-chips { gap: 6px; }
+      .bye-chip { padding: 5px 10px; font-size: 12px; }
+      .bye-grid { grid-template-columns: 1fr; gap: 12px; }
+      .bye-card-media { height: 120px; }
+
+      /* Opportunity cards on browse (legacy .opp-card) */
+      .opp-grid { grid-template-columns: 1fr; }
+
+      /* Tracker — visible on mobile too */
+      .tracker .stage .info .label { font-size: 12.5px; }
+      .tracker .stage .info .date { font-size: 10.5px; }
+
+      /* Signal form (extension hook, hidden in demo) */
+      .signal-form { padding: 12px; }
+
+      /* Compressed body padding under sticky bars */
+      body { padding-bottom: 60px; }
     }
   </style>
 </head>

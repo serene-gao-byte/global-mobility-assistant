@@ -462,3 +462,83 @@
   z-index: 30;
   font-weight: 500;
 }
+
+/* ============================================================
+   Mobile adaptation · < 768px
+   Applies globally to all pages. Page-specific overrides may add
+   additional rules in their own <style> blocks.
+============================================================ */
+@media (max-width: 768px) {
+  /* ---- Top bar ---- */
+  .topbar {
+    padding: 0 12px;
+    gap: 8px;
+    height: 52px;
+  }
+  .topbar .brand-suffix { display: none; }
+  .topbar .searchbar { display: none; }
+  .topbar .app-selector { font-size: 14px; margin-left: 2px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar-icons { gap: 12px; }
+  .topbar-icons .tb-icon[title="Search"],
+  .topbar-icons .tb-icon[title="Insights"] { display: none; }
+  .topbar-icons .role-chip { display: none; }
+
+  /* ---- Main layout ---- */
+  .app-shell { flex-direction: column; }
+  .main-area { padding: 14px 14px 96px; }
+  .main-area.joule-open { margin-right: 0; }   /* mobile: Joule becomes bottom sheet */
+
+  /* ---- Page header ---- */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .page-title { font-size: 20px; }
+  .page-actions { flex-wrap: wrap; width: 100%; }
+  .page-actions .btn { flex: 0 1 auto; }
+
+  /* ---- Cards ---- */
+  .card { padding: 14px 14px; }
+  .card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* ---- Grids collapse ---- */
+  .two-col { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+
+  /* ---- Tables: horizontal scroll rather than compressed layout ---- */
+  .card > .data-table,
+  .card table.data-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+  .data-table th, .data-table td { padding: 8px 10px; }
+
+  /* ---- Key-value lists ---- */
+  .kv-list li { flex-direction: column; gap: 2px; padding: 8px 0; }
+  .kv-list .k { width: auto; font-size: 12px; }
+
+  /* ---- Progress track (employee milestones) ---- */
+  .progress-track { flex-direction: column; padding: 10px 0; }
+  .progress-step { min-width: 0; text-align: left; padding: 10px 0; }
+  .progress-step::after { display: none; }
+  .progress-step .dot { display: inline-flex; vertical-align: middle; margin: 0 8px 0 0; }
+  .progress-step .label { display: inline; }
+
+  /* ---- Handoff columns collapse to 1 col ---- */
+  .handoff-col { padding: 12px 14px; }
+
+  /* ---- Info strip readability ---- */
+  .info-strip { font-size: 12.5px; padding: 10px 12px; }
+
+  /* ---- Footer: shorter text on mobile ---- */
+  .global-footer { font-size: 10.5px; padding: 5px 10px; }
+}
+
+/* Tablet mid range · 768px – 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-area.joule-open { margin-right: 340px; }
+  .three-col { grid-template-columns: repeat(2, 1fr); }
+}

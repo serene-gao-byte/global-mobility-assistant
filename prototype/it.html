@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Identity & Access · Global Mobility Assistant</title>
   <link rel="stylesheet" href="shared/tokens.css" />
   <link rel="stylesheet" href="shared/shell.css" />
@@ -55,6 +55,20 @@
     .dep-node .task-id { font-family: "SF Mono", Consolas, monospace; font-size: 11px; color: var(--text-muted); }
     .dep-node .task-label { font-weight: 600; margin: 4px 0; font-size: 12.5px; }
     .dep-node .task-meta { color: var(--text-muted); font-size: 11px; }
+
+    /* ============ Mobile adaptation · < 768px ============ */
+    @media (max-width: 768px) {
+      .journey-nav { padding: 8px 10px; gap: 4px; }
+      .journey-nav .step { padding: 4px 8px; font-size: 11px; }
+      .journey-nav .step .n { width: 16px; height: 16px; font-size: 10px; }
+      .journey-nav .sep { display: none; }
+      .breadcrumb { font-size: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .dep-graph { grid-template-columns: 1fr; gap: 8px; }
+      .health-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .health-cell { padding: 8px 10px; }
+      .diagnosis { padding: 12px 14px; }
+      .diagnosis h4 { font-size: 12.5px; }
+    }
   </style>
 </head>
 <body class="role-it">
