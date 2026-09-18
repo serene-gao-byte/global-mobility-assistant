@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Global Mobility Assistant · 角色入口</title>
+  <link rel="stylesheet" href="../shared/tokens.css" />
+  <link rel="stylesheet" href="../shared/shell.css" />
+  <link rel="stylesheet" href="../shared/guide.css" />
+  <style>
+    body { background: linear-gradient(180deg, #00144A 0%, #002A86 100%); min-height: 100vh; color: #fff; }
+    .landing { max-width: 1080px; margin: 0 auto; padding: 60px 32px 100px; }
+    .landing-header { text-align: center; margin-bottom: 40px; }
+    .landing-header .logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .landing-header h1 { font-size: 34px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.4px; }
+    .landing-header .subtitle { color: #B4C6DF; font-size: 15px; max-width: 720px; margin: 0 auto; line-height: 1.7; }
+    .lang-switch { position: absolute; top: 20px; right: 24px; font-size: 12px; color: #B4C6DF; }
+    .lang-switch a { color: #fff; text-decoration: none; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.25); }
+    .lang-switch a:hover { background: rgba(255,255,255,0.1); }
+    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+    .role-card {
+      background: #fff; color: var(--text-primary);
+      border-radius: 12px; padding: 28px 24px; text-decoration: none;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.25);
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex; flex-direction: column;
+      border-top: 4px solid var(--sap-blue);
+    }
+    .role-card:hover { transform: translateY(-4px); box-shadow: 0 14px 42px rgba(0,0,0,0.3); text-decoration: none; }
+    .role-card.employee { border-top-color: var(--role-employee); }
+    .role-card.hrbp { border-top-color: var(--role-hrbp); }
+    .role-card.it { border-top-color: var(--role-it); }
+    .role-card .role-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 18px; margin-bottom: 16px;
+    }
+    .role-card.employee .role-avatar { background: linear-gradient(135deg, #F1B6A7, #C74A3A); }
+    .role-card.hrbp .role-avatar     { background: linear-gradient(135deg, #A4E0C0, #049F9A); }
+    .role-card.it .role-avatar       { background: linear-gradient(135deg, #B894FF, #5D36FF); }
+    .role-card h2 { margin: 0 0 4px; font-size: 18px; }
+    .role-card .role-person { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
+    .role-card .role-desc { color: var(--text-primary); font-size: 13px; line-height: 1.65; margin-bottom: 14px; flex: 1; }
+    .role-card .steps { font-size: 12px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 12px; }
+    .role-card .steps b { display: block; color: var(--text-primary); margin-bottom: 4px; }
+    .role-card .role-open { margin-top: 8px; color: var(--sap-blue); font-weight: 600; font-size: 13px; }
+    .landing-footer { text-align: center; margin-top: 40px; color: #7A94BE; font-size: 12px; line-height: 1.7; }
+
+    .landing-how-to {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 20px;
+      color: #E3ECFA;
+    }
+    .landing-how-to .how-to-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .landing-how-to h3 { margin: 0 0 6px; font-size: 16px; color: #fff; }
+    .landing-how-to p { margin: 0; font-size: 13px; line-height: 1.65; color: #B4C6DF; max-width: 640px; }
+    .landing-how-to .btn.primary { flex-shrink: 0; padding: 10px 18px; font-size: 13px; white-space: nowrap; }
+
+    @media (max-width: 768px) {
+      .landing { padding: 30px 16px 80px; }
+      .landing-header { margin-bottom: 24px; }
+      .landing-header h1 { font-size: 26px; }
+      .landing-header .subtitle { font-size: 13px; padding: 0 8px; }
+      .role-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 24px; }
+      .role-card { padding: 20px 18px; }
+      .role-card h2 { font-size: 16px; }
+      .role-card .role-avatar { width: 44px; height: 44px; font-size: 16px; margin-bottom: 12px; }
+      .role-card .steps { font-size: 11.5px; }
+      .landing-footer { font-size: 11px; margin-top: 24px; }
+      .landing-how-to .how-to-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-switch">
+    <a href="../index.html">English</a>
+  </div>
+  <div class="landing">
+    <div class="landing-header">
+      <div class="logo">
+        <span class="brand-logo" style="background:#0070F2;color:#fff;font-weight:800;padding:6px 10px 6px 8px;font-size:20px;clip-path:polygon(0 0,100% 0,90% 100%,0 100%);padding-right:20px;">SAP</span>
+        <span style="color:#049F9A; font-size:14px; letter-spacing:1.4px; font-weight:600;">SUCCESS MAP</span>
+      </div>
+      <h1>Global Mobility Assistant</h1>
+      <div class="subtitle">
+        Aurora Industries —— 一家中国新能源集团 —— 顺着 <b>Vision 2030</b> 的浪潮走进沙特,
+        在利雅得设立中东首家子公司,承接公用事业级储能项目的交付。
+        <br><br>
+        每一次跨境扩张背后,都藏着一个更难的问题:<b>如何把合适的人、流程、访问权限,安全地、一起地搬到那里。</b>
+        Global Mobility Assistant 就是为这一刻而生的 AI —— 一个赋能中国企业出海的加速器,懂得在何处帮你推进,也懂得在何处该停下。
+      </div>
+    </div>
+
+    <div class="role-grid">
+      <a class="role-card employee" href="home.html" target="_blank">
+        <div class="role-avatar">LC</div>
+        <h2>员工 · 6 个步骤</h2>
+        <div class="role-person">林晨 · 资深方案顾问</div>
+        <div class="role-desc">
+          申请利雅得的岗位 · 追踪调动进度 · 看到个人视角的影响 · 也可以给 HR 发信号。
+        </div>
+        <div class="steps">
+          <b>路径</b>
+          发现机会 → 评估匹配 → 面试准备 → 提交申请 → 追踪进度 → 我的调动
+        </div>
+        <div class="role-open">进入员工视图 →</div>
+      </a>
+
+      <a class="role-card hrbp" href="hrbp.html" target="_blank">
+        <div class="role-avatar">MK</div>
+        <h2>HRBP · 6 个步骤</h2>
+        <div class="role-person">Mira Klein · 中东区 HR 业务伙伴</div>
+        <div class="role-desc">
+          管理调动请求队列 · 派发专家审查(带容量感知)· 协调审批 · 关键字段变更时保持签字状态同步。
+        </div>
+        <div class="steps">
+          <b>路径</b>
+          调动收件箱 → 请求详情 → 影响审查 → 编辑请求 → 审批流 → 交接
+        </div>
+        <div class="role-open">进入 HRBP 视图 →</div>
+      </a>
+
+      <a class="role-card it" href="it.html" target="_blank">
+        <div class="role-avatar">TR</div>
+        <h2>IT 管理员 · 5 个步骤</h2>
+        <div class="role-person">Tom Reeves · 身份与访问</div>
+        <div class="role-desc">
+          处理依赖驱动的供应队列 · 诊断身份异常 · 决定人工介入方式 · 把结果回执给 HR。
+        </div>
+        <div class="steps">
+          <b>路径</b>
+          告警控制台 → 告警详情 → 任务队列 → 审查与路由 → 记录路由
+        </div>
+        <div class="role-open">进入 IT 管理员视图 →</div>
+      </a>
+    </div>
+
+    <div class="landing-how-to">
+      <div class="how-to-header">
+        <div>
+          <h3>这个演示怎么看</h3>
+          <p>跟随一个中国新能源集团把员工从上海调往利雅得的完整流程。三种角色 · 三次刻意的"停下",每一次都由 AI 明确"下一步归谁处理"。</p>
+        </div>
+        <button class="btn primary" id="learnMoreBtn">查看完整演示路径</button>
+      </div>
+    </div>
+
+    <div class="landing-footer">
+      非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行<br>
+      Not an SAP official product · Learning prototype · Fictional data & simulated execution
+    </div>
+  </div>
+
+  <script src="../shared/guide.js"></script>
+  <script>
+    // 中文版引导浮层内容 override(简化:直接覆盖 GUIDE_STEPS 与文案)
+    // 这里我们直接使用英文版的 mountGuideOverlay · 5 步图仍显示英文标题(简短)· 但顶部 Background 由 zh 版本注入
+    const guide = window.GUIDE.mountGuideOverlay();
+    document.getElementById("learnMoreBtn").addEventListener("click", () => guide.show());
+
+    // 覆盖 Guide 面板文案为中文
+    setTimeout(() => {
+      const overlay = document.getElementById("guideOverlay");
+      if (!overlay) return;
+      const h2 = overlay.querySelector(".guide-panel-header h2");
+      const sub = overlay.querySelector(".guide-sub");
+      const context = overlay.querySelector(".guide-context");
+      const pausesTitle = overlay.querySelector(".guide-pauses h3");
+      const pausesList = overlay.querySelector(".guide-pauses ol");
+      const dismissBtn = overlay.querySelector("#guideDismiss");
+      const startBtn = overlay.querySelector("#guideStartEmployee");
+
+      if (h2) h2.textContent = "演示怎么看";
+      if (sub) sub.textContent = "5 步 · 3 种角色 · 完整走完约 5 分钟";
+      if (context) context.innerHTML = `
+        <strong>场景背景。</strong> Aurora Industries 顺着 Vision 2030 的浪潮走进沙特,
+        在利雅得设立中东首家子公司,承接公用事业级储能项目的交付。
+        每一次跨境扩张背后,都藏着更难的问题 —— 把合适的<em>人、流程、访问权限</em>安全地、一起地搬到那里。
+        Global Mobility Assistant 就是为这一刻而生的 AI:一个赋能中国企业出海的加速器,懂得在何处推进,也懂得在何处该停下。
+      `;
+      if (pausesTitle) pausesTitle.textContent = "3 次刻意的停下 —— 本演示的主线";
+      if (pausesList) pausesList.innerHTML = `
+        <li><strong>员工的职业分析</strong> —— Joule 帮她比较(优势/差距/权衡),同时点出只有她能判断的部分。</li>
+        <li><strong>HRBP 的专家派发</strong> —— Joule 按 责任 → 资格 → 授权 → 容量 给排序推荐 · HR 拍板。</li>
+        <li><strong>IT 的身份异常</strong> —— Joule 观察并路由到治理团队,不提议操作路径。</li>
+      `;
+      // 覆盖 5 步图文案
+      const steps = overlay.querySelectorAll(".guide-step");
+      const zhSteps = [
+        { role: "员工",  title: "发现机会",           body: "林晨在她的首页看到岗位推荐,点进详情。" },
+        { role: "员工",  title: "分析(停下 #1)",    body: "她请 Joule 分析岗位对她发展的意义。Joule 给出优势、差距与权衡 —— 同时点出只有她能判断的部分。" },
+        { role: "HRBP",  title: "派专家(停下 #2)",  body: "HR 看到请求。Joule 按 责任 → 资格 → 授权 → 容量 排序推荐,HR 决定。" },
+        { role: "HRBP",  title: "编辑请求 → 触发执行", body: "HR 改动生效日期。Joule 说清谁需要重新签字 · 哪些项目要单独核查。审批走完后触发执行。" },
+        { role: "IT",    title: "身份审查(停下 #3)", body: "IT 收到高优告警。Joule 观察到多个候选记录,不提议操作。case 路由到治理团队。" }
+      ];
+      steps.forEach((el, i) => {
+        if (!zhSteps[i]) return;
+        const roleEl = el.querySelector(".guide-step-role");
+        const titleEl = el.querySelector("h4");
+        const bodyEl = el.querySelector("p");
+        if (roleEl) roleEl.textContent = zhSteps[i].role;
+        if (titleEl) titleEl.textContent = zhSteps[i].title;
+        if (bodyEl) bodyEl.textContent = zhSteps[i].body;
+      });
+      if (dismissBtn) dismissBtn.textContent = "知道了 · 让我自己看看";
+      if (startBtn) startBtn.textContent = "从员工视图开始 →";
+      if (startBtn) {
+        // 保证跳转到中文版 home
+        startBtn.addEventListener("click", (e) => {
+          setTimeout(() => { if (location.pathname.includes("/zh/")) location.href = "home.html"; }, 100);
+        }, true);
+      }
+    }, 50);
+  </script>
+</body>
+</html>

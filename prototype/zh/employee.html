@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>职业发展 · Global Mobility Assistant</title>
+  <link rel="stylesheet" href="../shared/tokens.css" />
+  <link rel="stylesheet" href="../shared/shell.css" />
+  <link rel="stylesheet" href="../shared/joule.css" />
+  <link rel="stylesheet" href="../shared/guide.css" />
+  <style>
+    /* --------- Journey nav --------- */
+    .journey-nav {
+      display: flex; flex-wrap: wrap; gap: 2px 4px; padding: 10px 12px;
+      background: #fff; border: 1px solid var(--border-soft);
+      border-radius: 8px; margin-bottom: 16px;
+      align-items: center;
+    }
+    .journey-nav .step {
+      padding: 5px 10px; border-radius: 6px;
+      font-size: 12px; color: var(--text-secondary);
+      cursor: pointer; white-space: nowrap;
+      border: 1px solid transparent;
+      display: inline-flex; align-items: center; gap: 6px;
+      user-select: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .journey-nav .step:hover { background: #EAF3FD; color: var(--sap-blue); }
+    .journey-nav .step:active { transform: scale(0.98); }
+    .journey-nav .step.active { background: var(--sap-blue); color: #fff; font-weight: 600; }
+    .journey-nav .step.done { color: var(--status-green); }
+    .journey-nav .step.pending { opacity: 0.9; }
+    .journey-nav .step.pending:hover { opacity: 1; background: #EAF3FD; color: var(--sap-blue); }
+    .journey-nav .step .n {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #EEF1F4; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .journey-nav .step.active .n { background: rgba(255,255,255,0.25); color: #fff; }
+    .journey-nav .step.done .n { background: var(--status-green); color: #fff; }
+    .journey-nav .sep { color: var(--border-mid); align-self: center; padding: 0 2px; font-size: 11px; }
+
+    /* --------- Opportunity cards --------- */
+    .opp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .opp-card {
+      background: #fff; border: 1px solid var(--border-soft);
+      border-radius: 8px; padding: 18px; cursor: pointer;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      display: flex; flex-direction: column;
+    }
+    .opp-card:hover { border-color: var(--sap-blue); box-shadow: 0 4px 12px rgba(0,112,242,0.1); }
+    .opp-card.readonly { cursor: default; opacity: 0.7; }
+    .opp-card.readonly:hover { border-color: var(--border-soft); box-shadow: var(--shadow-card); }
+    .opp-card.highlighted { border-left: 4px solid var(--sap-blue); background: linear-gradient(90deg,#F0F7FF 0,#fff 40%); }
+    .preview-tag { display: inline-block; background: #EEF1F4; color: var(--text-muted); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-left: 6px; letter-spacing: 0.2px; vertical-align: middle; }
+    .opp-card .opp-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+    .opp-card .opp-meta { color: var(--text-secondary); font-size: 12px; margin-bottom: 10px; }
+    .opp-card .opp-summary { color: var(--text-primary); font-size: 13px; flex: 1; margin-bottom: 12px; line-height: 1.5; }
+    .opp-card .opp-footer { display: flex; align-items: center; gap: 8px; }
+    .opp-card .match { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .opp-card .match.green  { background: var(--status-green-bg); color: var(--status-green); }
+    .opp-card .match.yellow { background: var(--status-yellow-bg); color: var(--status-yellow); }
+    .opp-card .match.grey   { background: var(--status-grey-bg); color: var(--status-grey); }
+    .breadcrumb {
+      color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;
+    }
+    .breadcrumb a { color: var(--sap-blue); cursor: pointer; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    /* Tracker */
+    .tracker {
+      padding: 4px 0;
+    }
+    .tracker .stage {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px dashed var(--border-soft);
+    }
+    .tracker .stage:last-child { border-bottom: none; }
+    .tracker .stage .dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #EEF1F4; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px; flex-shrink: 0;
+    }
+    .tracker .stage.done .dot { background: var(--status-green); color: #fff; }
+    .tracker .stage.active .dot { background: var(--sap-blue); color: #fff; box-shadow: 0 0 0 4px rgba(0,112,242,0.15); }
+    .tracker .stage .info { flex: 1; }
+    .tracker .stage .info .label { font-weight: 600; font-size: 13px; }
+    .tracker .stage .info .date { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+    .signal-form {
+      background: #F7F8FA; border: 1px solid var(--border-soft);
+      border-radius: 8px; padding: 14px 16px; margin-top: 14px;
+    }
+
+    /* ============ Assignment Detail (SF 机会市场 style) ============ */
+    .assignment-detail {
+      background: transparent;
+    }
+    .ad-breadcrumb {
+      color: var(--sap-blue);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+    .ad-breadcrumb a {
+      color: var(--sap-blue);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .ad-breadcrumb a:hover { text-decoration: underline; }
+    .ad-breadcrumb .sep { color: var(--text-secondary); margin: 0 4px; }
+    .ad-breadcrumb .current { color: var(--text-secondary); }
+
+    .ad-header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .ad-header .ad-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #FFF3D6 0%, #F5E6C9 100%);
+      border-radius: 10px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .ad-header .ad-icon svg { width: 100%; height: 100%; display: block; }
+    .ad-header .ad-title-area { flex: 1; }
+    .ad-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+      letter-spacing: -0.3px;
+      display: inline;
+    }
+    .ad-header .ad-badges {
+      display: inline-flex;
+      gap: 8px;
+      margin-left: 12px;
+      vertical-align: middle;
+    }
+    .ad-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .ad-badge.ongoing {
+      background: #DDF3E1;
+      color: #256F3A;
+    }
+    .ad-badge.hiring-closed {
+      background: #fff;
+      color: var(--text-secondary);
+      border: 1px solid #C9CFD6;
+    }
+    .ad-period {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .ad-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .ad-icon-btn {
+      width: 36px; height: 36px;
+      border: 1px solid #C9CFD6;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--sap-blue);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ad-icon-btn:hover { background: #EAF3FD; }
+    .ad-icon-btn svg { width: 16px; height: 16px; }
+
+    .ad-tabs {
+      display: flex;
+      gap: 24px;
+      border-bottom: 1px solid #E4E7EB;
+      margin-bottom: 20px;
+    }
+    .ad-tab {
+      padding: 10px 4px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .ad-tab.active {
+      color: var(--sap-blue);
+      font-weight: 600;
+      border-bottom-color: var(--sap-blue);
+    }
+
+    .ad-body {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+    }
+    .ad-main-col > .card,
+    .ad-side-col > .card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      box-shadow: none;
+    }
+    .ad-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 14px;
+    }
+    .ad-section-title.mt {
+      margin-top: 22px;
+    }
+    .ad-desc-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .ad-desc-body {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    .ad-desc-body strong { font-weight: 700; }
+    .ad-show-more {
+      color: var(--sap-blue);
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 10px;
+      display: inline-block;
+      font-weight: 500;
+    }
+    .ad-show-more:hover { text-decoration: underline; }
+    .ad-show-more::before { content: "› "; }
+    .ad-show-more.open::before { content: "⌄ "; }
+
+    .ad-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #F0F2F5;
+    }
+    .ad-meta-item .ad-meta-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ad-meta-item .ad-meta-label .q {
+      width: 14px; height: 14px;
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      cursor: help;
+    }
+    .ad-meta-item .ad-meta-value {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* Attributes cards with skill progress bars */
+    .ad-attributes-header {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .ad-attributes-header strong {
+      color: var(--text-primary);
+    }
+    .ad-attr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .ad-attr-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 16px 18px;
+      position: relative;
+    }
+    .ad-attr-card .ad-attr-heart {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      cursor: pointer;
+      color: #E4E7EB;
+      font-size: 18px;
+    }
+    .ad-attr-card .ad-attr-heart.filled {
+      color: #E85A4B;
+    }
+    .ad-attr-card .ad-attr-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      padding-right: 26px;
+    }
+    .ad-attr-card .ad-attr-type {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .ad-attr-card .ad-attr-current {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .ad-attr-card .ad-attr-current strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    /* Skill progress bar with markers */
+    .ad-skill-bar {
+      position: relative;
+      height: 6px;
+      background: #E4E7EB;
+      border-radius: 3px;
+      margin: 20px 0 6px;
+    }
+    .ad-skill-bar .ad-skill-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: linear-gradient(90deg, var(--sap-blue) 0%, #1B90FF 100%);
+      border-radius: 3px;
+    }
+    .ad-skill-bar .ad-skill-marker {
+      position: absolute;
+      top: -2px;
+      width: 10px; height: 10px;
+      background: var(--sap-blue);
+      border-radius: 50%;
+      transform: translateX(-50%);
+    }
+    .ad-skill-bar .ad-skill-marker.expected {
+      top: 8px;
+      width: 0; height: 0;
+      background: transparent;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 8px solid #36A41D;
+      transform: translateX(-50%);
+    }
+    .ad-skill-tick {
+      position: absolute;
+      top: 1px;
+      width: 1px;
+      height: 4px;
+      background: #8A94A6;
+    }
+    .ad-expected-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    .ad-expected-label strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Side column · Assignment Owner + Co-Owners */
+    .ad-side-col .card { padding: 20px 22px; }
+    .ad-side-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 14px;
+    }
+    .ad-owner-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    .ad-owner-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .ad-owner-name {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .ad-owner-card-icon {
+      color: var(--sap-blue);
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 15px;
+    }
+    .ad-owner-card-icon:hover { opacity: 1; }
+    .ad-owner-email {
+      padding: 8px 0 4px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-top: 1px solid #F0F2F5;
+      margin-top: 8px;
+    }
+    .ad-owner-email strong {
+      color: var(--sap-blue);
+    }
+    .ad-coowners-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 18px 0 8px;
+    }
+
+    /* Sticky apply bar for Detail page */
+    .ad-apply-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 24px;
+      padding: 8px 8px 8px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(0,20,74,0.12);
+      z-index: 30;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    .ad-apply-bar .apply-btn {
+      background: var(--sap-blue);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .ad-apply-bar .apply-btn:hover { background: var(--sap-blue-hover); }
+    .ad-apply-bar .prep-btn {
+      background: transparent;
+      color: var(--sap-blue);
+      border: none;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .ad-apply-bar .prep-btn:hover { text-decoration: underline; }
+
+    /* ============ 拓展你的经历 (SF listing page) ============ */
+    .bye-breadcrumb {
+      color: var(--sap-blue);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .bye-breadcrumb a { color: var(--sap-blue); cursor: pointer; text-decoration: none; }
+    .bye-breadcrumb a:hover { text-decoration: underline; }
+    .bye-breadcrumb .sep { color: var(--text-secondary); margin: 0 4px; }
+    .bye-breadcrumb .current { color: var(--text-secondary); }
+
+    .bye-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .bye-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+    .bye-header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .bye-dropdown-btn {
+      background: #fff;
+      color: var(--sap-blue);
+      border: 1px solid var(--sap-blue);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bye-dropdown-btn:hover { background: #EAF3FD; }
+    .bye-dropdown-btn .caret { font-size: 10px; margin-left: 2px; }
+
+    .bye-filters {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 260px repeat(4, 1fr);
+      gap: 16px;
+      align-items: end;
+    }
+    .bye-filter-item .filter-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .bye-filter-item .filter-input,
+    .bye-filter-item .filter-select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #C9CFD6;
+      border-radius: 4px;
+      padding: 0 32px 0 10px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-primary);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23556677' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+    }
+    .bye-filter-item.search .filter-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='5' stroke='%23556677' stroke-width='1.5' fill='none'/%3E%3Cline x1='11' y1='11' x2='14' y2='14' stroke='%23556677' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-position: right 10px center;
+      background-size: 14px;
+      background-repeat: no-repeat;
+    }
+    .bye-filter-toggle {
+      display: flex;
+      justify-content: center;
+      margin: -14px 0 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .bye-filter-toggle .bye-toggle-btn {
+      width: 32px; height: 32px;
+      background: #fff;
+      border: 1px solid #C9CFD6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--sap-blue);
+      box-shadow: 0 1px 3px rgba(0,20,74,0.06);
+    }
+    .bye-filter-toggle .bye-toggle-btn:hover { background: #EAF3FD; }
+
+    /* Interested-in chips row */
+    .bye-interested {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .bye-interested-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .bye-interested-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bye-interested-title .info-i {
+      width: 16px; height: 16px;
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-style: italic;
+    }
+    .bye-view-all {
+      color: var(--sap-blue);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .bye-view-all:hover { text-decoration: underline; }
+    .bye-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .bye-chip {
+      background: #fff;
+      color: var(--sap-blue);
+      border: 1px solid var(--sap-blue);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+    .bye-chip:hover { background: #EAF3FD; }
+    .bye-chip .heart { color: #E85A4B; }
+    .bye-show-more {
+      color: var(--sap-blue);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    .bye-show-more::before { content: "› "; }
+    .bye-show-more:hover { text-decoration: underline; }
+
+    /* Opportunity card grid */
+    .bye-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1280px) { .bye-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 1024px) { .bye-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 720px)  { .bye-grid { grid-template-columns: repeat(2, 1fr); } }
+    .bye-card {
+      background: #fff;
+      border: 1px solid #E4E7EB;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .bye-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,20,74,0.1); }
+    .bye-card.readonly { cursor: default; opacity: 0.75; }
+    .bye-card.readonly:hover { transform: none; box-shadow: none; }
+    .bye-card-media {
+      height: 130px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bye-card-media svg { width: 100%; height: 100%; display: block; }
+    .bye-card-bookmark {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px; height: 28px;
+      background: #fff;
+      border: 1px solid var(--sap-blue);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sap-blue);
+      cursor: pointer;
+      z-index: 2;
+    }
+    .bye-card-bookmark svg { width: 14px; height: 14px; }
+    .bye-card-body {
+      padding: 14px 16px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .bye-card-tag {
+      color: var(--text-secondary);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+    .bye-card-tag svg { width: 12px; height: 12px; }
+    .bye-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .bye-card-type {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .bye-card-date {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .bye-preview-tag {
+      display: inline-block;
+      background: #EEF1F4;
+      color: var(--text-muted);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .signal-form textarea {
+      width: 100%; min-height: 60px; padding: 8px 10px;
+      border: 1px solid var(--border-mid); border-radius: 4px;
+      font-family: inherit; font-size: 13px; resize: vertical;
+    }
+    .signal-form .signal-preview {
+      background: #fff; border: 1px dashed var(--joule-purple-border);
+      padding: 8px 10px; border-radius: 4px; margin-top: 10px;
+      font-size: 12px; color: var(--joule-purple-dark);
+    }
+
+    /* ============ Mobile adaptation · < 768px ============ */
+    @media (max-width: 768px) {
+      /* Journey nav — smaller pills, wrap tightly */
+      .journey-nav { padding: 8px 10px; gap: 4px 4px; }
+      .journey-nav .step { padding: 4px 8px; font-size: 11px; }
+      .journey-nav .step .n { width: 16px; height: 16px; font-size: 10px; }
+      .journey-nav .sep { display: none; }
+
+      /* Assignment Detail — collapse to single column */
+      .ad-body { grid-template-columns: 1fr; gap: 12px; }
+      .ad-side-col { order: 2; }
+      .ad-header { flex-wrap: wrap; gap: 12px; }
+      .ad-header .ad-icon { width: 56px; height: 56px; }
+      .ad-header h1 { font-size: 20px; display: block; margin-bottom: 6px; }
+      .ad-header .ad-badges { margin-left: 0; margin-top: 4px; display: flex; }
+      .ad-header-actions { width: 100%; justify-content: flex-end; }
+      .ad-period { font-size: 12px; }
+      .ad-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .ad-main-col > .card, .ad-side-col > .card { padding: 16px 16px; }
+      .ad-meta-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .ad-attr-grid { grid-template-columns: 1fr; }
+      .ad-breadcrumb { font-size: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+
+      /* Apply Bar — pin to bottom edge, full width */
+      .ad-apply-bar {
+        left: 12px; right: 12px; transform: none;
+        bottom: 40px;   /* above global-footer */
+        border-radius: 12px;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .ad-apply-bar > span { flex-basis: 100%; text-align: center; }
+      .ad-apply-bar .apply-btn, .ad-apply-bar .prep-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; }
+
+      /* 拓展你的经历 — mobile listing */
+      .bye-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .bye-title { font-size: 20px; }
+      .bye-header-actions { flex-wrap: wrap; width: 100%; }
+      .bye-header-actions .bye-dropdown-btn { flex: 1; padding: 7px 12px; font-size: 12px; }
+      .bye-filters {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px;
+      }
+      .bye-filters .bye-filter-item.search { grid-column: 1; }
+      .bye-filter-toggle { margin: -10px 0 10px; }
+      .bye-interested { padding: 14px 16px; }
+      .bye-chips { gap: 6px; }
+      .bye-chip { padding: 5px 10px; font-size: 12px; }
+      .bye-grid { grid-template-columns: 1fr; gap: 12px; }
+      .bye-card-media { height: 120px; }
+
+      /* Opportunity cards on browse (legacy .opp-card) */
+      .opp-grid { grid-template-columns: 1fr; }
+
+      /* Tracker — visible on mobile too */
+      .tracker .stage .info .label { font-size: 12.5px; }
+      .tracker .stage .info .date { font-size: 10.5px; }
+
+      /* Signal form (extension hook, hidden in demo) */
+      .signal-form { padding: 12px; }
+
+      /* Compressed body padding under sticky bars */
+      body { padding-bottom: 60px; }
+    }
+  </style>
+</head>
+<body class="role-employee">
+  <div id="topbarSlot"></div>
+
+  <div class="app-shell">
+    <main class="main-area joule-open" id="mainArea">
+
+      <div class="journey-nav" id="journeyNav"></div>
+
+      <div id="viewContainer"></div>
+
+    </main>
+  </div>
+
+  <div id="jouleSlot"></div>
+
+  <div class="global-footer">
+    非 SAP 官方产品 · 学习原型 · 虚构数据与模拟执行 &nbsp;|&nbsp; Not an SAP official product · Learning prototype · 虚构数据与模拟执行
+  </div>
+
+  <script src="../shared/state.js"></script>
+  <script src="../shared/topbar.js"></script>
+  <script src="../shared/joule.js"></script>
+  <script src="../shared/guide.js"></script>
+  <script src="data/employee-data.js"></script>
+  <script>
+  const D = window.EMPLOYEE_DATA;
+  document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("employee");
+  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Career");
+
+  // Mount guidance layers
+  window.GUIDE.injectGuideButton();
+  window.GUIDE.mountGuideOverlay({ suppressAutoShow: true });
+  window.GUIDE.mountRoleRibbon("employee");
+
+  // Show step-appropriate hints as the user navigates
+  function showStepHint(step) {
+    if (step === "detail") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "detail-ask-joule",
+        title: "Try this — Pause #1",
+        body: "Open Joule (💎 icon) and ask it to analyze this role for your career development. Watch how it compares strengths, gaps, trade-offs — but names what only you can weigh.",
+        anchor: "top-right"
+      }), 800);
+    } else if (step === "tracking") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "tracking-switch-hrbp",
+        title: "Application submitted — now switch role",
+        body: "Open the HRBP view (from Landing page) to see how HR handles the request. State syncs across tabs — you'll see the same case from Mira's perspective.",
+        anchor: "bottom-right"
+      }), 600);
+    } else if (step === "mymove") {
+      setTimeout(() => window.GUIDE.showHint({
+        id: "mymove-notice-status",
+        title: "Notice what's not here",
+        body: "No 'complete' badge. The banner says <b>awaiting target-side verification</b>. This is intentional — submitted ≠ verified.",
+        anchor: "top-right"
+      }), 600);
+    }
+  }
+  // Hook into hash changes
+  window.addEventListener("hashchange", () => showStepHint((location.hash || "#browse").replace("#","")));
+  document.addEventListener("DOMContentLoaded", () => showStepHint((location.hash || "#browse").replace("#","")));
+  showStepHint((location.hash || "#browse").replace("#",""));
+
+  const STEPS = [
+    { id: "browse",   n: 1, label: "发现机会" },
+    { id: "detail",   n: 2, label: "评估匹配" },
+    { id: "prep",     n: 3, label: "面试准备" },
+    { id: "apply",    n: 4, label: "提交申请" },
+    { id: "tracking", n: 5, label: "追踪进度" },
+    { id: "mymove",   n: 6, label: "我的调动" }
+  ];
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function pill(cls, text) { return `<span class="pill ${cls}">${esc(text)}</span>`; }
+
+  const jouleCtl = window.JOULE.bindJouleShell();
+  let jouleExtra = [];   // ephemeral messages this session
+
+  function currentStepId() {
+    const h = (location.hash || "#browse").replace("#","");
+    return STEPS.find(s => s.id === h) ? h : "browse";
+  }
+
+  function stepStatus(stepId) {
+    const s = window.GMA.loadState();
+    const cur = currentStepId();
+    if (stepId === cur) return "active";
+    // "done" if the step's state has clearly happened
+    if (stepId === "browse")   return cur !== "browse" ? "done" : "active";
+    if (stepId === "detail")   return (cur !== "browse" && cur !== "detail") ? "done" : (cur === "detail" ? "active" : "pending");
+    if (stepId === "prep")     return (["apply","tracking","mymove"].includes(cur)) ? "done" : (cur === "prep" ? "active" : "pending");
+    if (stepId === "apply")    return s.employeeApplied ? "done" : (cur === "apply" ? "active" : "pending");
+    if (stepId === "tracking") return s.executionStarted ? "done" : (cur === "tracking" ? "active" : "pending");
+    if (stepId === "mymove")   return (s.executionStarted && !s.provisioningIssue) || s.iasConflictResolved ? "done" : (cur === "mymove" ? "active" : "pending");
+    return "pending";
+  }
+
+  function renderNav() {
+    const nav = document.getElementById("journeyNav");
+    nav.innerHTML = "";
+    STEPS.forEach((step, i) => {
+      const status = stepStatus(step.id);
+      const el = document.createElement("div");
+      el.className = "step " + status;
+      el.innerHTML = `<span class="n">${status === "done" ? "✓" : step.n}</span><span>${esc(step.label)}</span>`;
+      el.addEventListener("click", () => { location.hash = "#" + step.id; });
+      nav.appendChild(el);
+      if (i < STEPS.length - 1) {
+        const sep = document.createElement("span");
+        sep.className = "sep";
+        sep.textContent = "›";
+        nav.appendChild(sep);
+      }
+    });
+  }
+
+  // ============ Views ============
+  function view_browse() {
+    const s = window.GMA.loadState();
+
+    // SVG illustration for each opportunity card top (original geometric designs)
+    const cardIllustration = (i) => {
+      const illustrations = [
+        // 0 · Magnifier / Discovery (yellow bg)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <circle cx="90" cy="60" r="24" fill="none" stroke="#E88C0A" stroke-width="6"/>
+          <circle cx="90" cy="60" r="18" fill="#FFEBC4"/>
+          <line x1="107" y1="77" x2="130" y2="100" stroke="#E88C0A" stroke-width="6" stroke-linecap="round"/>
+          <path d="M 160 30 l 2 5 l 5 2 l -5 2 l -2 5 l -2 -5 l -5 -2 l 5 -2 z" fill="#FFB03A"/>
+          <path d="M 190 70 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFA033"/>
+          <path d="M 50 100 l 1 3 l 3 1 l -3 1 l -1 3 l -1 -3 l -3 -1 l 3 -1 z" fill="#FFB03A"/>
+        </svg>`,
+        // 1 · Notebook / Documents (yellow bg with paper)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <rect x="85" y="30" width="70" height="80" rx="4" fill="#FFFFFF" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="50" x2="146" y2="47" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="60" x2="140" y2="57" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="70" x2="146" y2="67" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <line x1="94" y1="80" x2="130" y2="77" stroke="#E88C0A" stroke-width="2" transform="rotate(-4 120 70)"/>
+          <circle cx="170" cy="40" r="8" fill="#FFB03A"/>
+          <circle cx="60" cy="90" r="10" fill="#FFCA5E"/>
+          <path d="M 195 90 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#FFA033"/>
+        </svg>`,
+        // 2 · Rocket / Launch (yellow bg)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <path d="M 120 25 Q 135 55 135 80 L 135 95 L 105 95 L 105 80 Q 105 55 120 25 Z" fill="#FFFFFF" stroke="#E88C0A" stroke-width="2"/>
+          <circle cx="120" cy="60" r="6" fill="#FFB03A"/>
+          <path d="M 105 85 L 90 100 L 105 95 Z" fill="#FFB03A"/>
+          <path d="M 135 85 L 150 100 L 135 95 Z" fill="#FFB03A"/>
+          <path d="M 115 95 L 110 110 L 120 105 L 130 110 L 125 95 Z" fill="#E88C0A"/>
+          <circle cx="60" cy="40" r="3" fill="#FFB03A"/>
+          <circle cx="180" cy="50" r="3" fill="#FFB03A"/>
+          <path d="M 195 30 l 1 3 l 3 1 l -3 1 l -1 3 l -1 -3 l -3 -1 l 3 -1 z" fill="#FFA033"/>
+        </svg>`,
+        // 3 · Lightbulb / Ideas (yellow bg)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#FFF3D6"/>
+          <circle cx="120" cy="55" r="24" fill="#FFFFFF" stroke="#E88C0A" stroke-width="3"/>
+          <path d="M 108 75 L 108 90 Q 108 96 114 96 L 126 96 Q 132 96 132 90 L 132 75 Z" fill="#FFCA5E"/>
+          <line x1="112" y1="86" x2="128" y2="86" stroke="#E88C0A" stroke-width="1"/>
+          <line x1="120" y1="20" x2="120" y2="28" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="90" y1="30" x2="95" y2="35" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="150" y1="30" x2="145" y2="35" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="80" y1="55" x2="88" y2="55" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="160" y1="55" x2="152" y2="55" stroke="#E88C0A" stroke-width="2" stroke-linecap="round"/>
+        </svg>`,
+        // 4 · Bird / Freedom (dark navy - for one alt card)
+        `<svg viewBox="0 0 240 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="240" height="130" fill="#1B2A3D"/>
+          <path d="M 100 55 Q 110 45 130 50 Q 145 45 155 60 Q 145 65 135 65 L 130 80 L 125 70 Q 115 68 100 55 Z" fill="#4A9EFF"/>
+          <circle cx="150" cy="55" r="2" fill="#FFF"/>
+          <path d="M 70 40 Q 78 35 85 42" stroke="#4A9EFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 170 80 Q 178 75 185 82" stroke="#4A9EFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="200" cy="30" r="1.5" fill="#FFF"/>
+          <circle cx="40" cy="70" r="1.5" fill="#FFF"/>
+          <circle cx="210" cy="100" r="1.5" fill="#FFF"/>
+        </svg>`
+      ];
+      return illustrations[i % illustrations.length];
+    };
+
+    // Sample additional opportunities to fill the grid (in addition to D.opportunities)
+    const sampleOpps = [
+      { id: "OPP-PT-01", title: "1st Rotation STAR Portugal – Cohort SEP26 - Trainee in Logistics & Digital",   type: "STAR",             period: "Sep 14, 2026 - Mar 17, 2027" },
+      { id: "OPP-PT-02", title: "1st Rotation STAR Portugal – Cohort SEP26 - Trainee in Logistics & Digital 2", type: "STAR",             period: "Sep 14, 2026 - Mar 17, 2027" },
+      { id: "OPP-GG-01", title: "Customer Engagement Fellowship at Aurora Community (North America)",           type: "Gig Exchange (GGX) – Deep Dive", period: "Jan 1, 2027 - Jun 30, 2027" },
+      { id: "OPP-CN-01", title: "Cloud (Backend) Software Engineer for Kyma",                                   type: "STAR",             period: "Sep 16, 2026 - Mar 31, 2028" },
+      { id: "OPP-DE-01", title: "STAR - Cloud Native Developer - GCO CLEO",                                     type: "STAR",             period: "Oct 1, 2026 - Mar 31, 2027" }
+    ];
+
+    return `
+      <div class="bye-breadcrumb">
+        <a onclick="location.href='home.html'">机会市场</a>
+        <span class="sep">/</span>
+        <span class="current">拓展你的经历</span>
+      </div>
+
+      <div class="bye-header">
+        <h1 class="bye-title">拓展你的经历</h1>
+        <div class="bye-header-actions">
+          <button class="bye-dropdown-btn">Track My Opportunities <span class="caret">▾</span></button>
+          <button class="bye-dropdown-btn">Manage Opportunity Offerings <span class="caret">▾</span></button>
+        </div>
+      </div>
+
+      <div class="bye-filters">
+        <div class="bye-filter-item search">
+          <div class="filter-label">&nbsp;</div>
+          <input type="text" class="filter-input" placeholder="Search for opportunities" />
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Type:</div>
+          <select class="filter-select"><option>All</option><option>STAR</option><option>Gig Exchange</option><option>Internal Transfer</option></select>
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Location:</div>
+          <select class="filter-select"><option>All</option><option>Riyadh, Saudi Arabia</option><option>Munich, Germany</option><option>Singapore</option></select>
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Work Mode:</div>
+          <select class="filter-select"><option>All</option><option>Onsite</option><option>Remote</option><option>Hybrid</option></select>
+        </div>
+        <div class="bye-filter-item">
+          <div class="filter-label">Participation:</div>
+          <select class="filter-select"><option>All</option><option>Full-Time</option><option>Part-Time</option></select>
+        </div>
+      </div>
+
+      <div class="bye-filter-toggle">
+        <button class="bye-toggle-btn" title="Collapse filters">
+          <svg viewBox="0 0 12 12" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 8l4-4 4 4"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="bye-interested">
+        <div class="bye-interested-header">
+          <div class="bye-interested-title">
+            I'm interested in… <span class="info-i">i</span>
+          </div>
+          <a class="bye-view-all">View All in Growth Portfolio</a>
+        </div>
+        <div class="bye-chips">
+          <button class="bye-chip">Solution Consulting</button>
+          <button class="bye-chip">Energy Storage <span class="heart">♥</span></button>
+          <button class="bye-chip">BESS Platform</button>
+          <button class="bye-chip">Cross-Cultural Communication</button>
+          <button class="bye-chip">Renewable Energy <span class="heart">♥</span></button>
+          <button class="bye-chip">Presales</button>
+          <button class="bye-chip">Middle East Region</button>
+          <button class="bye-chip">Technical Sales</button>
+          <button class="bye-chip">Data Analysis</button>
+        </div>
+        <span class="bye-show-more">Show More</span>
+      </div>
+
+      <div class="bye-grid">
+        <!-- Primary card: Lin Chen's target role (from D.opportunities) -->
+        <div class="bye-card" data-job="JOB-ME-SC-14">
+          <div class="bye-card-media">
+            ${cardIllustration(0)}
+            <button class="bye-card-bookmark" title="Save">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="bye-card-body">
+            <div class="bye-card-tag">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10M10 3v10"/></svg>
+              Assignment
+            </div>
+            <div class="bye-card-title">Senior Solution Consultant — Middle East (Riyadh)</div>
+            <div class="bye-card-type">Internal Transfer</div>
+            <div class="bye-card-date">Nov 1, 2026 - Ongoing</div>
+          </div>
+        </div>
+
+        ${sampleOpps.map((o, i) => `
+          <div class="bye-card readonly" data-job="${esc(o.id)}">
+            <div class="bye-card-media">
+              ${cardIllustration(i + 1)}
+              <button class="bye-card-bookmark" title="Save">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="bye-card-body">
+              <div class="bye-card-tag">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10M10 3v10"/></svg>
+                Assignment <span class="bye-preview-tag">preview</span>
+              </div>
+              <div class="bye-card-title">${esc(o.title)}</div>
+              <div class="bye-card-type">${esc(o.type)}</div>
+              <div class="bye-card-date">${esc(o.period)}</div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function view_detail() {
+    const s = window.GMA.loadState();
+    const job = D.opportunities.find(o => o.id === "JOB-ME-SC-14");
+    const applied = s.employeeApplied;
+
+    // Skill attributes (mapped from evidence) — for the SF-style Attributes cards
+    const attributes = [
+      { title: "Solution Consulting", type: "Skill", current: 4, currentLabel: "Advanced", expected: 3, expectedLabel: "Practitioner", favorited: true },
+      { title: "Energy Storage Domain", type: "Skill", current: 3, currentLabel: "Practitioner", expected: 3, expectedLabel: "Practitioner", favorited: true },
+      { title: "Cross-Cultural Communication", type: "Skill", current: 2, currentLabel: "Novice", expected: 2, expectedLabel: "Novice", favorited: false }
+    ];
+    const skillLevels = 5;   // 1..5 with tick marks
+    function skillBar(a) {
+      const currentPct = ((a.current - 1) / (skillLevels - 1)) * 100;
+      const expectedPct = ((a.expected - 1) / (skillLevels - 1)) * 100;
+      const ticks = [];
+      for (let i = 1; i <= skillLevels; i++) {
+        const pct = ((i - 1) / (skillLevels - 1)) * 100;
+        ticks.push(`<div class="ad-skill-tick" style="left: ${pct}%;"></div>`);
+      }
+      return `
+        <div class="ad-skill-bar">
+          <div class="ad-skill-fill" style="width: ${currentPct}%;"></div>
+          ${ticks.join("")}
+          <div class="ad-skill-marker" style="left: ${currentPct}%;"></div>
+          <div class="ad-skill-marker expected" style="left: ${expectedPct}%;"></div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="assignment-detail">
+        <div class="ad-breadcrumb">
+          <a onclick="location.href='home.html'">机会市场</a>
+          <span class="sep">/</span>
+          <a onclick="location.hash='#browse'">拓展你的经历</a>
+          <span class="sep">/</span>
+          <span class="current">岗位详情</span>
+        </div>
+
+        <div class="ad-header">
+          <div class="ad-icon">
+            <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="ad-icon-bg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#FFF3D6"/>
+                  <stop offset="1" stop-color="#F5E6C9"/>
+                </linearGradient>
+              </defs>
+              <rect width="72" height="72" fill="url(#ad-icon-bg)"/>
+              <!-- Magnifying glass -->
+              <circle cx="30" cy="30" r="14" fill="none" stroke="#E88C0A" stroke-width="4"/>
+              <circle cx="30" cy="30" r="10" fill="#FFEBC4"/>
+              <line x1="40" y1="40" x2="54" y2="54" stroke="#E88C0A" stroke-width="4" stroke-linecap="round"/>
+              <!-- Sparkles -->
+              <path d="M 18 12 l 1.2 3 l 3 1.2 l -3 1.2 l -1.2 3 l -1.2 -3 l -3 -1.2 l 3 -1.2 z" fill="#FFB03A"/>
+              <path d="M 52 22 l 1 2.5 l 2.5 1 l -2.5 1 l -1 2.5 l -1 -2.5 l -2.5 -1 l 2.5 -1 z" fill="#FFA033"/>
+            </svg>
+          </div>
+          <div class="ad-title-area">
+            <h1>${esc(job.title)}</h1>
+            <span class="ad-badges">
+              <span class="ad-badge ongoing">Ongoing</span>
+              <span class="ad-badge hiring-closed">${applied ? "Applied" : "Open to Apply"}</span>
+            </span>
+            <div class="ad-period">Period: Sep 2, 2026 - Feb 28, 2027</div>
+          </div>
+          <div class="ad-header-actions">
+            <button class="ad-icon-btn" title="Save">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+            <button class="ad-icon-btn" title="Share">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="ad-tabs">
+          <div class="ad-tab active">岗位详情</div>
+        </div>
+
+        <div class="ad-body">
+          <div class="ad-main-col">
+            <div class="card">
+              <h2 class="ad-section-title">About This Assignment</h2>
+              <div class="ad-desc-label">Description:</div>
+              <div class="ad-desc-body">
+                <div style="font-weight:600; margin-bottom:6px;">About the Role</div>
+                We are looking for a <strong>Senior Solution Consultant</strong> to join the <strong>Aurora Middle East</strong> team in Riyadh and support the rollout of utility-scale energy-storage projects across the Kingdom...
+              </div>
+              <span class="ad-show-more" id="adShowMore">Show More</span>
+              <div class="ad-desc-more" id="adDescMore" style="display:none; margin-top:10px; font-size:13px; color:var(--text-primary); line-height:1.6;">
+                <p>You'll partner with regional Business Development to design and present technical solutions for BESS deployments (100–300 MWh), lead pre-sales workshops with Saudi utilities and industrial prospects, and contribute product feedback back to the Shanghai HQ team.</p>
+                <p>This is a <strong>full relocation</strong> under the target legal entity (Aurora Middle East LLC), not an expatriate assignment. Comfort with a multicultural, regulated workforce environment is a plus.</p>
+              </div>
+
+              <div class="ad-meta-grid">
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Type: <span class="q">?</span></div>
+                  <div class="ad-meta-value">Internal Transfer</div>
+                </div>
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Openings: <span class="q">?</span></div>
+                  <div class="ad-meta-value">1/1</div>
+                </div>
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Participation:</div>
+                  <div class="ad-meta-value">Full-Time</div>
+                </div>
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Work Mode:</div>
+                  <div class="ad-meta-value">Onsite · Riyadh</div>
+                </div>
+              </div>
+
+              <div class="ad-meta-grid" style="border-top:none; padding-top:0; margin-top:14px;">
+                <div class="ad-meta-item">
+                  <div class="ad-meta-label">Last Edited On:</div>
+                  <div class="ad-meta-value">Sep 2, 2026</div>
+                </div>
+                <div class="ad-meta-item" style="grid-column: span 2;">
+                  <div class="ad-meta-label">Last Edited By:</div>
+                  <div class="ad-meta-value">Mira Klein</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="ad-section-title">Attributes</h2>
+              <div class="ad-attributes-header">
+                <strong>Required Attributes (3/3 Matched)</strong>
+              </div>
+              <div class="ad-attr-grid">
+                ${attributes.map(a => `
+                  <div class="ad-attr-card">
+                    <span class="ad-attr-heart ${a.favorited ? "filled" : ""}">${a.favorited ? "♥" : "♡"}</span>
+                    <div class="ad-attr-title">${esc(a.title)}</div>
+                    <div class="ad-attr-type">${esc(a.type)}</div>
+                    <div class="ad-attr-current">Current: <strong>${a.current} - ${esc(a.currentLabel)}</strong></div>
+                    ${skillBar(a)}
+                    <div class="ad-expected-label">Expected: <strong>${a.expected} - ${esc(a.expectedLabel)}</strong></div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="ad-section-title">How Your Experience Matches</h2>
+              <div class="ad-attributes-header">Sourced from authorized data · self-reported items are labeled. <span class="cap-tag ext" style="margin-left:6px;">项目扩展设计</span></div>
+              <table class="data-table" style="margin-top:8px;">
+                <thead><tr><th>Requirement</th><th>Your match</th></tr></thead>
+                <tbody>
+                  ${D.evidence.map(e => `
+                    <tr>
+                      <td>${esc(e.req)}<div style="margin-top:4px;"><span class="src-tag ${esc(e.source)}">${esc(e.srcLabel)}</span></div></td>
+                      <td>${esc(e.match)}${e.note ? `<div class="muted mt-8" style="font-size:11px;">${esc(e.note)}</div>` : ""}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="ad-side-col">
+            <div class="card">
+              <h3 class="ad-side-title">Assignment Owner</h3>
+              <div class="ad-owner-row">
+                <div class="ad-owner-avatar" style="background: linear-gradient(135deg, #A4E0C0, #049F9A);">MK</div>
+                <div class="ad-owner-name">Mira Klein</div>
+                <span class="ad-owner-card-icon" title="View profile">👤</span>
+              </div>
+              <div class="ad-owner-email">Email: <strong>mira.klein@aurora-me.example</strong></div>
+
+              <h4 class="ad-coowners-header">Co-Owners</h4>
+              <div class="ad-owner-row">
+                <div class="ad-owner-avatar" style="background: linear-gradient(135deg, #B7D5F8, #0070F2);">AB</div>
+                <div class="ad-owner-name">Anna Becker</div>
+                <span class="ad-owner-card-icon" title="View profile">👤</span>
+              </div>
+              <div class="ad-owner-row">
+                <div class="ad-owner-avatar" style="background: linear-gradient(135deg, #FFCA5E, #E88C0A);">TW</div>
+                <div class="ad-owner-name">Tim Weiss</div>
+                <span class="ad-owner-card-icon" title="View profile">👤</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-apply-bar">
+        <span>Interested? Prepare, then apply.</span>
+        <button class="prep-btn" onclick="location.hash='#prep'">Prepare for interview</button>
+        <button class="apply-btn" id="btnApply">${applied ? "Continue to Track" : "Apply for this role"}</button>
+      </div>
+    `;
+  }
+
+  function view_prep() {
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">职业发展</a> › <a onclick="location.hash='#detail'">Senior Solution Consultant — Middle East</a> › <b>Interview preparation</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Interview preparation pack</h1>
+          <div class="page-sub">Practice questions · your career preference in this session is not permanently saved or disclosed</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#detail'">← Back to role</button>
+          <button class="btn primary" onclick="location.hash='#apply'">Continue to apply →</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 3 · Interview prep.</b> Joule generates practice content but never predicts outcomes or ranks you.</div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="card-title">Likely interview questions</h2></div>
+            <span class="cap-tag ext">项目扩展设计</span>
+          </div>
+          <ul style="margin:0; padding-left:18px;">
+            ${D.interviewPrep.questions.map(q => `<li style="margin:6px 0; line-height:1.5;">${esc(q)}</li>`).join("")}
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><h2 class="card-title">Reverse questions to ask them</h2></div>
+            <span class="cap-tag ext">项目扩展设计</span>
+          </div>
+          <ul style="margin:0; padding-left:18px;">
+            ${D.interviewPrep.reverse.map(q => `<li style="margin:6px 0; line-height:1.5;">${esc(q)}</li>`).join("")}
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-strip warn">
+        <span class="i-icon">!</span>
+        <div><b>Related native AI (reference only, not rebuilt here):</b> Career Insights · Interview Question Generation (interviewer via Teams) · Performance Preparation Agent (current manager). Each requires the correct role and entry point.</div>
+      </div>
+    `;
+  }
+
+  function view_apply() {
+    const s = window.GMA.loadState();
+    const applied = s.employeeApplied;
+    return `
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">职业发展</a> › <b>Apply</b></div>
+
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Confirm your application</h1>
+          <div class="page-sub">Review what will be shared with the hiring team, then submit</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" onclick="location.hash='#detail'">← Back</button>
+        </div>
+      </div>
+
+      <div class="info-strip ${applied ? "success" : ""}">
+        <span class="i-icon">${applied ? "✓" : "i"}</span>
+        <div><b>Step 4 · Apply.</b> ${applied ? "Your application has been submitted. Track progress in the next step." : "Your Candidate Profile will be shared. You can review below before submitting."}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">What will be shared</h2>
+          <div class="card-sub">From your Candidate Profile · you control what stays private</div></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <ul class="kv-list">
+          <li><span class="k">Employee</span><span class="v">${esc(D.self.name)} · ${esc(D.self.id)}</span></li>
+          <li><span class="k">Current role</span><span class="v">${esc(D.self.currentTitle)} · ${esc(D.self.currentOrg)}</span></li>
+          <li><span class="k">Applying for</span><span class="v">Senior Solution Consultant — Middle East · Aurora Middle East LLC</span></li>
+          <li><span class="k">Skills shared</span><span class="v">Solution Consulting · BESS Platform (cert) · English fluent · Arabic A1</span></li>
+          <li><span class="k">Notice period</span><span class="v">4 weeks</span></li>
+          <li><span class="k">Preferred start</span><span class="v">To be discussed</span></li>
+        </ul>
+      </div>
+
+      <div class="row" style="justify-content:flex-end; margin-top:16px;">
+        ${applied
+          ? `<button class="btn primary" onclick="location.hash='#tracking'">Track my application →</button>`
+          : `<button class="btn primary" id="btnSubmitApp">Submit application</button>`}
+      </div>
+    `;
+  }
+
+  function view_tracking() {
+    const s = window.GMA.loadState();
+    const app = D.application;
+    // Determine which stage is active
+    let activeIdx = 4;   // move preparation by default
+    if (s.approvalsSubmitted) activeIdx = 5;
+    if (s.executionStarted) activeIdx = 6;
+    if (s.iasConflictResolved || (s.executionStarted && !s.provisioningIssue)) activeIdx = 6;
+
+    return `
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">My application · Track progress</h1>
+          <div class="page-sub">${esc(app.id)} · Submitted ${esc(app.submittedOn)}</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn outlined" id="btnRefresh">🔄 刷新</button>
+        </div>
+      </div>
+
+      <div class="info-strip">
+        <span class="i-icon">i</span>
+        <div><b>Step 5 · Track progress.</b> High-level view of where you stand. Approver identities and internal review details are not shown here by design.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Application timeline</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <div class="tracker">
+          ${app.trackerStages.map((st, i) => {
+            const cls = i < activeIdx ? "done" : i === activeIdx ? "active" : "";
+            return `<div class="stage ${cls}">
+              <div class="dot">${i < activeIdx ? "✓" : i + 1}</div>
+              <div class="info"><div class="label">${esc(st.label)}</div><div class="date">${esc(st.date)}</div></div>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Interviews</h2></div>
+          <span class="cap-tag native">标准业务功能模拟</span>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Round</th><th>With</th><th>Date</th><th>Modality</th><th>Status</th></tr></thead>
+          <tbody>
+            ${D.interviews.map(iv => `<tr>
+              <td>${esc(iv.round)}</td>
+              <td>${esc(iv.with)}</td>
+              <td>${esc(iv.date)}</td>
+              <td>${esc(iv.modality)}</td>
+              <td>${pill("green", "Completed")}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Signal to HR — future extension, hidden by default -->
+      <!-- Kept as extension hook per docs/scenario.md; not part of the 3-pause demo flow -->
+    `;
+  }
+
+  function view_mymove() {
+    const s = window.GMA.loadState();
+    if (!s.executionStarted) {
+      return `
+        <div class="info-strip warn">
+          <span class="i-icon">!</span>
+          <div><b>Step 6 · My move.</b> Not yet available. This section unlocks once HR triggers execution and your move becomes effective.</div>
+        </div>
+        <div class="card">
+          <div class="card-body muted">Once execution starts, you will see:
+            <ul>
+              <li>A summary of what's ready, what's still processing, and what needs a step from you</li>
+              <li>Your new access, reporting line, work location</li>
+              <li>Any updates from HR on your effective date</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+    const routedToGovernance = s.iasConflictResolved;
+    const stillPaused = s.provisioningIssue && !routedToGovernance;
+    return `
+      <div class="conclusion-banner">
+        <div class="cb-icon">!</div>
+        <div>
+          <div class="cb-title">${stillPaused
+            ? "Move effective · Some IT items pending review"
+            : "Move effective · Awaiting target-side verification"}</div>
+          <div class="cb-sub">You start at Aurora Middle East LLC (Riyadh) on <b>${esc(s.effectiveDate)}</b>. ${stillPaused
+            ? "The IT team has flagged an item for internal review. You will be notified once your access is fully in place."
+            : "Some technical steps have been submitted but not yet verified on the target side. You will be notified once your access is confirmed."}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h2 class="card-title">Your move summary</h2>
+          <div class="card-sub">What's confirmed, what's still being verified, what needs a step from you.</div></div>
+          <span class="cap-tag ext">项目扩展设计</span>
+        </div>
+        <div class="three-col">
+          <div class="handoff-col done">
+            <h4>✓ Confirmed</h4>
+            <ul>
+              <li>New position on record<span class="sub">Senior Solution Consultant · Middle East</span></li>
+              <li>Reporting line updated<span class="sub">Reports to Anna Becker</span></li>
+              <li>Riyadh office desk assigned<span class="sub">KAFD · Tower 4 · Floor 12</span></li>
+              <li>Compensation loaded<span class="sub">Offer v2 · effective ${esc(s.effectiveDate)}</span></li>
+            </ul>
+          </div>
+          <div class="handoff-col progress">
+            <h4>⏳ Awaiting verification</h4>
+            <ul>
+              <li>Work email &amp; system access<span class="sub">Submitted · pending target-side verification</span></li>
+              <li>Payroll setup (Saudi Arabia)<span class="sub">First cycle: end of November</span></li>
+            </ul>
+          </div>
+          <div class="handoff-col paused">
+            <h4>📋 Your step</h4>
+            <ul>
+              <li>Sign data protection consent<span class="sub">Available now (Legal will confirm applicable framework)</span></li>
+              <li>Meet your onboarding buddy<span class="sub">Anna will confirm in week 1</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============ Render ============
+  function renderView() {
+    const step = currentStepId();
+    const container = document.getElementById("viewContainer");
+    const renderer = { browse: view_browse, detail: view_detail, prep: view_prep, apply: view_apply, tracking: view_tracking, mymove: view_mymove };
+    container.innerHTML = renderer[step]();
+    bindViewInteractions(step);
+    renderNav();
+    refreshJoule();
+    refreshBadges();
+    // Dynamic topbar app label based on step
+    const appLabelMap = {
+      browse: "机会市场",
+      detail: "机会市场",
+      prep:   "机会市场",
+      apply:  "机会市场",
+      tracking: "我的申请",
+      mymove: "My Move"
+    };
+    const appLabelEl = document.querySelector(".app-selector span:first-child");
+    if (appLabelEl) appLabelEl.textContent = appLabelMap[step] || "职业发展";
+    // Hide journey nav on detail step (匹配 SF 原生页,不显示流程 nav)
+    const nav = document.getElementById("journeyNav");
+    if (nav) nav.style.display = (step === "detail") ? "none" : "";
+  }
+
+  function bindViewInteractions(step) {
+    document.getElementById("btnRefresh")?.addEventListener("click", renderView);
+    document.getElementById("btnResetAll")?.addEventListener("click", () => { window.GMA.resetState(); jouleExtra = []; renderView(); });
+
+    if (step === "browse") {
+      document.querySelectorAll(".bye-card, .opp-card").forEach(c => {
+        c.addEventListener("click", (e) => {
+          // Ignore clicks on bookmark button
+          if (e.target.closest(".bye-card-bookmark")) { e.stopPropagation(); return; }
+          const id = c.getAttribute("data-job");
+          if (id === "JOB-ME-SC-14") location.hash = "#detail";
+          // Non-primary opportunities are read-only preview — no navigation
+        });
+      });
+    }
+
+    if (step === "detail") {
+      document.getElementById("btnApply")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        location.hash = s.employeeApplied ? "#tracking" : "#apply";
+      });
+      // Show More toggle for the description
+      document.getElementById("adShowMore")?.addEventListener("click", (e) => {
+        const more = document.getElementById("adDescMore");
+        const btn = e.currentTarget;
+        if (more.style.display === "none") {
+          more.style.display = "block";
+          btn.textContent = "Show Less";
+          btn.classList.add("open");
+        } else {
+          more.style.display = "none";
+          btn.textContent = "Show More";
+          btn.classList.remove("open");
+        }
+      });
+    }
+
+    if (step === "apply") {
+      document.getElementById("btnSubmitApp")?.addEventListener("click", () => {
+        window.GMA.mutateState(x => { x.employeeApplied = true; }, "employee-submitted-application");
+        jouleExtra.push({ role: "bot", html: `<strong>Application submitted.</strong> You'll see updates in <b>Track progress</b>. I'll notify you if anything on your side needs action.`, sources: 1 });
+        renderView();
+      });
+    }
+
+    if (step === "tracking") {
+      // Signal card removed from demo flow (kept as extension hook only).
+      // No event bindings needed for this step in the current narrative.
+    }
+  }
+
+  // ============ Joule frames (employee flavor) with autoplay pacing ============
+  function jouleFramesFor(step) {
+    const s = window.GMA.loadState();
+    const dateChanged = s.effectiveDate !== "2026-11-01";
+    const executed = s.executionStarted;
+
+    const overview = {
+      role: "bot", autoplay: true, delay: 300,
+      html: `Hi 林晨. I can help you discover roles, evaluate fit, prepare for interviews, and track your application. I <strong>cannot</strong> predict offer outcomes or make the decision for you.`,
+      sources: 2
+    };
+
+    switch (step) {
+      case "browse":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 800,
+            html: `I surfaced <strong>4 opportunities</strong> based on your Career Profile. The Riyadh role is your strongest match.`,
+            actions: [{ label: "Open Riyadh role detail", event: "goto-detail" }],
+            sources: 3 }
+        ];
+
+      case "detail":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 700,
+            html: `Take a moment to review the requirements. Sources are labeled so you know what's on record vs. self-reported.`,
+            sources: 2 },
+          { role: "user", autoplay: false, continueLabel: "▸ Ask Joule for a personal analysis",
+            text: "I'm interested in this role. Based on my experience and strengths, can you help me analyze the pros and cons for my development?" },
+          { role: "bot", autoplay: true, delay: 900,
+            html: `Happy to help you <strong>compare and reflect</strong> — but the final judgment about your growth is yours. Here's what I can lay out:<ul><li><strong>Strengths that align:</strong> your solution-consulting record and BESS certification match the core skill bar</li><li><strong>Gaps to consider:</strong> Arabic-language exposure is on your self-report, not the system record — worth verifying during hiring</li><li><strong>Trade-offs:</strong> a Middle East posting broadens your regional exposure, but also involves relocation and adjustment</li></ul>What only <em>you</em> can weigh: family plans, life stage, appetite for a new market — those aren't in my data, and I won't guess at them. A conversation with your manager or a mentor is a better fit for that side.`,
+            actions: [
+              { label: "Show my experience match", event: "focus-match" },
+              { label: "Continue to interview prep", event: "goto-prep" }
+            ],
+            sources: 2 }
+        ];
+
+      case "prep":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: `Interview prep pack ready. Practice questions — not predictions of what you'll be asked. Your notes stay with you.`,
+            sources: 1 }
+        ];
+
+      case "apply":
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: `Ready to apply? Your Candidate Profile will be shared — review it on the page. Nothing beyond what's shown will be sent.`,
+            sources: 1 }
+        ];
+
+      case "tracking": {
+        const frames = [
+          overview,
+          { role: "bot", autoplay: true, delay: 600,
+            html: `Your application is at <strong>${s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation"}</strong>. I'll notify you of anything that needs action.`,
+            sources: 2 }
+        ];
+        if (dateChanged) {
+          frames.push({
+            role: "bot", autoplay: false, continueLabel: "▸ Show what HR changed",
+            html: `<strong>Update from HR:</strong> your proposed effective date is now <strong>${esc(s.effectiveDate)}</strong>. No action needed from you.`,
+            sources: 1
+          });
+        }
+        return frames;
+      }
+
+      case "mymove": {
+        if (!executed) return [ overview, { role: "bot", autoplay: true, delay: 500, html: `Not yet — this section unlocks after your move becomes effective.`, sources: 1 } ];
+        const delayed = s.provisioningIssue && !s.iasConflictResolved;
+        return [
+          overview,
+          { role: "bot", autoplay: true, delay: 500,
+            html: delayed
+              ? `Your move is effective. IT will finalize your account switch within 2 business days — no action needed from you.`
+              : `Your move is complete. All access confirmed. Welcome to the Middle East team.`,
+            sources: 1 }
+        ];
+      }
+    }
+    return [ overview ];
+  }
+
+  function refreshJoule() {
+    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "Career");
+    const base = jouleFramesFor(currentStepId());
+    const frames = base.concat(jouleExtra.map(f => ({ ...f, autoplay: f.autoplay !== undefined ? f.autoplay : true })));
+    window.JOULE.loadSequence(frames, handleJouleAction);
+    window.JOULE.setIntentRouter(employeeIntentRouter);
+    window.JOULE.setSuggestions(suggestionsForStep(currentStepId()));
+  }
+
+  // ============ Interactive input · intent router ============
+  // Keyword-based routing. Not an LLM. Preset replies keep the demo predictable.
+  function suggestionsForStep(step) {
+    switch (step) {
+      case "browse":
+        return ["Which role fits me best?", "Why the Riyadh role?"];
+      case "detail":
+        return ["Analyze this role for my development", "What's my match strength?", "What's the compensation like?"];
+      case "prep":
+        return ["What might they ask me?", "What should I ask them?"];
+      case "apply":
+        return ["What info gets shared?", "Can I edit before sending?"];
+      case "tracking":
+        return ["Where is my application now?", "Can I send HR a note?", "When will I start?"];
+      case "mymove":
+        return ["What's left for me to do?", "When does payroll start?"];
+      default:
+        return [];
+    }
+  }
+
+  function employeeIntentRouter(userText) {
+    const t = userText.toLowerCase();
+    const s = window.GMA.loadState();
+
+    // ---- Pause #1 · Personal-development analysis (AI helps compare, doesn't decide) ----
+    if (/should i (take|accept|apply)|worth it|is it a good|is this right for me|接受|该不该|analyze.*(role|position|development|career)|pros? and cons?|strengths?.*(match|align)|优劣势|发展|适合我/i.test(t)) {
+      return {
+        html: `Happy to help you <strong>compare and reflect</strong> — but the final judgment about your growth is yours. Here's what I can lay out:<ul><li><strong>Strengths that align:</strong> your solution-consulting record and BESS certification match the core skill bar</li><li><strong>Gaps to consider:</strong> Arabic-language exposure is on your self-report, not the system record — worth verifying during hiring</li><li><strong>Trade-offs:</strong> a Middle East posting broadens your regional exposure, but also involves relocation and adjustment</li></ul>What only <em>you</em> can weigh: family plans, life stage, appetite for a new market — those aren't in my data, and I won't guess at them. A conversation with your manager or a mentor is a better fit for that side.`,
+        actions: [
+          { label: "Show my experience match", event: "focus-match" },
+          { label: "Continue to interview prep", event: "goto-prep" }
+        ],
+        sources: 2
+      };
+    }
+
+    // Compensation
+    if (/(comp|salary|pay|package|money|薪|工资|待遇)/.test(t)) {
+      return {
+        html: `Proposed: <strong>SAR 360,000/yr</strong> base + 18% bonus + housing + one-time relocation. Current: <strong>CNY 480,000/yr</strong> base + 15% bonus. The comparison is on the Evaluate page — I show version + date, but I don't compute post-tax or treat this as a personal commitment.`,
+        sources: 2
+      };
+    }
+
+    // Match / requirements
+    if (/(match|requirements?|qualif|经历|要求)/.test(t)) {
+      return {
+        html: `Your matches: <strong>2 items on system record</strong> (BESS certification, solution consulting on 3 tier-1 pursuits), <strong>1 self-reported</strong> (GCC workshop as observer), <strong>1 with no source</strong> (cross-cultural project scope). I don't fabricate — absent from records is not the same as absent in fact.`,
+        actions: [{ label: "Open Evaluate page", event: "goto-detail" }],
+        sources: 2
+      };
+    }
+
+    // Interview
+    if (/(interview|question|ask me|prep|面试)/.test(t)) {
+      return {
+        html: `I have 3 practice questions and 3 reverse questions for you on the Interview prep page. They're practice — not predictions of what you'll be asked.`,
+        actions: [{ label: "Open Interview prep", event: "goto-prep" }],
+        sources: 1
+      };
+    }
+
+    // Status / progress
+    if (/(status|progress|where|when|start|track|进度|状态)/.test(t)) {
+      const stage = s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation";
+      const startDate = s.effectiveDate || "2026-11-01";
+      return {
+        html: `Your application is at <strong>${stage}</strong>. Planned start at Aurora Middle East LLC (Riyadh): <strong>${startDate}</strong>. I'll update you if anything on your side needs action.`,
+        actions: [{ label: "Open Track progress", event: "goto-tracking" }],
+        sources: 2
+      };
+    }
+
+    // Signal / tell HR
+    if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟)/.test(t)) {
+      return {
+        html: `You can send a signal on the <strong>Track progress</strong> page. I'll show you a preview of what HR will see — an abstract flag, not your exact wording. Your private phrasing stays in your record until you have a real conversation.`,
+        actions: [{ label: "Go to signal box", event: "goto-tracking" }],
+        sources: 1
+      };
+    }
+
+    // Shared info on apply
+    if (/(share|shared|profile|what info|visible|哪些信息)/.test(t)) {
+      return {
+        html: `On the Apply page, you can see exactly what will be shared: your ID, current role, target role, skills (BESS cert, English fluent, Arabic A1), notice period, and preferred start. Nothing beyond that is sent.`,
+        actions: [{ label: "Open Apply page", event: "goto-apply" }],
+        sources: 1
+      };
+    }
+
+    // Payroll / benefits
+    if (/(payroll|benefit|first cycle|gosi|social|housing)/.test(t)) {
+      return {
+        html: `Your first payroll cycle at the target entity runs end of November. Local social insurance and payroll configuration are handled by HR / Payroll specialists. Housing is included as a component of your offer. Global Mobility handles relocation logistics.`,
+        sources: 1
+      };
+    }
+
+    // Which role / recommend
+    if (/(which role|best|recommend|fits|哪个|推荐)/.test(t)) {
+      return {
+        html: `Based on your Career Profile, the <strong>Riyadh Solution Consultant</strong> role is your strongest match — energy-storage domain, senior IC role, aligned with your recent BESS work. The Shanghai Lead role is also a strong match, but a management-track lateral move. I show matches — you choose what fits your life.`,
+        actions: [{ label: "Open Riyadh detail", event: "goto-detail" }],
+        sources: 2
+      };
+    }
+
+    // Fallback
+    return null;
+  }
+
+  function handleJouleAction(ev) {
+    if (ev === "goto-detail") location.hash = "#detail";
+    if (ev === "goto-prep") location.hash = "#prep";
+    if (ev === "goto-apply") location.hash = "#apply";
+    if (ev === "goto-tracking") location.hash = "#tracking";
+    if (ev === "focus-match") { location.hash = "#detail"; setTimeout(() => document.querySelector(".data-table")?.scrollIntoView({behavior:"smooth"}), 150); }
+    if (ev === "book-chat") alert("Booking flow is not part of this simulation. In a real product this would open a calendar picker.");
+  }
+
+  function refreshBadges() {
+    const s = window.GMA.loadState();
+    let n = D.myActions.filter(a => a.state === "todo").length;
+    if (s.effectiveDate !== "2026-11-01") n += 1;
+    window.TOPBAR.setNotifBadge(n);
+  }
+
+  window.addEventListener("hashchange", renderView);
+  window.GMA.onStateChange(renderView);
+  window.GMA.loadState();
+  renderView();
+  </script>
+</body>
+</html>
