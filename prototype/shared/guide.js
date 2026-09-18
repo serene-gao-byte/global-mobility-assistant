@@ -182,7 +182,9 @@ function _buildGuideOverlay() {
           <div class="guide-context">
             <strong>Background.</strong> Aurora Industries is riding the Vision 2030 wave into Saudi Arabia,
             opening its first Middle East subsidiary in Riyadh to deliver utility-scale energy-storage projects.
-            The strategy is set — the hard part is moving the right people there without breaking anything on the way.
+            Behind every cross-border expansion is a harder problem — moving the right <em>people, workflows, and access</em> safely, together.
+            Global Mobility Assistant is AI built for that moment: an accelerator for Chinese enterprises going global,
+            one that helps each role advance and knows exactly where to pause.
           </div>
           <div class="guide-steps">${stepsHTML}</div>
           <div class="guide-pauses">
