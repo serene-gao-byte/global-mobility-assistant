@@ -852,7 +852,7 @@
   <script>
   const D = window.EMPLOYEE_DATA;
   document.getElementById("topbarSlot").innerHTML = window.TOPBAR.renderTopbar("employee");
-  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · Career");
+  document.getElementById("jouleSlot").innerHTML = window.JOULE.jouleHTML("employee", "Joule · 职业发展");
 
   // Mount guidance layers
   window.GUIDE.injectGuideButton();
@@ -864,22 +864,22 @@
     if (step === "detail") {
       setTimeout(() => window.GUIDE.showHint({
         id: "detail-ask-joule",
-        title: "Try this — Pause #1",
-        body: "Open Joule (💎 icon) and ask it to analyze this role for your career development. Watch how it compares strengths, gaps, trade-offs — but names what only you can weigh.",
+        title: "试试看 —— 第 1 处暂停",
+        body: "打开 Joule(💎 图标),让它分析这个岗位对你职业发展的利与弊。观察它如何对比优势、差距、权衡取舍 —— 同时指出哪些是只有你自己能权衡的。",
         anchor: "top-right"
       }), 800);
     } else if (step === "tracking") {
       setTimeout(() => window.GUIDE.showHint({
         id: "tracking-switch-hrbp",
-        title: "Application submitted — now switch role",
-        body: "Open the HRBP view (from Landing page) to see how HR handles the request. State syncs across tabs — you'll see the same case from Mira's perspective.",
+        title: "申请已提交 —— 切换到 HRBP 视角",
+        body: "打开 HRBP 视图(从引导页进入),看 HR 如何处理这个请求。状态会跨标签页同步 —— 你会从 Mira 的视角看到同一个案例。",
         anchor: "bottom-right"
       }), 600);
     } else if (step === "mymove") {
       setTimeout(() => window.GUIDE.showHint({
         id: "mymove-notice-status",
-        title: "Notice what's not here",
-        body: "No 'complete' badge. The banner says <b>awaiting target-side verification</b>. This is intentional — submitted ≠ verified.",
+        title: "留意这里 <b>没有</b> 什么",
+        body: "没有 “完成” 徽章。横幅上写的是 <b>目标侧待核实</b>。这是有意为之 —— 已提交 ≠ 已核实。",
         anchor: "top-right"
       }), 600);
     }
@@ -1041,19 +1041,19 @@
         </div>
         <div class="bye-filter-item">
           <div class="filter-label">类型:</div>
-          <select class="filter-select"><option>All</option><option>STAR</option><option>Gig Exchange</option><option>内部调动</option></select>
+          <select class="filter-select"><option>全部</option><option>STAR</option><option>Gig Exchange</option><option>内部调动</option></select>
         </div>
         <div class="bye-filter-item">
           <div class="filter-label">地点:</div>
-          <select class="filter-select"><option>All</option><option>Riyadh, Saudi Arabia</option><option>Munich, Germany</option><option>Singapore</option></select>
+          <select class="filter-select"><option>全部</option><option>利雅得,沙特阿拉伯</option><option>慕尼黑,德国</option><option>新加坡</option></select>
         </div>
         <div class="bye-filter-item">
           <div class="filter-label">工作模式:</div>
-          <select class="filter-select"><option>All</option><option>Onsite</option><option>Remote</option><option>Hybrid</option></select>
+          <select class="filter-select"><option>全部</option><option>驻场办公</option><option>远程</option><option>混合</option></select>
         </div>
         <div class="bye-filter-item">
           <div class="filter-label">参与方式:</div>
-          <select class="filter-select"><option>All</option><option>Full-Time</option><option>Part-Time</option></select>
+          <select class="filter-select"><option>全部</option><option>全职</option><option>兼职</option></select>
         </div>
       </div>
 
@@ -1340,28 +1340,28 @@
 
   function view_prep() {
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#browse'">职业发展</a> › <a onclick="location.hash='#detail'">Senior Solution Consultant — Middle East</a> › <b>Interview preparation</b></div>
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">职业发展</a> › <a onclick="location.hash='#detail'">资深方案顾问 — 中东区</a> › <b>面试准备</b></div>
 
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">Interview preparation pack</h1>
-          <div class="page-sub">Practice questions · your career preference in this session is not permanently saved or disclosed</div>
+          <h1 class="page-title">面试准备包</h1>
+          <div class="page-sub">练习题 · 你在本次会话中的职业偏好不会被永久保存或披露给招聘方</div>
         </div>
         <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#detail'">← Back to role</button>
-          <button class="btn primary" onclick="location.hash='#apply'">Continue to apply →</button>
+          <button class="btn outlined" onclick="location.hash='#detail'">← 返回岗位</button>
+          <button class="btn primary" onclick="location.hash='#apply'">继续提交申请 →</button>
         </div>
       </div>
 
       <div class="info-strip">
         <span class="i-icon">i</span>
-        <div><b>Step 3 · Interview prep.</b> Joule generates practice content but never predicts outcomes or ranks you.</div>
+        <div><b>第 3 步 · 面试准备。</b> Joule 生成练习内容 · 但不预测结果 · 不给你打分。</div>
       </div>
 
       <div class="two-col">
         <div class="card">
           <div class="card-header">
-            <div><h2 class="card-title">Likely interview questions</h2></div>
+            <div><h2 class="card-title">可能被问到的问题</h2></div>
             <span class="cap-tag ext">项目扩展设计</span>
           </div>
           <ul style="margin:0; padding-left:18px;">
@@ -1370,7 +1370,7 @@
         </div>
         <div class="card">
           <div class="card-header">
-            <div><h2 class="card-title">Reverse questions to ask them</h2></div>
+            <div><h2 class="card-title">建议你反问的问题</h2></div>
             <span class="cap-tag ext">项目扩展设计</span>
           </div>
           <ul style="margin:0; padding-left:18px;">
@@ -1381,7 +1381,7 @@
 
       <div class="info-strip warn">
         <span class="i-icon">!</span>
-        <div><b>Related native AI (reference only, not rebuilt here):</b> Career Insights · Interview Question Generation (interviewer via Teams) · Performance Preparation Agent (current manager). Each requires the correct role and entry point.</div>
+        <div><b>相关的原生 AI 能力(仅作参考 · 本原型未重建):</b> Career Insights · Interview Question Generation(面试官通过 Teams 使用)· Performance Preparation Agent(当前经理使用)。每一项都需要正确的角色和入口。</div>
       </div>
     `;
   }
@@ -1390,21 +1390,21 @@
     const s = window.GMA.loadState();
     const applied = s.employeeApplied;
     return `
-      <div class="breadcrumb"><a onclick="location.hash='#browse'">职业发展</a> › <b>Apply</b></div>
+      <div class="breadcrumb"><a onclick="location.hash='#browse'">职业发展</a> › <b>提交申请</b></div>
 
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">Confirm your application</h1>
-          <div class="page-sub">Review what will be shared with the hiring team, then submit</div>
+          <h1 class="page-title">确认你的申请</h1>
+          <div class="page-sub">检查即将分享给招聘方的信息 · 确认后再提交</div>
         </div>
         <div class="page-actions">
-          <button class="btn outlined" onclick="location.hash='#detail'">← Back</button>
+          <button class="btn outlined" onclick="location.hash='#detail'">← 返回</button>
         </div>
       </div>
 
       <div class="info-strip ${applied ? "success" : ""}">
         <span class="i-icon">${applied ? "✓" : "i"}</span>
-        <div><b>Step 4 · Apply.</b> ${applied ? "Your application has been submitted. Track progress in the next step." : "Your Candidate Profile will be shared. You can review below before submitting."}</div>
+        <div><b>第 4 步 · 提交申请。</b> ${applied ? "你的申请已提交。下一步在追踪进度页查看。" : "你的候选人档案将被分享给招聘方。你可以在下方核对后再提交。"}</div>
       </div>
 
       <div class="card">
@@ -1425,8 +1425,8 @@
 
       <div class="row" style="justify-content:flex-end; margin-top:16px;">
         ${applied
-          ? `<button class="btn primary" onclick="location.hash='#tracking'">Track my application →</button>`
-          : `<button class="btn primary" id="btnSubmitApp">Submit application</button>`}
+          ? `<button class="btn primary" onclick="location.hash='#tracking'">追踪我的申请 →</button>`
+          : `<button class="btn primary" id="btnSubmitApp">提交申请</button>`}
       </div>
     `;
   }
@@ -1443,8 +1443,8 @@
     return `
       <div class="page-header">
         <div class="page-title-wrap">
-          <h1 class="page-title">My application · Track progress</h1>
-          <div class="page-sub">${esc(app.id)} · Submitted ${esc(app.submittedOn)}</div>
+          <h1 class="page-title">我的申请 · 追踪进度</h1>
+          <div class="page-sub">${esc(app.id)} · 已于 ${esc(app.submittedOn)} 提交</div>
         </div>
         <div class="page-actions">
           <button class="btn outlined" id="btnRefresh">🔄 刷新</button>
@@ -1453,12 +1453,12 @@
 
       <div class="info-strip">
         <span class="i-icon">i</span>
-        <div><b>Step 5 · Track progress.</b> High-level view of where you stand. Approver identities and internal review details are not shown here by design.</div>
+        <div><b>第 5 步 · 追踪进度。</b> 只展示你需要看到的进度层级。审批人身份和内部审查细节在这里刻意不展示。</div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Application timeline</h2></div>
+          <div><h2 class="card-title">申请时间线</h2></div>
           <span class="cap-tag native">标准业务功能模拟</span>
         </div>
         <div class="tracker">
@@ -1474,18 +1474,18 @@
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Interviews</h2></div>
+          <div><h2 class="card-title">面试记录</h2></div>
           <span class="cap-tag native">标准业务功能模拟</span>
         </div>
         <table class="data-table">
-          <thead><tr><th>Round</th><th>With</th><th>Date</th><th>Modality</th><th>Status</th></tr></thead>
+          <thead><tr><th>轮次</th><th>面试方</th><th>日期</th><th>形式</th><th>状态</th></tr></thead>
           <tbody>
             ${D.interviews.map(iv => `<tr>
               <td>${esc(iv.round)}</td>
               <td>${esc(iv.with)}</td>
               <td>${esc(iv.date)}</td>
               <td>${esc(iv.modality)}</td>
-              <td>${pill("green", "Completed")}</td>
+              <td>${pill("green", "已完成")}</td>
             </tr>`).join("")}
           </tbody>
         </table>
@@ -1502,14 +1502,14 @@
       return `
         <div class="info-strip warn">
           <span class="i-icon">!</span>
-          <div><b>Step 6 · My move.</b> Not yet available. This section unlocks once HR triggers execution and your move becomes effective.</div>
+          <div><b>第 6 步 · 我的调动。</b> 尚未开放。此栏目将在 HR 触发执行、调动正式生效后解锁。</div>
         </div>
         <div class="card">
-          <div class="card-body muted">Once execution starts, you will see:
+          <div class="card-body muted">执行开始后,你会在这里看到:
             <ul>
-              <li>A summary of what's ready, what's still processing, and what needs a step from you</li>
-              <li>Your new access, reporting line, work location</li>
-              <li>Any updates from HR on your effective date</li>
+              <li>已就绪、进行中、需要你操作的事项总览</li>
+              <li>新的访问权限、汇报关系、办公地点</li>
+              <li>HR 关于生效日期的最新更新</li>
             </ul>
           </div>
         </div>
@@ -1522,42 +1522,42 @@
         <div class="cb-icon">!</div>
         <div>
           <div class="cb-title">${stillPaused
-            ? "Move effective · Some IT items pending review"
-            : "Move effective · Awaiting target-side verification"}</div>
-          <div class="cb-sub">You start at Aurora Middle East LLC (Riyadh) on <b>${esc(s.effectiveDate)}</b>. ${stillPaused
-            ? "The IT team has flagged an item for internal review. You will be notified once your access is fully in place."
-            : "Some technical steps have been submitted but not yet verified on the target side. You will be notified once your access is confirmed."}</div>
+            ? "调动已生效 · 部分 IT 事项待复核"
+            : "调动已生效 · 目标侧待核实"}</div>
+          <div class="cb-sub">你将于 <b>${esc(s.effectiveDate)}</b> 在 Aurora Middle East LLC(利雅得)开始新岗位。${stillPaused
+            ? "IT 团队已标记一项待内部复核的事项。访问权限完全就位后会通知你。"
+            : "部分技术步骤已提交,但目标侧尚未核实。访问权限确认后会通知你。"}</div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div><h2 class="card-title">Your move summary</h2>
-          <div class="card-sub">What's confirmed, what's still being verified, what needs a step from you.</div></div>
+          <div><h2 class="card-title">调动总览</h2>
+          <div class="card-sub">已确认、正在核实、需要你操作的事项一览。</div></div>
           <span class="cap-tag ext">项目扩展设计</span>
         </div>
         <div class="three-col">
           <div class="handoff-col done">
-            <h4>✓ Confirmed</h4>
+            <h4>✓ 已确认</h4>
             <ul>
-              <li>New position on record<span class="sub">Senior Solution Consultant · Middle East</span></li>
-              <li>Reporting line updated<span class="sub">Reports to Anna Becker</span></li>
-              <li>Riyadh office desk assigned<span class="sub">KAFD · Tower 4 · Floor 12</span></li>
-              <li>Compensation loaded<span class="sub">Offer v2 · effective ${esc(s.effectiveDate)}</span></li>
+              <li>新岗位已入档<span class="sub">资深方案顾问 · 中东区</span></li>
+              <li>汇报关系已更新<span class="sub">汇报给 Anna Becker</span></li>
+              <li>利雅得办公位已分配<span class="sub">阿卜杜拉国王金融区 · 4 号楼 · 12 层</span></li>
+              <li>薪酬已入档<span class="sub">Offer v2 · 生效 ${esc(s.effectiveDate)}</span></li>
             </ul>
           </div>
           <div class="handoff-col progress">
-            <h4>⏳ Awaiting verification</h4>
+            <h4>⏳ 待核实</h4>
             <ul>
-              <li>Work email &amp; system access<span class="sub">Submitted · pending target-side verification</span></li>
-              <li>Payroll setup (Saudi Arabia)<span class="sub">First cycle: end of November</span></li>
+              <li>工作邮箱与系统访问<span class="sub">已提交 · 待目标侧核实</span></li>
+              <li>薪资流程(沙特阿拉伯)<span class="sub">首个周期:11 月末</span></li>
             </ul>
           </div>
           <div class="handoff-col paused">
-            <h4>📋 Your step</h4>
+            <h4>📋 你的操作</h4>
             <ul>
-              <li>Sign data protection consent<span class="sub">Available now (Legal will confirm applicable framework)</span></li>
-              <li>Meet your onboarding buddy<span class="sub">Anna will confirm in week 1</span></li>
+              <li>签署数据保护同意书<span class="sub">现已开放(适用规则由法务确认)</span></li>
+              <li>与入职引导伙伴见面<span class="sub">Anna 将在第 1 周内确认</span></li>
             </ul>
           </div>
         </div>
@@ -1631,7 +1631,7 @@
     if (step === "apply") {
       document.getElementById("btnSubmitApp")?.addEventListener("click", () => {
         window.GMA.mutateState(x => { x.employeeApplied = true; }, "employee-submitted-application");
-        jouleExtra.push({ role: "bot", html: `<strong>Application submitted.</strong> You'll see updates in <b>Track progress</b>. I'll notify you if anything on your side needs action.`, sources: 1 });
+        jouleExtra.push({ role: "bot", html: `<strong>申请已提交。</strong>你可以在 <b>追踪进度</b> 里看到后续更新。任何需要你操作的事,我都会通知你。`, sources: 1 });
         renderView();
       });
     }
@@ -1650,7 +1650,7 @@
 
     const overview = {
       role: "bot", autoplay: true, delay: 300,
-      html: `Hi 林晨. I can help you discover roles, evaluate fit, prepare for interviews, and track your application. I <strong>cannot</strong> predict offer outcomes or make the decision for you.`,
+      html: `你好,林晨。我可以帮你发现岗位、评估匹配度、准备面试、追踪申请进度。我 <strong>不会</strong> 预测 Offer 结果,也不会替你做决定。`,
       sources: 2
     };
 
@@ -1659,8 +1659,8 @@
         return [
           overview,
           { role: "bot", autoplay: true, delay: 800,
-            html: `I surfaced <strong>4 opportunities</strong> based on your Career Profile. The Riyadh role is your strongest match.`,
-            actions: [{ label: "Open Riyadh role detail", event: "goto-detail" }],
+            html: `我根据你的职业档案筛选出了 <strong>4 个机会</strong>。利雅得的岗位与你的匹配度最高。`,
+            actions: [{ label: "打开利雅得岗位详情", event: "goto-detail" }],
             sources: 3 }
         ];
 
@@ -1668,15 +1668,15 @@
         return [
           overview,
           { role: "bot", autoplay: true, delay: 700,
-            html: `Take a moment to review the requirements. Sources are labeled so you know what's on record vs. self-reported.`,
+            html: `花点时间浏览岗位要求。每一条都有来源标记,系统记录还是员工自述一目了然。`,
             sources: 2 },
-          { role: "user", autoplay: false, continueLabel: "▸ Ask Joule for a personal analysis",
-            text: "I'm interested in this role. Based on my experience and strengths, can you help me analyze the pros and cons for my development?" },
+          { role: "user", autoplay: false, continueLabel: "▸ 请 Joule 做个人化分析",
+            text: "我对这个岗位有兴趣。基于我的经历和优势,你能帮我分析一下这个岗位对我的发展有哪些利与弊吗?" },
           { role: "bot", autoplay: true, delay: 900,
-            html: `Happy to help you <strong>compare and reflect</strong> — but the final judgment about your growth is yours. Here's what I can lay out:<ul><li><strong>Strengths that align:</strong> your solution-consulting record and BESS certification match the core skill bar</li><li><strong>Gaps to consider:</strong> Arabic-language exposure is on your self-report, not the system record — worth verifying during hiring</li><li><strong>Trade-offs:</strong> a Middle East posting broadens your regional exposure, but also involves relocation and adjustment</li></ul>What only <em>you</em> can weigh: family plans, life stage, appetite for a new market — those aren't in my data, and I won't guess at them. A conversation with your manager or a mentor is a better fit for that side.`,
+            html: `很乐意帮你 <strong>做对比与反思</strong> —— 但关于你个人发展的最终判断,还是你自己来。我可以摆出这些:<ul><li><strong>契合的优势:</strong>你的方案顾问履历与 BESS 认证与核心能力要求吻合</li><li><strong>需要留意的差距:</strong>阿拉伯语能力来自你的自述,不在系统记录中 —— 招聘环节值得核实</li><li><strong>权衡取舍:</strong>中东岗位能拓宽你的区域视野,但也涉及搬迁与适应</li></ul>只有 <em>你自己</em> 能权衡的:家庭规划、人生阶段、对新市场的接受度 —— 这些不在我的数据里,我不会代你猜测。这一面,和你的经理或导师聊聊会比找我更合适。`,
             actions: [
-              { label: "Show my experience match", event: "focus-match" },
-              { label: "Continue to interview prep", event: "goto-prep" }
+              { label: "查看我的经历对照", event: "focus-match" },
+              { label: "继续前往面试准备", event: "goto-prep" }
             ],
             sources: 2 }
         ];
@@ -1685,7 +1685,7 @@
         return [
           overview,
           { role: "bot", autoplay: true, delay: 500,
-            html: `Interview prep pack ready. Practice questions — not predictions of what you'll be asked. Your notes stay with you.`,
+            html: `面试准备包已就绪。练习题 —— 不是对你会被问到的题目的预测。你的笔记只保留在你这里。`,
             sources: 1 }
         ];
 
@@ -1693,7 +1693,7 @@
         return [
           overview,
           { role: "bot", autoplay: true, delay: 500,
-            html: `Ready to apply? Your Candidate Profile will be shared — review it on the page. Nothing beyond what's shown will be sent.`,
+            html: `准备申请了吗?你的候选人档案会被分享 —— 在页面上核对一下。除了页面展示的内容,不会额外发送任何信息。`,
             sources: 1 }
         ];
 
@@ -1701,13 +1701,13 @@
         const frames = [
           overview,
           { role: "bot", autoplay: true, delay: 600,
-            html: `Your application is at <strong>${s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation"}</strong>. I'll notify you of anything that needs action.`,
+            html: `你的申请当前处于 <strong>${s.executionStarted ? "执行中" : s.approvalsSubmitted ? "正式审批中" : "调动准备中"}</strong>。任何需要你操作的事项,我都会通知你。`,
             sources: 2 }
         ];
         if (dateChanged) {
           frames.push({
-            role: "bot", autoplay: false, continueLabel: "▸ Show what HR changed",
-            html: `<strong>Update from HR:</strong> your proposed effective date is now <strong>${esc(s.effectiveDate)}</strong>. No action needed from you.`,
+            role: "bot", autoplay: false, continueLabel: "▸ 查看 HR 的更新",
+            html: `<strong>HR 的更新:</strong>你的拟生效日期现已调整为 <strong>${esc(s.effectiveDate)}</strong>。你这边无需操作。`,
             sources: 1
           });
         }
@@ -1715,14 +1715,14 @@
       }
 
       case "mymove": {
-        if (!executed) return [ overview, { role: "bot", autoplay: true, delay: 500, html: `Not yet — this section unlocks after your move becomes effective.`, sources: 1 } ];
+        if (!executed) return [ overview, { role: "bot", autoplay: true, delay: 500, html: `暂时还没有 —— 这个栏目会在你的调动正式生效后解锁。`, sources: 1 } ];
         const delayed = s.provisioningIssue && !s.iasConflictResolved;
         return [
           overview,
           { role: "bot", autoplay: true, delay: 500,
             html: delayed
-              ? `Your move is effective. IT will finalize your account switch within 2 business days — no action needed from you.`
-              : `Your move is complete. All access confirmed. Welcome to the Middle East team.`,
+              ? `你的调动已经生效。IT 会在 2 个工作日内完成账户切换的收尾 —— 你这边无需操作。`
+              : `你的调动已全部完成。所有访问权限均已确认。欢迎加入中东团队。`,
             sources: 1 }
         ];
       }
@@ -1731,7 +1731,7 @@
   }
 
   function refreshJoule() {
-    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "Career");
+    document.getElementById("jouleTitle").textContent = "Joule · " + (STEPS.find(x => x.id === currentStepId())?.label || "职业发展");
     const base = jouleFramesFor(currentStepId());
     const frames = base.concat(jouleExtra.map(f => ({ ...f, autoplay: f.autoplay !== undefined ? f.autoplay : true })));
     window.JOULE.loadSequence(frames, handleJouleAction);
@@ -1744,17 +1744,17 @@
   function suggestionsForStep(step) {
     switch (step) {
       case "browse":
-        return ["Which role fits me best?", "Why the Riyadh role?"];
+        return ["哪个岗位最适合我?", "为什么推荐利雅得?"];
       case "detail":
-        return ["Analyze this role for my development", "What's my match strength?", "What's the compensation like?"];
+        return ["分析这个岗位对我的发展", "我的匹配度如何?", "薪酬待遇怎么样?"];
       case "prep":
-        return ["What might they ask me?", "What should I ask them?"];
+        return ["他们可能会问什么?", "我可以问他们什么?"];
       case "apply":
-        return ["What info gets shared?", "Can I edit before sending?"];
+        return ["会分享哪些信息?", "提交前我能编辑吗?"];
       case "tracking":
-        return ["Where is my application now?", "Can I send HR a note?", "When will I start?"];
+        return ["我的申请现在到哪一步了?", "我能给 HR 留言吗?", "什么时候能入职?"];
       case "mymove":
-        return ["What's left for me to do?", "When does payroll start?"];
+        return ["还有什么需要我做?", "薪资什么时候开始发?"];
       default:
         return [];
     }
@@ -1767,10 +1767,10 @@
     // ---- Pause #1 · Personal-development analysis (AI helps compare, doesn't decide) ----
     if (/should i (take|accept|apply)|worth it|is it a good|is this right for me|接受|该不该|analyze.*(role|position|development|career)|pros? and cons?|strengths?.*(match|align)|优劣势|发展|适合我/i.test(t)) {
       return {
-        html: `Happy to help you <strong>compare and reflect</strong> — but the final judgment about your growth is yours. Here's what I can lay out:<ul><li><strong>Strengths that align:</strong> your solution-consulting record and BESS certification match the core skill bar</li><li><strong>Gaps to consider:</strong> Arabic-language exposure is on your self-report, not the system record — worth verifying during hiring</li><li><strong>Trade-offs:</strong> a Middle East posting broadens your regional exposure, but also involves relocation and adjustment</li></ul>What only <em>you</em> can weigh: family plans, life stage, appetite for a new market — those aren't in my data, and I won't guess at them. A conversation with your manager or a mentor is a better fit for that side.`,
+        html: `很乐意帮你 <strong>做对比与反思</strong> —— 但关于你个人发展的最终判断,还是你自己来。我可以摆出这些:<ul><li><strong>契合的优势:</strong>你的方案顾问履历与 BESS 认证与核心能力要求吻合</li><li><strong>需要留意的差距:</strong>阿拉伯语能力来自你的自述,不在系统记录中 —— 招聘环节值得核实</li><li><strong>权衡取舍:</strong>中东岗位能拓宽你的区域视野,但也涉及搬迁与适应</li></ul>只有 <em>你自己</em> 能权衡的:家庭规划、人生阶段、对新市场的接受度 —— 这些不在我的数据里,我不会代你猜测。这一面,和你的经理或导师聊聊会比找我更合适。`,
         actions: [
-          { label: "Show my experience match", event: "focus-match" },
-          { label: "Continue to interview prep", event: "goto-prep" }
+          { label: "查看我的经历对照", event: "focus-match" },
+          { label: "继续前往面试准备", event: "goto-prep" }
         ],
         sources: 2
       };
@@ -1779,7 +1779,7 @@
     // Compensation
     if (/(comp|salary|pay|package|money|薪|工资|待遇)/.test(t)) {
       return {
-        html: `Proposed: <strong>SAR 360,000/yr</strong> base + 18% bonus + housing + one-time relocation. Current: <strong>CNY 480,000/yr</strong> base + 15% bonus. The comparison is on the Evaluate page — I show version + date, but I don't compute post-tax or treat this as a personal commitment.`,
+        html: `拟定方案:<strong>沙特里亚尔 360,000/年</strong> 基本工资 + 18% 目标奖金 + 住房补贴 + 一次性搬迁补偿。现状:<strong>人民币 480,000/年</strong> 基本工资 + 15% 目标奖金。对比在评估页有详细展示 —— 我会标注版本与日期,但不会计算税后收入,也不会把这当作对你的个人承诺。`,
         sources: 2
       };
     }
@@ -1787,8 +1787,8 @@
     // Match / requirements
     if (/(match|requirements?|qualif|经历|要求)/.test(t)) {
       return {
-        html: `Your matches: <strong>2 items on system record</strong> (BESS certification, solution consulting on 3 tier-1 pursuits), <strong>1 self-reported</strong> (GCC workshop as observer), <strong>1 with no source</strong> (cross-cultural project scope). I don't fabricate — absent from records is not the same as absent in fact.`,
-        actions: [{ label: "Open Evaluate page", event: "goto-detail" }],
+        html: `你的匹配情况:<strong>2 项来自系统记录</strong>(BESS 认证、3 个头部客户售前项目),<strong>1 项来自自述</strong>(海湾工作坊观察员经历),<strong>1 项无来源</strong>(跨文化项目)。我不会编造 —— 记录里没有,不等于事实上没有。`,
+        actions: [{ label: "打开评估页", event: "goto-detail" }],
         sources: 2
       };
     }
@@ -1796,19 +1796,19 @@
     // Interview
     if (/(interview|question|ask me|prep|面试)/.test(t)) {
       return {
-        html: `I have 3 practice questions and 3 reverse questions for you on the Interview prep page. They're practice — not predictions of what you'll be asked.`,
-        actions: [{ label: "Open Interview prep", event: "goto-prep" }],
+        html: `面试准备页有 3 道练习题和 3 道反向提问。这些是练习 —— 不是对你会被问到的题目的预测。`,
+        actions: [{ label: "打开面试准备", event: "goto-prep" }],
         sources: 1
       };
     }
 
     // Status / progress
     if (/(status|progress|where|when|start|track|进度|状态)/.test(t)) {
-      const stage = s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation";
+      const stage = s.executionStarted ? "执行中" : s.approvalsSubmitted ? "正式审批中" : "调动准备中";
       const startDate = s.effectiveDate || "2026-11-01";
       return {
-        html: `Your application is at <strong>${stage}</strong>. Planned start at Aurora Middle East LLC (Riyadh): <strong>${startDate}</strong>. I'll update you if anything on your side needs action.`,
-        actions: [{ label: "Open Track progress", event: "goto-tracking" }],
+        html: `你的申请当前处于 <strong>${stage}</strong>。拟入职 Aurora Middle East LLC(利雅得)的日期:<strong>${startDate}</strong>。任何需要你操作的事项,我都会及时提醒。`,
+        actions: [{ label: "打开追踪进度", event: "goto-tracking" }],
         sources: 2
       };
     }
@@ -1816,8 +1816,8 @@
     // Signal / tell HR
     if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟)/.test(t)) {
       return {
-        html: `You can send a signal on the <strong>Track progress</strong> page. I'll show you a preview of what HR will see — an abstract flag, not your exact wording. Your private phrasing stays in your record until you have a real conversation.`,
-        actions: [{ label: "Go to signal box", event: "goto-tracking" }],
+        html: `你可以在 <strong>追踪进度</strong> 页发送一个信号。我会先给你看 HR 那边会收到的预览 —— 一个抽象化的提示,而不是你的原话。在你真正面对面沟通之前,你的原话只保留在你自己的记录里。`,
+        actions: [{ label: "前往信号入口", event: "goto-tracking" }],
         sources: 1
       };
     }
@@ -1825,16 +1825,16 @@
     // Shared info on apply
     if (/(share|shared|profile|what info|visible|哪些信息)/.test(t)) {
       return {
-        html: `On the Apply page, you can see exactly what will be shared: your ID, current role, target role, skills (BESS cert, English fluent, Arabic A1), notice period, and preferred start. Nothing beyond that is sent.`,
-        actions: [{ label: "Open Apply page", event: "goto-apply" }],
+        html: `在申请页,你可以逐条看到会被分享的内容:你的员工 ID、当前岗位、目标岗位、技能(BESS 认证、英语流利、阿拉伯语 A1)、通知期、期望入职日。除此之外不会额外发送。`,
+        actions: [{ label: "打开申请页", event: "goto-apply" }],
         sources: 1
       };
     }
 
     // Payroll / benefits
-    if (/(payroll|benefit|first cycle|gosi|social|housing)/.test(t)) {
+    if (/(payroll|benefit|first cycle|gosi|social|housing|薪资|福利|社保|住房)/.test(t)) {
       return {
-        html: `Your first payroll cycle at the target entity runs end of November. Local social insurance and payroll configuration are handled by HR / Payroll specialists. Housing is included as a component of your offer. Global Mobility handles relocation logistics.`,
+        html: `你在目标法人的首个薪资周期在 11 月末。本地社保与薪资配置由 HR / Payroll 专业人员处理。住房补贴是你 Offer 的组成部分。搬迁事务由 Global Mobility 团队负责。`,
         sources: 1
       };
     }
@@ -1842,8 +1842,8 @@
     // Which role / recommend
     if (/(which role|best|recommend|fits|哪个|推荐)/.test(t)) {
       return {
-        html: `Based on your Career Profile, the <strong>Riyadh Solution Consultant</strong> role is your strongest match — energy-storage domain, senior IC role, aligned with your recent BESS work. The Shanghai Lead role is also a strong match, but a management-track lateral move. I show matches — you choose what fits your life.`,
-        actions: [{ label: "Open Riyadh detail", event: "goto-detail" }],
+        html: `基于你的职业档案,<strong>利雅得的资深方案顾问</strong> 匹配度最高 —— 储能领域、资深个人贡献者岗位、与你近期的 BESS 工作对得上。上海团队 lead 岗位也是高度匹配,但属于管理线的平级调动。我给你摆出匹配情况 —— 具体选哪个,由你决定。`,
+        actions: [{ label: "打开利雅得详情", event: "goto-detail" }],
         sources: 2
       };
     }
@@ -1858,7 +1858,7 @@
     if (ev === "goto-apply") location.hash = "#apply";
     if (ev === "goto-tracking") location.hash = "#tracking";
     if (ev === "focus-match") { location.hash = "#detail"; setTimeout(() => document.querySelector(".data-table")?.scrollIntoView({behavior:"smooth"}), 150); }
-    if (ev === "book-chat") alert("Booking flow is not part of this simulation. In a real product this would open a calendar picker.");
+    if (ev === "book-chat") alert("此原型不含预约流程。真实产品中,这里会打开日历选择器。");
   }
 
   function refreshBadges() {
