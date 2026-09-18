@@ -1,12 +1,12 @@
 /* 员工侧数据 · 中文版
-   林晨从 Aurora 上海调往利雅得的场景 · 内容 100% 原创中文改写 */
+   林晨从 启曜上海调往利雅得的场景 · 内容 100% 原创中文改写 */
 
 window.EMPLOYEE_DATA = {
   self: {
     id: "EMP-CN-2381",
     name: "林晨",
     currentTitle: "资深方案顾问",
-    currentOrg: "Aurora Industries · 上海总部",
+    currentOrg: "启曜集团 · 上海总部",
     country: "中国",
     photo: "LC"
   },
@@ -50,7 +50,7 @@ window.EMPLOYEE_DATA = {
       id: "JOB-CN-SC-22",
       title: "方案顾问团队负责人 — 大中华区",
       location: "上海,中国",
-      entity: "Aurora Industries · 上海总部",
+      entity: "启曜集团 · 上海总部",
       type: "全职 · 平级调动",
       posted: "2026-08-20",
       matchScore: "高度匹配",

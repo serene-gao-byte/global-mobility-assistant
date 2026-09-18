@@ -20,7 +20,7 @@ window.HRBP_DATA = {
     appId: "APP-2026-ME-0071",
     reqId: "REQ-ME-2044",
     posTitle: "资深方案顾问 — 中东区(利雅得)",
-    sourceEntity: "Aurora Industries · 上海总部",
+    sourceEntity: "启曜集团 · 上海总部",
     targetEntity: "Aurora Middle East LLC · 利雅得",
     sourceManager: "Wei Zhang",
     targetManager: "Anna Becker",
