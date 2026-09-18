@@ -324,4 +324,12 @@
   .guide-step-num { margin: 0; flex-shrink: 0; }
   .guide-step-content { flex: 1; }
   .guide-actions { padding: 14px 18px; }
+
+  /* Hint bubble: shrink and pin to safe insets so it never overflows */
+  .hint-bubble {
+    left: 12px !important;
+    right: 12px !important;
+    max-width: none;
+    transform: none !important;
+  }
 }
