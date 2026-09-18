@@ -179,6 +179,11 @@ function _buildGuideOverlay() {
           <button class="guide-close" id="guideClose" title="Close">✕</button>
         </div>
         <div class="guide-panel-body">
+          <div class="guide-context">
+            <strong>Background.</strong> Aurora Industries is riding the Vision 2030 wave into Saudi Arabia,
+            opening its first Middle East subsidiary in Riyadh to deliver utility-scale energy-storage projects.
+            The strategy is set — the hard part is moving the right people there without breaking anything on the way.
+          </div>
           <div class="guide-steps">${stepsHTML}</div>
           <div class="guide-pauses">
             <h3>The 3 intentional pauses — the theme of this demo</h3>

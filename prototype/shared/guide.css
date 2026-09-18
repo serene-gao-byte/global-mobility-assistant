@@ -178,6 +178,20 @@
   padding: 24px 32px 32px;
 }
 
+/* Context blurb at the top of guide body */
+.guide-context {
+  background: linear-gradient(90deg, #EAF3FD 0%, #F5FAFF 100%);
+  border: 1px solid #C7DBF7;
+  border-left: 4px solid var(--sap-blue);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+.guide-context strong { color: var(--sap-blue); font-weight: 700; }
+
 /* Step diagram: 5 numbered steps with connectors */
 .guide-steps {
   display: grid;
