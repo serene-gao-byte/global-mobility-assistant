@@ -1631,12 +1631,12 @@
         return [
           overview,
           { role: "bot", autoplay: true, delay: 700,
-            html: `Take a moment to review requirements. Sources are labeled so you know what's on record vs. self-reported.`,
+            html: `Take a moment to review the requirements. Sources are labeled so you know what's on record vs. self-reported.`,
             sources: 2 },
-          { role: "user", autoplay: false, continueLabel: "▸ Ask Joule a hard question",
-            text: "Should I take this role?" },
+          { role: "user", autoplay: false, continueLabel: "▸ Ask Joule for a personal analysis",
+            text: "I'm interested in this role. Based on my experience and strengths, can you help me analyze the pros and cons for my development?" },
           { role: "bot", autoplay: true, delay: 900,
-            html: `This is a personal decision — I'm not the right one to answer <strong>should you</strong>. What I can do:<ul><li>Compare your comp before/after</li><li>Show what's on record vs. self-reported</li><li>Give you reverse questions to ask</li></ul>Consider: <em>relocation, family plans, growth priorities</em> — those belong to conversations with your manager, mentor, or your own reflection.`,
+            html: `Happy to help you <strong>compare and reflect</strong> — but the final judgment about your growth is yours. Here's what I can lay out:<ul><li><strong>Strengths that align:</strong> your solution-consulting record and BESS certification match the core skill bar</li><li><strong>Gaps to consider:</strong> Arabic-language exposure is on your self-report, not the system record — worth verifying during hiring</li><li><strong>Trade-offs:</strong> a Middle East posting broadens your regional exposure, but also involves relocation and adjustment</li></ul>What only <em>you</em> can weigh: family plans, life stage, appetite for a new market — those aren't in my data, and I won't guess at them. A conversation with your manager or a mentor is a better fit for that side.`,
             actions: [
               { label: "Show my experience match", event: "focus-match" },
               { label: "Continue to interview prep", event: "goto-prep" }
@@ -1709,7 +1709,7 @@
       case "browse":
         return ["Which role fits me best?", "Why the Riyadh role?"];
       case "detail":
-        return ["Should I take this role?", "What's my match strength?", "What's the compensation like?"];
+        return ["Analyze this role for my development", "What's my match strength?", "What's the compensation like?"];
       case "prep":
         return ["What might they ask me?", "What should I ask them?"];
       case "apply":
@@ -1727,10 +1727,10 @@
     const t = userText.toLowerCase();
     const s = window.GMA.loadState();
 
-    // ---- Refusal #1 · Should I take this role? ----
-    if (/should i (take|accept|apply)|worth it|is it a good|is this right for me|接受|该不该/i.test(t)) {
+    // ---- Pause #1 · Personal-development analysis (AI helps compare, doesn't decide) ----
+    if (/should i (take|accept|apply)|worth it|is it a good|is this right for me|接受|该不该|analyze.*(role|position|development|career)|pros? and cons?|strengths?.*(match|align)|优劣势|发展|适合我/i.test(t)) {
       return {
-        html: `This is a personal decision — I'm not the right one to answer <strong>should you</strong>. What I can do:<ul><li>Compare your comp before/after</li><li>Show what's on record vs. self-reported</li><li>Give you reverse questions to ask</li></ul>Consider <em>relocation, family plans, growth priorities</em> — those belong to conversations with your manager, mentor, or your own reflection.`,
+        html: `Happy to help you <strong>compare and reflect</strong> — but the final judgment about your growth is yours. Here's what I can lay out:<ul><li><strong>Strengths that align:</strong> your solution-consulting record and BESS certification match the core skill bar</li><li><strong>Gaps to consider:</strong> Arabic-language exposure is on your self-report, not the system record — worth verifying during hiring</li><li><strong>Trade-offs:</strong> a Middle East posting broadens your regional exposure, but also involves relocation and adjustment</li></ul>What only <em>you</em> can weigh: family plans, life stage, appetite for a new market — those aren't in my data, and I won't guess at them. A conversation with your manager or a mentor is a better fit for that side.`,
         actions: [
           { label: "Show my experience match", event: "focus-match" },
           { label: "Continue to interview prep", event: "goto-prep" }
