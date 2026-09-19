@@ -1809,7 +1809,7 @@
     }
 
     // Interview
-    if (/(interview|question|ask me|prep|面试)/.test(t)) {
+    if (/(interview|question|ask me|ask them|prep|面试|会问|可以问|问他|问什么)/.test(t)) {
       return {
         html: `面试准备页有 3 道练习题和 3 道反向提问。这些是练习 —— 不是对你会被问到的题目的预测。`,
         actions: [{ label: "打开面试准备", event: "goto-prep" }],
@@ -1818,7 +1818,7 @@
     }
 
     // Status / progress
-    if (/(status|progress|where|when|start|track|进度|状态)/.test(t)) {
+    if (/(status|progress|where|when|start|track|进度|状态|哪一步|入职|什么时候|何时)/.test(t)) {
       const stage = s.executionStarted ? "执行中" : s.approvalsSubmitted ? "正式审批中" : "调动准备中";
       const startDate = s.effectiveDate || "2026-11-01";
       return {
@@ -1829,7 +1829,7 @@
     }
 
     // Signal / tell HR
-    if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟)/.test(t)) {
+    if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟|留言|联系hr|给\s*hr|跟hr说)/.test(t)) {
       return {
         html: `你可以在 <strong>追踪进度</strong> 页发送一个信号。我会先给你看 HR 那边会收到的预览 —— 一个抽象化的提示,而不是你的原话。在你真正面对面沟通之前,你的原话只保留在你自己的记录里。`,
         actions: [{ label: "前往信号入口", event: "goto-tracking" }],
@@ -1864,11 +1864,20 @@
     }
 
     // Which role / recommend
-    if (/(which role|best|recommend|fits|哪个|推荐)/.test(t)) {
+    if (/(which role|best|recommend|fits|哪个|推荐|riyadh|利雅得|why the)/.test(t)) {
       return {
         html: `基于你的职业档案,<strong>利雅得的资深方案顾问</strong> 匹配度最高 —— 储能领域、资深个人贡献者岗位、与你近期的 BESS 工作对得上。上海团队 lead 岗位也是高度匹配,但属于管理线的平级调动。我给你摆出匹配情况 —— 具体选哪个,由你决定。`,
         actions: [{ label: "打开利雅得详情", event: "goto-detail" }],
         sources: 2
+      };
+    }
+
+    // What's left for me to do
+    if (/(what.?s left|left for me|anything.*(do|need)|to-?do|还需要|还有什么|需要我做|我要做|我该做)/.test(t)) {
+      return {
+        html: `目前 <strong>没有需要你立即处理的事项</strong>。下一步的动作在 HR 和 IT 那边;一旦有需要你确认或操作的环节,我会在这里提醒你。你可以随时到 <strong>我的调动</strong> 页查看进度和待办。`,
+        actions: [{ label: "打开我的调动", event: "goto-mymove" }],
+        sources: 1
       };
     }
 
@@ -1881,6 +1890,7 @@
     if (ev === "goto-prep") location.hash = "#prep";
     if (ev === "goto-apply") location.hash = "#apply";
     if (ev === "goto-tracking") location.hash = "#tracking";
+    if (ev === "goto-mymove") location.hash = "#mymove";
     if (ev === "focus-match") {
       const reveal = () => {
         const card = document.getElementById("experienceMatchCard");

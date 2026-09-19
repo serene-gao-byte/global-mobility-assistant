@@ -1809,7 +1809,7 @@
     }
 
     // Interview
-    if (/(interview|question|ask me|prep|面试)/.test(t)) {
+    if (/(interview|question|ask me|ask them|prep|面试|会问|可以问|问他|问什么)/.test(t)) {
       return {
         html: `I have 3 practice questions and 3 reverse questions for you on the Interview prep page. They're practice — not predictions of what you'll be asked.`,
         actions: [{ label: "Open Interview prep", event: "goto-prep" }],
@@ -1818,7 +1818,7 @@
     }
 
     // Status / progress
-    if (/(status|progress|where|when|start|track|进度|状态)/.test(t)) {
+    if (/(status|progress|where|when|start|track|进度|状态|哪一步|入职|什么时候|何时)/.test(t)) {
       const stage = s.executionStarted ? "Execution" : s.approvalsSubmitted ? "Formal approvals" : "Move preparation";
       const startDate = s.effectiveDate || "2026-11-01";
       return {
@@ -1829,7 +1829,7 @@
     }
 
     // Signal / tell HR
-    if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟)/.test(t)) {
+    if (/(delay|postpone|tell hr|send hr|signal|note to hr|告诉hr|推迟|留言|联系hr|给\s*hr|跟hr说)/.test(t)) {
       return {
         html: `You can send a signal on the <strong>Track progress</strong> page. I'll show you a preview of what HR will see — an abstract flag, not your exact wording. Your private phrasing stays in your record until you have a real conversation.`,
         actions: [{ label: "Go to signal box", event: "goto-tracking" }],
@@ -1864,11 +1864,20 @@
     }
 
     // Which role / recommend
-    if (/(which role|best|recommend|fits|哪个|推荐)/.test(t)) {
+    if (/(which role|best|recommend|fits|哪个|推荐|riyadh|利雅得|why the)/.test(t)) {
       return {
         html: `Based on your Career Profile, the <strong>Riyadh Solution Consultant</strong> role is your strongest match — energy-storage domain, senior IC role, aligned with your recent BESS work. The Shanghai Lead role is also a strong match, but a management-track lateral move. I show matches — you choose what fits your life.`,
         actions: [{ label: "Open Riyadh detail", event: "goto-detail" }],
         sources: 2
+      };
+    }
+
+    // What's left for me to do
+    if (/(what.?s left|left for me|anything.*(do|need)|to-?do|还需要|还有什么|需要我做|我要做|我该做)/.test(t)) {
+      return {
+        html: `Right now there's <strong>nothing waiting on you</strong>. The next moves are on HR and IT — the moment something needs your confirmation or action, I'll flag it here. You can always open <strong>My Move</strong> to see progress and any to-dos.`,
+        actions: [{ label: "Open My Move", event: "goto-mymove" }],
+        sources: 1
       };
     }
 
@@ -1881,6 +1890,7 @@
     if (ev === "goto-prep") location.hash = "#prep";
     if (ev === "goto-apply") location.hash = "#apply";
     if (ev === "goto-tracking") location.hash = "#tracking";
+    if (ev === "goto-mymove") location.hash = "#mymove";
     if (ev === "focus-match") {
       const reveal = () => {
         const card = document.getElementById("experienceMatchCard");
