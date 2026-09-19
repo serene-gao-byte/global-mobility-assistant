@@ -73,6 +73,25 @@ def structure_check(path, label):
           "x.v2Reconfirmed = true;" in src and
           re.search(r"btnSimReconfirm[\s\S]*?v2Generated && !s\.v2Reconfirmed", src) is not None)
 
+    # --- Execution trigger gate (submit != approve) ---
+    # canTrigger must require approvalsApproved, not just approvalsSubmitted.
+    check(f"[{label}] trigger gate requires approvalsApproved",
+          "const canTrigger = s.approvalsSubmitted && s.approvalsApproved && !s.executionStarted;" in src)
+    # The OLD trigger predicate (submitted-only) must be gone from both button and handler.
+    check(f"[{label}] old submitted-only trigger predicate removed",
+          "s.approvalsSubmitted && !s.executionStarted" not in src)
+    # A demo 'simulate approval' control must exist and only set approvalsApproved.
+    check(f"[{label}] approve sim only sets approvalsApproved",
+          "x.approvalsApproved = true;" in src and
+          re.search(r"btnSimApprove[\s\S]*?approvalsSubmitted && !s\.approvalsApproved", src) is not None)
+    # Changing the effective date must reset approvalsApproved (version-bound sign-off).
+    check(f"[{label}] date change resets approvalsApproved",
+          re.search(r"x\.approvalsApproved = false;[\s\S]*?hrbp-changed-effective-date", src) is not None)
+    # Version label must be emitted independent of approvalsSubmitted (Issue 2 fix):
+    # the v2 label is computed once from s.v2Generated, not nested only inside !approvalsSubmitted.
+    check(f"[{label}] v2 version label independent of submission",
+          re.search(r'let ver = s\.v2Generated \? \(a\.flow\.startsWith\("EC"\)', src) is not None)
+
 # ---------------------------------------------------------------------------
 # 2. TRUTH TABLE — faithful mirror of the JS ladder.
 # ---------------------------------------------------------------------------
@@ -87,7 +106,8 @@ def gate(s):
 
 def st(**kw):
     base = {"invalidatedByEdit": False, "v2Generated": False,
-            "v2Reconfirmed": False, "approvalsSubmitted": False}
+            "v2Reconfirmed": False, "approvalsSubmitted": False,
+            "approvalsApproved": False, "executionStarted": False}
     base.update(kw); return base
 
 def truth_table():
@@ -134,11 +154,37 @@ def truth_table():
     check("(6) gate is deterministic on latest state",
           gate(s6)["code"] == gate(dict(s6))["code"] == "needs-reconfirm")
 
+# ---------------------------------------------------------------------------
+# 3. TRIGGER GATE — submit != approve. Execution can only start after approval.
+# ---------------------------------------------------------------------------
+def can_trigger(s):
+    return bool(s.get("approvalsSubmitted") and s.get("approvalsApproved")
+                and not s.get("executionStarted"))
+
+def trigger_table():
+    # T1. Submitted but not approved -> trigger blocked (the reported bug)
+    check("(T1) submitted, not approved -> trigger blocked",
+          not can_trigger(st(approvalsSubmitted=True)))
+    # T2. Submitted AND approved -> trigger allowed
+    check("(T2) submitted + approved -> trigger allowed",
+          can_trigger(st(approvalsSubmitted=True, approvalsApproved=True)))
+    # T3. Already executing -> no re-trigger
+    check("(T3) already executing -> trigger blocked",
+          not can_trigger(st(approvalsSubmitted=True, approvalsApproved=True, executionStarted=True)))
+    # T4. Neither submitted nor approved -> blocked
+    check("(T4) fresh state -> trigger blocked", not can_trigger(st()))
+    # T5. Date change resets approval -> trigger blocked again
+    #     (date-change mutator clears approvalsSubmitted + approvalsApproved)
+    reset = st(invalidatedByEdit=True, approvalsSubmitted=False, approvalsApproved=False)
+    check("(T5) date change after approval -> trigger blocked", not can_trigger(reset))
+
 print("== STRUCTURE CHECK ==")
 structure_check(EN, "EN")
 structure_check(ZH, "ZH")
 print("== TRUTH TABLE ==")
 truth_table()
+print("== TRIGGER GATE ==")
+trigger_table()
 
 # 9. EN/ZH parity: both files carry the same gate structure (checked above);
 #    assert both define the four codes identically.

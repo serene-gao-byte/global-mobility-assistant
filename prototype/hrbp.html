@@ -416,13 +416,13 @@
   function view_approvals() {
     const s = window.GMA.loadState();
     const rows = D.approvals.map(a => {
+      // Version label is bound to the Move Request version, independent of submission/approval.
+      let ver = s.v2Generated ? (a.flow.startsWith("EC") ? "MoveRequest v2" : "MDF v2") : a.version;
+      // Status is computed separately so submitting/approving never resets the version label.
       let st = a.status;
-      let ver = a.version;
-      if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("EC")) st = "blocked — v1 invalidated";
-      if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("MDF")) st = "blocked — v1 invalidated";
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = s.v2Reconfirmed ? "re-confirmed · ready to submit" : "awaiting v2 re-confirmation"; }
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = s.v2Reconfirmed ? "re-confirmed · ready to submit" : "awaiting v2 re-confirmation"; }
-      if (s.approvalsSubmitted && a.status.startsWith("pending")) st = "submitted (sim)";
+      if (s.invalidatedByEdit && !s.v2Generated) st = "blocked — v1 invalidated";
+      else if (s.v2Generated && !s.approvalsSubmitted) st = s.v2Reconfirmed ? "re-confirmed · ready to submit" : "awaiting v2 re-confirmation";
+      else if (s.approvalsSubmitted && a.status.startsWith("pending")) st = s.approvalsApproved ? "approved (sim)" : "submitted (sim)";
       const cls = st.startsWith("approved") ? "green" : st.startsWith("blocked") ? "red" : st.startsWith("submitted") ? "blue" : st.startsWith("re-confirmed") ? "blue" : "yellow";
       return `<tr>
         <td>${esc(a.flow)}</td><td>${esc(ver)}</td><td>${pill(cls, st)}</td><td class="muted">${esc(a.owners)}</td>
@@ -431,7 +431,8 @@
 
     const gate = computeSubmitGate(s);
     const canSubmit = gate.canSubmit;
-    const canTrigger = s.approvalsSubmitted && !s.executionStarted;
+    const canTrigger = s.approvalsSubmitted && s.approvalsApproved && !s.executionStarted;
+    const needsApprove = s.approvalsSubmitted && !s.approvalsApproved && !s.executionStarted;
     const needsReconfirm = s.v2Generated && !s.v2Reconfirmed && !s.approvalsSubmitted;
     const blockStrip = (!canSubmit && !s.approvalsSubmitted)
       ? `<div class="info-strip warn mt-16" style="margin-bottom:0"><span class="i-icon">!</span><div><b>Cannot submit yet.</b> ${esc(gate.reason)}</div></div>`
@@ -448,7 +449,18 @@
            </div>
          </div>`
       : "";
-    return `
+    const approveControl = needsApprove
+      ? `<div class="info-strip mt-16" style="margin-bottom:0; background:#F3EEFB; border-color:var(--joule-purple-border); color:var(--joule-purple-dark);">
+           <span class="i-icon" style="background:var(--joule-purple);">▸</span>
+           <div>
+             <b>Demo control · simulate approvers returning approved.</b>
+             This stands in for the 3 approvers approving EC + MDF in their own queues — it is <b>not</b> HR approving on their behalf. Execution can only be triggered once approval returns.
+             <div class="row mt-8"><div class="spacer"></div>
+               <button class="btn outlined sm" id="btnSimApprove">Mark EC + MDF approved by approvers (demo)</button>
+             </div>
+           </div>
+         </div>`
+      : "";
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Approvals</b></div>
 
       <div class="page-header">
@@ -483,6 +495,7 @@
         </div>
         ${blockStrip}
         ${reconfirmControl}
+        ${approveControl}
         <div class="info-strip warn mt-16" style="margin-bottom:0">
           <span class="i-icon">!</span>
           <div>Chat confirmation ≠ approval. HR cannot one-click "confirm compliance". Specialist review outcomes come from specialists themselves.</div>
@@ -648,6 +661,7 @@
           x.v2Generated = false;
           x.v2Reconfirmed = false;
           x.approvalsSubmitted = false;
+          x.approvalsApproved = false;
         }, "hrbp-changed-effective-date");
         addEditExchange(oldVal, newVal);
         jouleCtl.open();
@@ -677,9 +691,17 @@
         jouleExtra.push({ role: "bot", html: `Approvals submitted — now with the 3 approvers (EC + MDF). <strong>Not approved yet, and the move is not yet effective.</strong> Next: the approvers act in their own queues; once they return, you can trigger execution.`, sources: 1 });
         renderView();
       });
+      document.getElementById("btnSimApprove")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        // Only valid after submission and before execution. Stands in for the 3 approvers returning approved.
+        if (!(s.approvalsSubmitted && !s.approvalsApproved && !s.executionStarted)) { renderView(); return; }
+        window.GMA.mutateState(x => { x.approvalsApproved = true; }, "hrbp-approvals-approved-sim");
+        jouleExtra.push({ role: "bot", html: `All 3 approvers returned <strong>approved</strong> for EC + MDF (demo). You can now trigger execution. This reflects the approvers acting in their own queues — not HR approving for them.`, sources: 1 });
+        renderView();
+      });
       document.getElementById("btnTriggerExec")?.addEventListener("click", () => {
         const s = window.GMA.loadState();
-        if (!(s.approvalsSubmitted && !s.executionStarted)) { renderView(); return; }
+        if (!(s.approvalsSubmitted && s.approvalsApproved && !s.executionStarted)) { renderView(); return; }
         window.GMA.mutateState(x => { x.executionStarted = true; x.provisioningIssue = true; }, "hrbp-triggered-execution");
         jouleExtra.push({ role: "bot", html: `Execution triggered. IT team picking up provisioning. I'll notify you if they flag anything.`, sources: 1 });
         renderView();

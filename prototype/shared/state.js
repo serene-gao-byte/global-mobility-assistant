@@ -36,6 +36,7 @@ const DEFAULT_STATE = {
 
   // Approvals + execution
   approvalsSubmitted: false,
+  approvalsApproved: false,
   specialistSigned: false,
   executionStarted: false,
   provisioningIssue: false,

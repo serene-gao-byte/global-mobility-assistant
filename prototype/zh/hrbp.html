@@ -415,13 +415,13 @@
   function view_approvals() {
     const s = window.GMA.loadState();
     const rows = D.approvals.map(a => {
+      // 版本标签与 Move Request 版本绑定,与提交/通过状态无关。
+      let ver = s.v2Generated ? (a.flow.startsWith("EC") ? "MoveRequest v2" : "MDF v2") : a.version;
+      // 状态单独计算,提交/通过绝不重置版本标签。
       let st = a.status;
-      let ver = a.version;
-      if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("EC")) st = "已阻塞 — v1 失效";
-      if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("MDF")) st = "已阻塞 — v1 失效";
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = s.v2Reconfirmed ? "已重新确认 · 待提交" : "等待 v2 重新确认"; }
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = s.v2Reconfirmed ? "已重新确认 · 待提交" : "等待 v2 重新确认"; }
-      if (s.approvalsSubmitted && a.status.startsWith("pending")) st = "已提交(模拟)";
+      if (s.invalidatedByEdit && !s.v2Generated) st = "已阻塞 — v1 失效";
+      else if (s.v2Generated && !s.approvalsSubmitted) st = s.v2Reconfirmed ? "已重新确认 · 待提交" : "等待 v2 重新确认";
+      else if (s.approvalsSubmitted && a.status.startsWith("pending")) st = s.approvalsApproved ? "已通过(模拟)" : "已提交(模拟)";
       const cls = st.startsWith("已通过") || st.startsWith("approved") ? "green" : st.startsWith("已阻塞") ? "red" : st.startsWith("已提交") ? "blue" : st.startsWith("已重新确认") ? "blue" : "yellow";
       const stLabel = st === "approved" ? "已通过" : st === "pending-submit" ? "待提交" : st;
       return `<tr>
@@ -431,7 +431,8 @@
 
     const gate = computeSubmitGate(s);
     const canSubmit = gate.canSubmit;
-    const canTrigger = s.approvalsSubmitted && !s.executionStarted;
+    const canTrigger = s.approvalsSubmitted && s.approvalsApproved && !s.executionStarted;
+    const needsApprove = s.approvalsSubmitted && !s.approvalsApproved && !s.executionStarted;
     const needsReconfirm = s.v2Generated && !s.v2Reconfirmed && !s.approvalsSubmitted;
     const blockStrip = (!canSubmit && !s.approvalsSubmitted)
       ? `<div class="info-strip warn mt-16" style="margin-bottom:0"><span class="i-icon">!</span><div><b>暂时无法提交。</b>${esc(gate.reason)}</div></div>`
@@ -448,7 +449,18 @@
            </div>
          </div>`
       : "";
-    return `
+    const approveControl = needsApprove
+      ? `<div class="info-strip mt-16" style="margin-bottom:0; background:#F3EEFB; border-color:var(--joule-purple-border); color:var(--joule-purple-dark);">
+           <span class="i-icon" style="background:var(--joule-purple);">▸</span>
+           <div>
+             <b>演示控制 · 模拟审批人回执通过。</b>
+             这代表 3 位审批人在各自队列里通过了 EC + MDF —— <b>不是</b> HR 替他们审批。只有审批回执通过后,才能触发执行。
+             <div class="row mt-8"><div class="spacer"></div>
+               <button class="btn outlined sm" id="btnSimApprove">标记 EC + MDF 已由审批人通过(演示)</button>
+             </div>
+           </div>
+         </div>`
+      : "";
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">调动请求</a> › <a onclick="location.hash='#detail'">林晨</a> › <b>审批流</b></div>
 
       <div class="page-header">
@@ -483,6 +495,7 @@
         </div>
         ${blockStrip}
         ${reconfirmControl}
+        ${approveControl}
         <div class="info-strip warn mt-16" style="margin-bottom:0">
           <span class="i-icon">!</span>
           <div>对话确认 ≠ 审批。HR 不能一键 “确认合规”。专业审查的结论只能由专业人员出具。</div>
@@ -648,6 +661,7 @@
           x.v2Generated = false;
           x.v2Reconfirmed = false;
           x.approvalsSubmitted = false;
+          x.approvalsApproved = false;
         }, "hrbp-changed-effective-date");
         addEditExchange(oldVal, newVal);
         jouleCtl.open();
@@ -677,9 +691,17 @@
         jouleExtra.push({ role: "bot", html: `审批已提交 —— 现在交由 3 位审批人处理(EC + MDF)。<strong>尚未通过审批,调动也尚未生效。</strong>下一步:审批人在各自队列里处理;他们回执后,你可以触发执行。`, sources: 1 });
         renderView();
       });
+      document.getElementById("btnSimApprove")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        // 仅在已提交、尚未通过、尚未执行时有效。代表 3 位审批人回执通过。
+        if (!(s.approvalsSubmitted && !s.approvalsApproved && !s.executionStarted)) { renderView(); return; }
+        window.GMA.mutateState(x => { x.approvalsApproved = true; }, "hrbp-approvals-approved-sim");
+        jouleExtra.push({ role: "bot", html: `3 位审批人已对 EC + MDF 回执<strong>通过</strong>(演示)。现在可以触发执行。这反映的是审批人在各自队列里的处理 —— 不是 HR 替他们审批。`, sources: 1 });
+        renderView();
+      });
       document.getElementById("btnTriggerExec")?.addEventListener("click", () => {
         const s = window.GMA.loadState();
-        if (!(s.approvalsSubmitted && !s.executionStarted)) { renderView(); return; }
+        if (!(s.approvalsSubmitted && s.approvalsApproved && !s.executionStarted)) { renderView(); return; }
         window.GMA.mutateState(x => { x.executionStarted = true; x.provisioningIssue = true; }, "hrbp-triggered-execution");
         jouleExtra.push({ role: "bot", html: `执行已触发。IT 团队正在接手供应工作。如有异常我会通知你。`, sources: 1 });
         renderView();
