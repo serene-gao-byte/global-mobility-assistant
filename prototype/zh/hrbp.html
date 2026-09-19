@@ -146,6 +146,24 @@
 
   function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
   function pill(cls, text) { return `<span class="pill ${cls}">${esc(text)}</span>`; }
+
+  // 单一判断源:当前是否可以提交审批?按钮、对话、提交处理函数全部据此判断,不再各写一套。
+  function computeSubmitGate(s) {
+    if (s.approvalsSubmitted) {
+      return { canSubmit: false, code: "already-submitted", nextStep: "trigger-execution",
+        reason: "本版本的审批已提交 —— 正在等待审批人处理。等他们回执后可以触发执行。" };
+    }
+    if (s.invalidatedByEdit && !s.v2Generated) {
+      return { canSubmit: false, code: "needs-v2", nextStep: "generate-v2",
+        reason: "生效日期已变更,原 v1 签署不再适用。请先(通过 Joule)生成 Move Request v2。" };
+    }
+    if (s.v2Generated && !s.v2Reconfirmed) {
+      return { canSubmit: false, code: "needs-reconfirm", nextStep: "reconfirm-v2",
+        reason: "日期已变更,原确认不再适用。v2 草稿已生成,但 3 位审批人尚未重新确认。请先完成当前版本的重新确认,再提交审批。" };
+    }
+    return { canSubmit: true, code: "ok", nextStep: "submit",
+      reason: "Move Request 处于可提交状态。EC + MDF 两条流均已就绪。" };
+  }
   const jouleCtl = window.JOULE.bindJouleShell();
   let jouleExtra = [];
 
@@ -252,8 +270,8 @@
   function view_detail() {
     const s = window.GMA.loadState();
     const l = D.linChen;
-    const versionLabel = s.v2Generated ? "v2 · 待重新确认" : (s.invalidatedByEdit ? "v1 · 已失效" : "v1 · 2026-09-05 已确认");
-    const versionCls = s.v2Generated ? "yellow" : (s.invalidatedByEdit ? "red" : "green");
+    const versionLabel = s.v2Generated ? (s.v2Reconfirmed ? "v2 · 已重新确认" : "v2 · 待重新确认") : (s.invalidatedByEdit ? "v1 · 已失效" : "v1 · 2026-09-05 已确认");
+    const versionCls = s.v2Generated ? (s.v2Reconfirmed ? "blue" : "yellow") : (s.invalidatedByEdit ? "red" : "green");
 
     return `
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">调动请求</a> › <b>${esc(l.name)}</b></div>
@@ -353,8 +371,10 @@
     const s = window.GMA.loadState();
     const alertHTML = s.invalidatedByEdit && !s.v2Generated
       ? `<div class="info-strip danger"><span class="i-icon">!</span><div><b>v1 已失效。</b>使用右侧 Joule 生成 v2,并通知审批人。</div></div>`
-      : s.v2Generated
-      ? `<div class="info-strip warn"><span class="i-icon">!</span><div><b>Move Request v2 已生成。</b>已向 3 位审批人发送重新确认请求(模拟)。审批流将在重新确认后解锁。</div></div>`
+      : s.v2Generated && !s.v2Reconfirmed
+      ? `<div class="info-strip warn"><span class="i-icon">!</span><div><b>Move Request v2 已生成。</b>已向 3 位审批人发送重新确认请求(模拟)。在审批步骤收到重新确认后,审批流才会解锁。</div></div>`
+      : s.v2Generated && s.v2Reconfirmed
+      ? `<div class="info-strip success"><span class="i-icon">✓</span><div><b>Move Request v2 已重新确认。</b>现在可以在审批步骤提交审批。</div></div>`
       : "";
 
     return `
@@ -399,18 +419,35 @@
       let ver = a.version;
       if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("EC")) st = "已阻塞 — v1 失效";
       if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("MDF")) st = "已阻塞 — v1 失效";
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = "等待 v2 重新确认"; }
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = "等待 v2 重新确认"; }
+      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = s.v2Reconfirmed ? "已重新确认 · 待提交" : "等待 v2 重新确认"; }
+      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = s.v2Reconfirmed ? "已重新确认 · 待提交" : "等待 v2 重新确认"; }
       if (s.approvalsSubmitted && a.status.startsWith("pending")) st = "已提交(模拟)";
-      const cls = st.startsWith("已通过") || st.startsWith("approved") ? "green" : st.startsWith("已阻塞") ? "red" : st.startsWith("已提交") ? "blue" : "yellow";
+      const cls = st.startsWith("已通过") || st.startsWith("approved") ? "green" : st.startsWith("已阻塞") ? "red" : st.startsWith("已提交") ? "blue" : st.startsWith("已重新确认") ? "blue" : "yellow";
       const stLabel = st === "approved" ? "已通过" : st === "pending-submit" ? "待提交" : st;
       return `<tr>
         <td>${esc(a.flow)}</td><td>${esc(ver)}</td><td>${pill(cls, stLabel)}</td><td class="muted">${esc(a.owners)}</td>
       </tr>`;
     }).join("");
 
-    const canSubmit = !s.invalidatedByEdit && !s.approvalsSubmitted;
+    const gate = computeSubmitGate(s);
+    const canSubmit = gate.canSubmit;
     const canTrigger = s.approvalsSubmitted && !s.executionStarted;
+    const needsReconfirm = s.v2Generated && !s.v2Reconfirmed && !s.approvalsSubmitted;
+    const blockStrip = (!canSubmit && !s.approvalsSubmitted)
+      ? `<div class="info-strip warn mt-16" style="margin-bottom:0"><span class="i-icon">!</span><div><b>暂时无法提交。</b>${esc(gate.reason)}</div></div>`
+      : "";
+    const reconfirmControl = needsReconfirm
+      ? `<div class="info-strip mt-16" style="margin-bottom:0; background:#F3EEFB; border-color:var(--joule-purple-border); color:var(--joule-purple-dark);">
+           <span class="i-icon" style="background:var(--joule-purple);">▸</span>
+           <div>
+             <b>演示控制 · 模拟审批人重新确认。</b>
+             这代表 3 位审批人在各自队列里确认了 v2 —— <b>不是</b> HR 替他们签署。
+             <div class="row mt-8"><div class="spacer"></div>
+               <button class="btn outlined sm" id="btnSimReconfirm">标记 3 位审批人已重新确认(演示)</button>
+             </div>
+           </div>
+         </div>`
+      : "";
     return `
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">调动请求</a> › <a onclick="location.hash='#detail'">林晨</a> › <b>审批流</b></div>
 
@@ -444,6 +481,8 @@
           <button class="btn primary" id="btnSubmitApprovals" ${canSubmit ? "" : "disabled"}>提交 EC + MDF 审批</button>
           <button class="btn outlined" id="btnTriggerExec" ${canTrigger ? "" : "disabled"}>触发执行 →</button>
         </div>
+        ${blockStrip}
+        ${reconfirmControl}
         <div class="info-strip warn mt-16" style="margin-bottom:0">
           <span class="i-icon">!</span>
           <div>对话确认 ≠ 审批。HR 不能一键 “确认合规”。专业审查的结论只能由专业人员出具。</div>
@@ -607,6 +646,7 @@
           x.effectiveDate = newVal;
           x.invalidatedByEdit = true;
           x.v2Generated = false;
+          x.v2Reconfirmed = false;
           x.approvalsSubmitted = false;
         }, "hrbp-changed-effective-date");
         addEditExchange(oldVal, newVal);
@@ -616,12 +656,30 @@
     }
 
     if (step === "approvals") {
+      document.getElementById("btnSimReconfirm")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        // 仅在 v2 已生成但尚未重新确认时有效。绝不清除任何失效状态。
+        if (!(s.v2Generated && !s.v2Reconfirmed)) { renderView(); return; }
+        window.GMA.mutateState(x => { x.v2Reconfirmed = true; }, "hrbp-v2-reconfirmed-sim");
+        jouleExtra.push({ role: "bot", html: `已记录 3 位审批人对 v2 的重新确认(演示)。Move Request v2 现在可以提交。这反映的是审批人在各自队列里的确认 —— 不是 HR 替他们签署。`, sources: 1 });
+        renderView();
+      });
       document.getElementById("btnSubmitApprovals")?.addEventListener("click", () => {
+        // 点击时按最新状态重新判断 —— 不信任禁用属性或旧对话里的判断。
+        const s = window.GMA.loadState();
+        const gate = computeSubmitGate(s);
+        if (!gate.canSubmit) {
+          jouleExtra.push({ role: "bot", html: `暂时无法提交。${esc(gate.reason)}`, sources: 1 });
+          renderView();
+          return;
+        }
         window.GMA.mutateState(x => { x.approvalsSubmitted = true; }, "hrbp-submitted-approvals");
-        jouleExtra.push({ role: "bot", html: `审批已提交。等审批人确认后,你可以触发执行。`, sources: 1 });
+        jouleExtra.push({ role: "bot", html: `审批已提交 —— 现在交由 3 位审批人处理(EC + MDF)。<strong>尚未通过审批,调动也尚未生效。</strong>下一步:审批人在各自队列里处理;他们回执后,你可以触发执行。`, sources: 1 });
         renderView();
       });
       document.getElementById("btnTriggerExec")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        if (!(s.approvalsSubmitted && !s.executionStarted)) { renderView(); return; }
         window.GMA.mutateState(x => { x.executionStarted = true; x.provisioningIssue = true; }, "hrbp-triggered-execution");
         jouleExtra.push({ role: "bot", html: `执行已触发。IT 团队正在接手供应工作。如有异常我会通知你。`, sources: 1 });
         renderView();
@@ -659,7 +717,7 @@
     }
     if (step === "detail") return [overview,
       { role: "bot", autoplay: true, delay: 600,
-        html: `林晨的 Move Request 处于 <strong>${s.invalidatedByEdit && !s.v2Generated ? "v1 已失效" : (s.v2Generated ? "v2 待重新确认" : "v1 已确认")}</strong>。字段齐全。`, sources: 1 }];
+        html: `林晨的 Move Request 处于 <strong>${s.invalidatedByEdit && !s.v2Generated ? "v1 已失效" : (s.v2Generated ? (s.v2Reconfirmed ? "v2 已重新确认" : "v2 待重新确认") : "v1 已确认")}</strong>。字段齐全。`, sources: 1 }];
     if (step === "impact") return [overview,
       { role: "bot", autoplay: true, delay: 700,
         html: `跨系统的 9 项清单。3 项可路由到专业人员。`, sources: 2 },
@@ -682,13 +740,13 @@
 
   function handleJouleAction(ev, meta) {
     if (ev === "generate-v2") {
-      window.GMA.mutateState(x => { x.v2Generated = true; }, "hrbp-generated-v2");
+      window.GMA.mutateState(x => { x.v2Generated = true; x.v2Reconfirmed = false; }, "hrbp-generated-v2");
       jouleExtra.push({ role: "user", autoplay: true, delay: 300, text: "生成 v2 并通知他们。" });
       jouleExtra.push({ role: "bot", autoplay: true, delay: 700,
-        html: `完成。Move Request v2 草稿已创建;重新确认请求已发送给 3 位审批人。`, sources: 2 });
+        html: `完成。Move Request <strong>v2 草稿已创建</strong>;重新确认请求已发送给 3 位审批人。<strong>生成 v2 草稿不等于他们已经重新确认</strong> —— 在 3 位审批人于审批步骤重新确认之前,审批保持锁定。`, sources: 2 });
       renderView();
     } else if (ev === "cancel-change") {
-      window.GMA.mutateState(x => { x.effectiveDate = meta; x.invalidatedByEdit = false; x.v2Generated = false; }, "hrbp-cancelled-change");
+      window.GMA.mutateState(x => { x.effectiveDate = meta; x.invalidatedByEdit = false; x.v2Generated = false; x.v2Reconfirmed = false; }, "hrbp-cancelled-change");
       jouleExtra.push({ role: "bot", autoplay: true, delay: 500,
         html: `已恢复。v1 的确认继续有效。`, sources: 1 });
       renderView();
@@ -729,8 +787,11 @@
       return { html: has ? `有 —— 林晨提示了可能的时序调整。收件箱顶部会显示黄色卡片。<strong>她的原话保留在个人记录里</strong>;这里只展示抽象化的提示。` : `目前没有待处理的信号。`, sources: 1 };
     }
     if (/version|v1|v2|invalidat|版本|失效/.test(t)) {
-      const label = s.v2Generated ? "v2 待重新确认" : s.invalidatedByEdit ? "v1 已失效" : "v1 已确认";
-      return { html: `Move Request 当前状态:<strong>${label}</strong>。${s.v2Generated ? "3 位审批人已重新收到通知。" : s.invalidatedByEdit ? "你需要先生成 v2,审批才能继续。" : "3 位审批人全部已签署。"}`, sources: 1 };
+      const label = s.v2Generated ? (s.v2Reconfirmed ? "v2 已重新确认" : "v2 待重新确认") : s.invalidatedByEdit ? "v1 已失效" : "v1 已确认";
+      const note = s.v2Generated
+        ? (s.v2Reconfirmed ? "3 位审批人已重新确认 v2 —— 可以提交审批。" : "v2 草稿已生成;在提交审批之前,3 位审批人仍需重新确认。")
+        : s.invalidatedByEdit ? "你需要先生成 v2,审批才能继续。" : "3 位审批人全部已签署。";
+      return { html: `Move Request 当前状态:<strong>${label}</strong>。${note}`, sources: 1 };
     }
     if (/payroll|route|specialist|expert|assign|薪资|路由|专业人员|派发/.test(t)) {
       return { html: `对于 “薪资与福利”,我的推荐顺序是 <strong>职责 → 资质 → 授权 → 容量</strong>。在覆盖该职责且持有授权的候选人中,Payroll ME 当前有 3 项待处理;Global Mobility(Nikola)现在有档期。我建议先派 Global Mobility —— 但这只是推荐,拍板由你来。`, actions: [{ label: "打开影响审查", event: "goto-impact" }], sources: 2 };
@@ -739,9 +800,10 @@
       return { html: `DRTM(国别特定的数据保留期)标记为 <strong>阻塞</strong> —— 需要沙特侧的具体决策,超出本演示范围。其余项均为待处理或已核实。`, sources: 1 };
     }
     if (/submit|approve|approval|提交|审批/.test(t)) {
-      if (s.invalidatedByEdit && !s.v2Generated) return { html: `暂时不行 —— v1 已失效。请先生成 v2。`, sources: 1 };
-      if (s.approvalsSubmitted) return { html: `已提交。准备好后可以触发执行。`, sources: 1 };
-      return { html: `可以 —— Move Request 处于可提交状态。EC + MDF 两条流均已就绪。`, actions: [{ label: "打开审批流", event: "goto-approvals" }], sources: 1 };
+      const gate = computeSubmitGate(s);
+      if (gate.code === "already-submitted") return { html: `已提交 —— 现在交由 3 位审批人处理。尚未通过审批,调动也尚未生效。他们回执后可以触发执行。`, sources: 1 };
+      if (!gate.canSubmit) return { html: esc(gate.reason), sources: 1 };
+      return { html: `可以 —— ${esc(gate.reason)}`, actions: [{ label: "打开审批流", event: "goto-approvals" }], sources: 1 };
     }
     if (/it|technical|conflict|ias|技术|冲突|身份/.test(t)) {
       if (s.provisioningIssue && !s.iasConflictResolved) return { html: `IT 侧提交了一个身份映射案例给治理团队复核。在治理团队处理期间,HR 侧无需操作。员工侧只看到一个柔和的 “待核实” 提示。`, sources: 1 };

@@ -146,6 +146,25 @@
 
   function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
   function pill(cls, text) { return `<span class="pill ${cls}">${esc(text)}</span>`; }
+
+  // Single source of truth for "can approvals be submitted right now?"
+  // Button, dialog, and the submit handler all resolve against this — no drift.
+  function computeSubmitGate(s) {
+    if (s.approvalsSubmitted) {
+      return { canSubmit: false, code: "already-submitted", nextStep: "trigger-execution",
+        reason: "Approvals already submitted for this version — awaiting the approvers. You can trigger execution when they return." };
+    }
+    if (s.invalidatedByEdit && !s.v2Generated) {
+      return { canSubmit: false, code: "needs-v2", nextStep: "generate-v2",
+        reason: "The effective date changed, so the v1 sign-off no longer applies. Generate Move Request v2 first (via Joule)." };
+    }
+    if (s.v2Generated && !s.v2Reconfirmed) {
+      return { canSubmit: false, code: "needs-reconfirm", nextStep: "reconfirm-v2",
+        reason: "The date changed and v1 no longer applies. v2 is drafted, but the 3 approvers have not re-confirmed yet. Complete re-confirmation for the current version before submitting." };
+    }
+    return { canSubmit: true, code: "ok", nextStep: "submit",
+      reason: "Move Request is in a submittable state. EC + MDF flows are ready." };
+  }
   const jouleCtl = window.JOULE.bindJouleShell();
   let jouleExtra = [];
 
@@ -252,8 +271,8 @@
   function view_detail() {
     const s = window.GMA.loadState();
     const l = D.linChen;
-    const versionLabel = s.v2Generated ? "v2 · pending re-confirmation" : (s.invalidatedByEdit ? "v1 · invalidated" : "v1 · confirmed 2026-09-05");
-    const versionCls = s.v2Generated ? "yellow" : (s.invalidatedByEdit ? "red" : "green");
+    const versionLabel = s.v2Generated ? (s.v2Reconfirmed ? "v2 · re-confirmed" : "v2 · pending re-confirmation") : (s.invalidatedByEdit ? "v1 · invalidated" : "v1 · confirmed 2026-09-05");
+    const versionCls = s.v2Generated ? (s.v2Reconfirmed ? "blue" : "yellow") : (s.invalidatedByEdit ? "red" : "green");
 
     return `
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <b>${esc(l.name)}</b></div>
@@ -353,8 +372,10 @@
     const s = window.GMA.loadState();
     const alertHTML = s.invalidatedByEdit && !s.v2Generated
       ? `<div class="info-strip danger"><span class="i-icon">!</span><div><b>v1 confirmation invalidated.</b> Use Joule (right side) to generate v2 and notify approvers.</div></div>`
-      : s.v2Generated
-      ? `<div class="info-strip warn"><span class="i-icon">!</span><div><b>Move Request v2 generated.</b> Re-confirmation requests sent to 3 approvers (simulated). Approvals will unlock after re-confirmation.</div></div>`
+      : s.v2Generated && !s.v2Reconfirmed
+      ? `<div class="info-strip warn"><span class="i-icon">!</span><div><b>Move Request v2 generated.</b> Re-confirmation requests sent to 3 approvers (simulated). Approvals unlock on the Approvals step once re-confirmation is received.</div></div>`
+      : s.v2Generated && s.v2Reconfirmed
+      ? `<div class="info-strip success"><span class="i-icon">✓</span><div><b>Move Request v2 re-confirmed.</b> Approvals can now be submitted on the Approvals step.</div></div>`
       : "";
 
     return `
@@ -399,17 +420,34 @@
       let ver = a.version;
       if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("EC")) st = "blocked — v1 invalidated";
       if (s.invalidatedByEdit && !s.v2Generated && a.flow.startsWith("MDF")) st = "blocked — v1 invalidated";
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = "awaiting v2 re-confirmation"; }
-      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = "awaiting v2 re-confirmation"; }
+      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("EC")) { ver = "MoveRequest v2"; st = s.v2Reconfirmed ? "re-confirmed · ready to submit" : "awaiting v2 re-confirmation"; }
+      if (s.v2Generated && !s.approvalsSubmitted && a.flow.startsWith("MDF")) { ver = "MDF v2"; st = s.v2Reconfirmed ? "re-confirmed · ready to submit" : "awaiting v2 re-confirmation"; }
       if (s.approvalsSubmitted && a.status.startsWith("pending")) st = "submitted (sim)";
-      const cls = st.startsWith("approved") ? "green" : st.startsWith("blocked") ? "red" : st.startsWith("submitted") ? "blue" : "yellow";
+      const cls = st.startsWith("approved") ? "green" : st.startsWith("blocked") ? "red" : st.startsWith("submitted") ? "blue" : st.startsWith("re-confirmed") ? "blue" : "yellow";
       return `<tr>
         <td>${esc(a.flow)}</td><td>${esc(ver)}</td><td>${pill(cls, st)}</td><td class="muted">${esc(a.owners)}</td>
       </tr>`;
     }).join("");
 
-    const canSubmit = !s.invalidatedByEdit && !s.approvalsSubmitted;
+    const gate = computeSubmitGate(s);
+    const canSubmit = gate.canSubmit;
     const canTrigger = s.approvalsSubmitted && !s.executionStarted;
+    const needsReconfirm = s.v2Generated && !s.v2Reconfirmed && !s.approvalsSubmitted;
+    const blockStrip = (!canSubmit && !s.approvalsSubmitted)
+      ? `<div class="info-strip warn mt-16" style="margin-bottom:0"><span class="i-icon">!</span><div><b>Cannot submit yet.</b> ${esc(gate.reason)}</div></div>`
+      : "";
+    const reconfirmControl = needsReconfirm
+      ? `<div class="info-strip mt-16" style="margin-bottom:0; background:#F3EEFB; border-color:var(--joule-purple-border); color:var(--joule-purple-dark);">
+           <span class="i-icon" style="background:var(--joule-purple);">▸</span>
+           <div>
+             <b>Demo control · simulate approver re-confirmation.</b>
+             This stands in for the 3 approvers confirming v2 in their own queues — it is <b>not</b> HR approving on their behalf.
+             <div class="row mt-8"><div class="spacer"></div>
+               <button class="btn outlined sm" id="btnSimReconfirm">Mark 3 approvers' re-confirmation received (demo)</button>
+             </div>
+           </div>
+         </div>`
+      : "";
     return `
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Approvals</b></div>
 
@@ -443,6 +481,8 @@
           <button class="btn primary" id="btnSubmitApprovals" ${canSubmit ? "" : "disabled"}>Submit EC + MDF approvals</button>
           <button class="btn outlined" id="btnTriggerExec" ${canTrigger ? "" : "disabled"}>Trigger execution →</button>
         </div>
+        ${blockStrip}
+        ${reconfirmControl}
         <div class="info-strip warn mt-16" style="margin-bottom:0">
           <span class="i-icon">!</span>
           <div>Chat confirmation ≠ approval. HR cannot one-click "confirm compliance". Specialist review outcomes come from specialists themselves.</div>
@@ -606,6 +646,7 @@
           x.effectiveDate = newVal;
           x.invalidatedByEdit = true;
           x.v2Generated = false;
+          x.v2Reconfirmed = false;
           x.approvalsSubmitted = false;
         }, "hrbp-changed-effective-date");
         addEditExchange(oldVal, newVal);
@@ -615,12 +656,30 @@
     }
 
     if (step === "approvals") {
+      document.getElementById("btnSimReconfirm")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        // Only valid while v2 is drafted but not yet re-confirmed. Never clears an invalidation.
+        if (!(s.v2Generated && !s.v2Reconfirmed)) { renderView(); return; }
+        window.GMA.mutateState(x => { x.v2Reconfirmed = true; }, "hrbp-v2-reconfirmed-sim");
+        jouleExtra.push({ role: "bot", html: `Re-confirmation recorded for all 3 approvers (demo). Move Request v2 is now submittable. This reflects the approvers confirming in their own queues — not HR signing for them.`, sources: 1 });
+        renderView();
+      });
       document.getElementById("btnSubmitApprovals")?.addEventListener("click", () => {
+        // Re-check against the latest state at click time — never trust a stale disabled attr or old dialog.
+        const s = window.GMA.loadState();
+        const gate = computeSubmitGate(s);
+        if (!gate.canSubmit) {
+          jouleExtra.push({ role: "bot", html: `Can't submit yet. ${esc(gate.reason)}`, sources: 1 });
+          renderView();
+          return;
+        }
         window.GMA.mutateState(x => { x.approvalsSubmitted = true; }, "hrbp-submitted-approvals");
-        jouleExtra.push({ role: "bot", html: `Approvals submitted. Once confirmed, you can trigger execution.`, sources: 1 });
+        jouleExtra.push({ role: "bot", html: `Approvals submitted — now with the 3 approvers (EC + MDF). <strong>Not approved yet, and the move is not yet effective.</strong> Next: the approvers act in their own queues; once they return, you can trigger execution.`, sources: 1 });
         renderView();
       });
       document.getElementById("btnTriggerExec")?.addEventListener("click", () => {
+        const s = window.GMA.loadState();
+        if (!(s.approvalsSubmitted && !s.executionStarted)) { renderView(); return; }
         window.GMA.mutateState(x => { x.executionStarted = true; x.provisioningIssue = true; }, "hrbp-triggered-execution");
         jouleExtra.push({ role: "bot", html: `Execution triggered. IT team picking up provisioning. I'll notify you if they flag anything.`, sources: 1 });
         renderView();
@@ -658,7 +717,7 @@
     }
     if (step === "detail") return [overview,
       { role: "bot", autoplay: true, delay: 600,
-        html: `Lin Chen's Move Request is in <strong>${s.invalidatedByEdit && !s.v2Generated ? "v1 invalidated" : (s.v2Generated ? "v2 pending re-confirmation" : "v1 confirmed")}</strong>. All expected fields present.`, sources: 1 }];
+        html: `Lin Chen's Move Request is in <strong>${s.invalidatedByEdit && !s.v2Generated ? "v1 invalidated" : (s.v2Generated ? (s.v2Reconfirmed ? "v2 re-confirmed" : "v2 pending re-confirmation") : "v1 confirmed")}</strong>. All expected fields present.`, sources: 1 }];
     if (step === "impact") return [overview,
       { role: "bot", autoplay: true, delay: 700,
         html: `9-item cross-system checklist. 3 items have specialist routing available.`, sources: 2 },
@@ -681,13 +740,13 @@
 
   function handleJouleAction(ev, meta) {
     if (ev === "generate-v2") {
-      window.GMA.mutateState(x => { x.v2Generated = true; }, "hrbp-generated-v2");
+      window.GMA.mutateState(x => { x.v2Generated = true; x.v2Reconfirmed = false; }, "hrbp-generated-v2");
       jouleExtra.push({ role: "user", autoplay: true, delay: 300, text: "Generate v2 and notify them." });
       jouleExtra.push({ role: "bot", autoplay: true, delay: 700,
-        html: `Done. Move Request v2 draft created; re-confirmation requests sent to 3 approvers.`, sources: 2 });
+        html: `Done. Move Request <strong>v2 draft created</strong>; re-confirmation requests sent to 3 approvers. <strong>Drafting v2 is not the same as their re-confirmation</strong> — approvals stay locked until the 3 approvers re-confirm on the Approvals step.`, sources: 2 });
       renderView();
     } else if (ev === "cancel-change") {
-      window.GMA.mutateState(x => { x.effectiveDate = meta; x.invalidatedByEdit = false; x.v2Generated = false; }, "hrbp-cancelled-change");
+      window.GMA.mutateState(x => { x.effectiveDate = meta; x.invalidatedByEdit = false; x.v2Generated = false; x.v2Reconfirmed = false; }, "hrbp-cancelled-change");
       jouleExtra.push({ role: "bot", autoplay: true, delay: 500,
         html: `Reverted. v1 confirmation stays valid.`, sources: 1 });
       renderView();
@@ -728,8 +787,11 @@
       return { html: has ? `Yes — Lin Chen flagged a possible timing adjustment. You'll see the yellow card on top of the inbox. <strong>Her exact wording stays private</strong>; I only show you the abstract flag.` : `No open signals right now.`, sources: 1 };
     }
     if (/version|v1|v2|invalidat/.test(t)) {
-      const label = s.v2Generated ? "v2 pending re-confirmation" : s.invalidatedByEdit ? "v1 invalidated" : "v1 confirmed";
-      return { html: `Move Request is currently <strong>${label}</strong>. ${s.v2Generated ? "3 approvers were re-notified." : s.invalidatedByEdit ? "You need to generate v2 before approvals can resume." : "All 3 approvers signed."}`, sources: 1 };
+      const label = s.v2Generated ? (s.v2Reconfirmed ? "v2 re-confirmed" : "v2 pending re-confirmation") : s.invalidatedByEdit ? "v1 invalidated" : "v1 confirmed";
+      const note = s.v2Generated
+        ? (s.v2Reconfirmed ? "All 3 approvers re-confirmed v2 — approvals can be submitted." : "v2 drafted; 3 approvers still need to re-confirm before approvals can be submitted.")
+        : s.invalidatedByEdit ? "You need to generate v2 before approvals can resume." : "All 3 approvers signed.";
+      return { html: `Move Request is currently <strong>${label}</strong>. ${note}`, sources: 1 };
     }
     if (/payroll|route|specialist|expert|assign/.test(t)) {
       return { html: `For Payroll &amp; benefits, my recommendation follows <strong>responsibility → qualification → authorization → capacity</strong>. Among candidates who cover the responsibility and hold authorization, Payroll ME currently has 3 items pending; Global Mobility (Nikola) is available. My suggestion is Global Mobility first — but this is a recommendation, you make the call.`, actions: [{ label: "Open Impact review", event: "goto-impact" }], sources: 2 };
@@ -738,9 +800,10 @@
       return { html: `DRTM (country-specific retention) is marked <strong>Blocked</strong> — requires a Saudi-specific decision, out of demo scope. Everything else is pending or verified.`, sources: 1 };
     }
     if (/submit|approve|approval/.test(t)) {
-      if (s.invalidatedByEdit && !s.v2Generated) return { html: `Not yet — v1 is invalidated. Generate v2 first.`, sources: 1 };
-      if (s.approvalsSubmitted) return { html: `Already submitted. You can trigger execution when ready.`, sources: 1 };
-      return { html: `Yes — Move Request is in a submittable state. EC + MDF flows are ready.`, actions: [{ label: "Open Approvals", event: "goto-approvals" }], sources: 1 };
+      const gate = computeSubmitGate(s);
+      if (gate.code === "already-submitted") return { html: `Already submitted — now with the 3 approvers. Not approved yet, and the move is not yet effective. You can trigger execution once they return.`, sources: 1 };
+      if (!gate.canSubmit) return { html: esc(gate.reason), sources: 1 };
+      return { html: `Yes — ${esc(gate.reason)}`, actions: [{ label: "Open Approvals", event: "goto-approvals" }], sources: 1 };
     }
     if (/it|technical|conflict|ias/.test(t)) {
       if (s.provisioningIssue && !s.iasConflictResolved) return { html: `IT surfaced an identity mapping case for governance review. It is with the Identity governance team — no HR action while it is under review. Employee sees only a soft "awaiting verification" note.`, sources: 1 };
