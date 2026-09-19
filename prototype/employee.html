@@ -1275,6 +1275,14 @@
               </div>
             </div>
 
+            <div class="info-strip" style="margin-top:2px;">
+              <span class="i-icon">i</span>
+              <div>
+                <b>This decision is yours.</b> Joule can compare roles and lay out the gaps — but family plans, life stage, and your appetite for a new market aren't in the data, and it won't guess at them. Those are yours to weigh.
+                <span class="cap-tag ext" style="margin-left:6px;">项目扩展设计</span>
+              </div>
+            </div>
+
             <div class="card">
               <h2 class="ad-section-title">Attributes</h2>
               <div class="ad-attributes-header">
@@ -1294,7 +1302,7 @@
               </div>
             </div>
 
-            <div class="card">
+            <div class="card" id="experienceMatchCard">
               <h2 class="ad-section-title">How Your Experience Matches</h2>
               <div class="ad-attributes-header">Sourced from authorized data · self-reported items are labeled. <span class="cap-tag ext" style="margin-left:6px;">项目扩展设计</span></div>
               <table class="data-table" style="margin-top:8px;">
@@ -1792,7 +1800,7 @@
     }
 
     // Match / requirements
-    if (/(match|requirements?|qualif|经历|要求)/.test(t)) {
+    if (/(match|requirements?|qualif|经历|要求|匹配|匹配度|符合)/.test(t)) {
       return {
         html: `Your matches: <strong>2 items on system record</strong> (BESS certification, solution consulting on 3 tier-1 pursuits), <strong>1 self-reported</strong> (GCC workshop as observer), <strong>1 with no source</strong> (cross-cultural project scope). I don't fabricate — absent from records is not the same as absent in fact.`,
         actions: [{ label: "Open Evaluate page", event: "goto-detail" }],
@@ -1825,6 +1833,15 @@
       return {
         html: `You can send a signal on the <strong>Track progress</strong> page. I'll show you a preview of what HR will see — an abstract flag, not your exact wording. Your private phrasing stays in your record until you have a real conversation.`,
         actions: [{ label: "Go to signal box", event: "goto-tracking" }],
+        sources: 1
+      };
+    }
+
+    // Edit before submitting (apply page)
+    if (/(edit|change|modify|revise|before (submit|send)|编辑|修改|提交前|发送前|能改)/.test(t)) {
+      return {
+        html: `Yes. On the <strong>Apply</strong> page you'll see every item that will be shared — your ID, current role, target role, skills, notice period, and preferred start — before anything is sent. You review it, and you decide what stays private. Nothing is shared with the hiring side until you click "Submit application."`,
+        actions: [{ label: "Open Apply page", event: "goto-apply" }],
         sources: 1
       };
     }
@@ -1864,7 +1881,18 @@
     if (ev === "goto-prep") location.hash = "#prep";
     if (ev === "goto-apply") location.hash = "#apply";
     if (ev === "goto-tracking") location.hash = "#tracking";
-    if (ev === "focus-match") { location.hash = "#detail"; setTimeout(() => document.querySelector(".data-table")?.scrollIntoView({behavior:"smooth"}), 150); }
+    if (ev === "focus-match") {
+      const reveal = () => {
+        const card = document.getElementById("experienceMatchCard");
+        if (!card) return;
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+        card.classList.remove("flash-highlight");
+        void card.offsetWidth;   // restart the animation if re-triggered
+        card.classList.add("flash-highlight");
+      };
+      if (currentStepId() !== "detail") { location.hash = "#detail"; setTimeout(reveal, 250); }
+      else { reveal(); }
+    }
     if (ev === "book-chat") alert("Booking flow is not part of this simulation. In a real product this would open a calendar picker.");
   }
 

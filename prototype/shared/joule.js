@@ -180,10 +180,11 @@ function _submitUserText(text) {
   appendFrames([{ role: "user", text: clean, autoplay: true, delay: 200 }]);
   // Route to intent
   const routed = JOULE_STATE.intentRouter ? JOULE_STATE.intentRouter(clean) : null;
-  const reply = routed || {
-    html: `I can help with questions about <strong>your move</strong> — comparison of your comp, requirements match, interview prep, application status, or sending a signal to HR. For anything else I'd suggest a real conversation with your manager or HR.`,
-    sources: 1
-  };
+  const isZh = (document.documentElement.lang || "").toLowerCase().startsWith("zh");
+  const fallback = isZh
+    ? { html: `关于 <strong>你的调动</strong>,我可以帮你解答:薪酬对比、匹配情况、面试准备、申请进度,或给 HR 发送信号。其他问题,建议直接与你的经理或 HR 聊聊。`, sources: 1 }
+    : { html: `I can help with questions about <strong>your move</strong> — comparison of your comp, requirements match, interview prep, application status, or sending a signal to HR. For anything else I'd suggest a real conversation with your manager or HR.`, sources: 1 };
+  const reply = routed || fallback;
   setTimeout(() => {
     appendFrames([{ role: "bot", ...reply, autoplay: true, delay: 350 }]);
   }, 600);

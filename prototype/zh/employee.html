@@ -1275,6 +1275,14 @@
               </div>
             </div>
 
+            <div class="info-strip" style="margin-top:2px;">
+              <span class="i-icon">i</span>
+              <div>
+                <b>这个决定属于你。</b>Joule 可以帮你对比岗位、列出差距 —— 但家庭、人生阶段、对新市场的意愿这些不在数据里,它不会替你猜。这些由你权衡。
+                <span class="cap-tag ext" style="margin-left:6px;">项目扩展设计</span>
+              </div>
+            </div>
+
             <div class="card">
               <h2 class="ad-section-title">能力属性</h2>
               <div class="ad-attributes-header">
@@ -1294,7 +1302,7 @@
               </div>
             </div>
 
-            <div class="card">
+            <div class="card" id="experienceMatchCard">
               <h2 class="ad-section-title">你的经历对照</h2>
               <div class="ad-attributes-header">来自你授权范围内的系统数据 · 员工自述项已标注。<span class="cap-tag ext" style="margin-left:6px;">项目扩展设计</span></div>
               <table class="data-table" style="margin-top:8px;">
@@ -1792,7 +1800,7 @@
     }
 
     // Match / requirements
-    if (/(match|requirements?|qualif|经历|要求)/.test(t)) {
+    if (/(match|requirements?|qualif|经历|要求|匹配|匹配度|符合)/.test(t)) {
       return {
         html: `你的匹配情况:<strong>2 项来自系统记录</strong>(BESS 认证、3 个头部客户售前项目),<strong>1 项来自自述</strong>(海湾工作坊观察员经历),<strong>1 项无来源</strong>(跨文化项目)。我不会编造 —— 记录里没有,不等于事实上没有。`,
         actions: [{ label: "打开评估页", event: "goto-detail" }],
@@ -1825,6 +1833,15 @@
       return {
         html: `你可以在 <strong>追踪进度</strong> 页发送一个信号。我会先给你看 HR 那边会收到的预览 —— 一个抽象化的提示,而不是你的原话。在你真正面对面沟通之前,你的原话只保留在你自己的记录里。`,
         actions: [{ label: "前往信号入口", event: "goto-tracking" }],
+        sources: 1
+      };
+    }
+
+    // Edit before submitting (apply page)
+    if (/(edit|change|modify|revise|before (submit|send)|编辑|修改|改一改|提交前|发送前|能改)/.test(t)) {
+      return {
+        html: `可以。在 <strong>提交申请</strong> 页,你会先看到将要分享的每一项信息 —— 员工 ID、当前岗位、目标岗位、技能、通知期、期望入职日。提交之前,这些都由你核对;哪些保持私密也由你决定。只有你点击“提交申请”后,档案才会分享给招聘方。`,
+        actions: [{ label: "打开申请页", event: "goto-apply" }],
         sources: 1
       };
     }
@@ -1864,7 +1881,18 @@
     if (ev === "goto-prep") location.hash = "#prep";
     if (ev === "goto-apply") location.hash = "#apply";
     if (ev === "goto-tracking") location.hash = "#tracking";
-    if (ev === "focus-match") { location.hash = "#detail"; setTimeout(() => document.querySelector(".data-table")?.scrollIntoView({behavior:"smooth"}), 150); }
+    if (ev === "focus-match") {
+      const reveal = () => {
+        const card = document.getElementById("experienceMatchCard");
+        if (!card) return;
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+        card.classList.remove("flash-highlight");
+        void card.offsetWidth;   // restart the animation if re-triggered
+        card.classList.add("flash-highlight");
+      };
+      if (currentStepId() !== "detail") { location.hash = "#detail"; setTimeout(reveal, 250); }
+      else { reveal(); }
+    }
     if (ev === "book-chat") alert("此原型不含预约流程。真实产品中,这里会打开日历选择器。");
   }
 

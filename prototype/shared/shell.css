@@ -7,8 +7,7 @@
 /* ---------------- Top bar ---------------- */
 .topbar {
   background: var(--sap-navy);
-  color: #fff;
-  height: 56px;
+  color: #fff;  height: 56px;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -19,7 +18,9 @@
 }
 .brand {
   display: flex; align-items: center; gap: 6px;
+  text-decoration: none; cursor: pointer;
 }
+.brand:hover .brand-logo { background: var(--sap-blue-hover); }
 .brand-logo {
   background: var(--sap-blue);
   color: #fff;
@@ -563,3 +564,10 @@
   .main-area.joule-open { margin-right: 340px; }
   .three-col { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Flash highlight — used when Joule's "show my experience match" jumps to a card */
+@keyframes flashHighlight {
+  0%   { box-shadow: 0 0 0 3px rgba(0,112,242,0.55); background: #F0F7FF; }
+  100% { box-shadow: 0 0 0 3px rgba(0,112,242,0);    background: #fff; }
+}
+.flash-highlight { animation: flashHighlight 1.6s ease-out 1; }

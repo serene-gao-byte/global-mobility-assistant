@@ -56,10 +56,10 @@ function renderTopbar(role) {
 
   return `
     <div class="topbar">
-      <div class="brand">
+      <a class="brand" href="index.html" title="Back to role selection · 返回角色选择">
         <span class="brand-logo">SAP</span>
         <span class="brand-suffix">SUCCESS MAP</span>
-      </div>
+      </a>
       <div class="app-selector">
         <span>${cfg.app}</span>
         <span class="caret">▾</span>
