@@ -62,9 +62,9 @@ window.HRBP_DATA = {
   },
 
   approvals: [
-    { flow: "招聘 — Offer 审批",           version: "Offer v2",       status: "approved",       owners: "招聘经理 · 中东区薪酬" },
-    { flow: "HR — 国际调动工作流",         version: "MoveRequest v1", status: "pending-submit", owners: "HRBP(源国)· HRBP(目标国)· Payroll ME" },
-    { flow: "MDF — 补充调动信息",           version: "MDF v1",         status: "pending-submit", owners: "HR 运营" }
+    { kind: "recruiting", flow: "招聘 — Offer 审批",           version: "Offer v2",       status: "approved",       owners: "招聘经理 · 中东区薪酬" },
+    { kind: "hr",          flow: "HR — 国际调动工作流",         version: "MoveRequest v1", status: "pending-submit", owners: "HRBP(源国)· HRBP(目标国)· Payroll ME" },
+    { kind: "mdf",         flow: "MDF — 补充调动信息",           version: "MDF v1",         status: "pending-submit", owners: "HR 运营" }
   ],
 
   performancePrepAgent: {

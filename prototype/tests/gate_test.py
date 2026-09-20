@@ -88,9 +88,18 @@ def structure_check(path, label):
     check(f"[{label}] date change resets approvalsApproved",
           re.search(r"x\.approvalsApproved = false;[\s\S]*?hrbp-changed-effective-date", src) is not None)
     # Version label must be emitted independent of approvalsSubmitted (Issue 2 fix):
-    # the v2 label is computed once from s.v2Generated, not nested only inside !approvalsSubmitted.
+    # the v2 label is computed from s.v2Generated, not nested only inside !approvalsSubmitted.
+    # It must branch on the stable a.kind field (not a.flow text, which is localized and
+    # once used a startsWith("EC") predicate that matched no flow — see 2f58003 regression).
     check(f"[{label}] v2 version label independent of submission",
-          re.search(r'let ver = s\.v2Generated \? \(a\.flow\.startsWith\("EC"\)', src) is not None)
+          re.search(r'const ver = s\.v2Generated \? \(a\.kind === "hr" \? "MoveRequest v2" : "MDF v2"\) : a\.version;', src) is not None)
+    # The old broken startsWith("EC") version predicate must be gone.
+    check(f"[{label}] old startsWith(EC) version predicate removed",
+          'a.flow.startsWith("EC")' not in src)
+    # Recruiting/Offer row must be handled as an independent, already-approved flow
+    # (not swept into the move-version invalidation lifecycle).
+    check(f"[{label}] recruiting row handled independently",
+          'a.kind === "recruiting"' in src)
 
 # ---------------------------------------------------------------------------
 # 2. TRUTH TABLE — faithful mirror of the JS ladder.

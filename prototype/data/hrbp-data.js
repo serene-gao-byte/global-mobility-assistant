@@ -67,9 +67,9 @@ window.HRBP_DATA = {
   },
 
   approvals: [
-    { flow: "Recruiting — Offer Approval",           version: "Offer v2",          status: "approved",       owners: "Hiring Manager · ME Compensation" },
-    { flow: "HR — International Transfer Workflow",  version: "MoveRequest v1",    status: "pending-submit", owners: "HRBP (source) · HRBP (target) · Payroll ME" },
-    { flow: "MDF — Supplemental Move Info",          version: "MDF v1",            status: "pending-submit", owners: "HR Ops" }
+    { kind: "recruiting", flow: "Recruiting — Offer Approval",           version: "Offer v2",          status: "approved",       owners: "Hiring Manager · ME Compensation" },
+    { kind: "hr",          flow: "HR — International Transfer Workflow",  version: "MoveRequest v1",    status: "pending-submit", owners: "HRBP (source) · HRBP (target) · Payroll ME" },
+    { kind: "mdf",         flow: "MDF — Supplemental Move Info",          version: "MDF v1",            status: "pending-submit", owners: "HR Ops" }
   ],
 
   performancePrepAgent: {

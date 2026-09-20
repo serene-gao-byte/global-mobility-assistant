@@ -416,9 +416,15 @@
   function view_approvals() {
     const s = window.GMA.loadState();
     const rows = D.approvals.map(a => {
-      // Version label is bound to the Move Request version, independent of submission/approval.
-      let ver = s.v2Generated ? (a.flow.startsWith("EC") ? "MoveRequest v2" : "MDF v2") : a.version;
-      // Status is computed separately so submitting/approving never resets the version label.
+      // Recruiting/Offer is a separate flow, already approved. The move-date change does not
+      // invalidate it here (per Joule: confirm Offer impact with the hiring manager separately).
+      if (a.kind === "recruiting") {
+        return `<tr>
+          <td>${esc(a.flow)}</td><td>${esc(a.version)}</td><td>${pill("green", "approved")}</td><td class="muted">${esc(a.owners)}</td>
+        </tr>`;
+      }
+      // HR / MDF flows are bound to the Move Request version and share its lifecycle.
+      const ver = s.v2Generated ? (a.kind === "hr" ? "MoveRequest v2" : "MDF v2") : a.version;
       let st = a.status;
       if (s.invalidatedByEdit && !s.v2Generated) st = "blocked — v1 invalidated";
       else if (s.v2Generated && !s.approvalsSubmitted) st = s.v2Reconfirmed ? "re-confirmed · ready to submit" : "awaiting v2 re-confirmation";
@@ -461,6 +467,7 @@
            </div>
          </div>`
       : "";
+    return `
       <div class="breadcrumb"><a onclick="location.hash='#inbox'">Move Requests</a> › <a onclick="location.hash='#detail'">Lin Chen</a> › <b>Approvals</b></div>
 
       <div class="page-header">
