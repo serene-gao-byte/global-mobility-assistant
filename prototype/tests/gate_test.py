@@ -101,6 +101,22 @@ def structure_check(path, label):
     check(f"[{label}] recruiting row handled independently",
           'a.kind === "recruiting"' in src)
 
+    # --- Post-execution edit protection (irreversible action must not be faked-undone) ---
+    # Render layer: the effective-date input AND the apply button must be disabled when
+    # executionStarted, so a user can't fat-finger a change after execution begins.
+    check(f"[{label}] date input disabled after execution",
+          re.search(r'id="effDateInput"[^>]*\$\{s\.executionStarted \? "disabled" : ""\}', src) is not None)
+    check(f"[{label}] apply button disabled after execution",
+          re.search(r'id="applyEffDate" \$\{s\.executionStarted \? "disabled" : ""\}', src) is not None)
+    # Click handler: re-check latest state and refuse the edit when executionStarted, BEFORE
+    # the "no change" short-circuit — a disabled attr alone is not the source of truth.
+    check(f"[{label}] apply handler refuses edit after execution",
+          re.search(r'applyEffDate[\s\S]*?const s = window\.GMA\.loadState\(\);[\s\S]*?if \(s\.executionStarted\) \{[\s\S]*?return;[\s\S]*?\}[\s\S]*?if \(!newVal', src) is not None)
+    # The refusal must NOT fake an undo by clearing executionStarted — no mutator in the
+    # apply handler may set executionStarted = false.
+    check(f"[{label}] refusal does not clear executionStarted",
+          "x.executionStarted = false;" not in src)
+
 # ---------------------------------------------------------------------------
 # 2. TRUTH TABLE — faithful mirror of the JS ladder.
 # ---------------------------------------------------------------------------

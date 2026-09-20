@@ -399,6 +399,8 @@
 
       ${alertHTML}
 
+      ${s.executionStarted ? `<div class="info-strip warn"><span class="i-icon">!</span><div><b>Execution has started.</b> This demo does not support editing the effective date directly once execution is under way.</div></div>` : ""}
+
       <div class="card">
         <div class="card-header">
           <div><h2 class="card-title">Effective date</h2></div>
@@ -406,8 +408,8 @@
         </div>
         <div class="row wrap">
           <span class="k" style="width:auto;">Current value:</span>
-          <input id="effDateInput" type="date" value="${esc(s.effectiveDate)}" style="padding:6px 10px; border:1px solid var(--border-mid); border-radius:4px; font-family:inherit; font-size:13px;" />
-          <button class="btn primary sm" id="applyEffDate">Apply change</button>
+          <input id="effDateInput" type="date" value="${esc(s.effectiveDate)}" ${s.executionStarted ? "disabled" : ""} style="padding:6px 10px; border:1px solid var(--border-mid); border-radius:4px; font-family:inherit; font-size:13px;" />
+          <button class="btn primary sm" id="applyEffDate" ${s.executionStarted ? "disabled" : ""}>Apply change</button>
         </div>
       </div>
     `;
@@ -660,6 +662,14 @@
       document.getElementById("applyEffDate")?.addEventListener("click", () => {
         const newVal = document.getElementById("effDateInput").value;
         const s = window.GMA.loadState();
+        // Execution is irreversible — once it has started, refuse the edit at click time too
+        // (never fake an undo by clearing executionStarted).
+        if (s.executionStarted) {
+          jouleExtra.push({ role: "bot", html: `Execution has already started — the effective date can't be edited directly in this demo. A date change after execution would need a separate correction/rollback process, not an in-place edit.`, sources: 1 });
+          jouleCtl.open();
+          renderView();
+          return;
+        }
         if (!newVal || newVal === s.effectiveDate) return;
         const oldVal = s.effectiveDate;
         window.GMA.mutateState(x => {
