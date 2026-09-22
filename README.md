@@ -55,11 +55,11 @@ Same event, three views, cross-tab state synced in real time. 同一事件，三
 
 **1）异常按角色分流与交接**
 
-同一异常,不同角色看到不同信息:员工看到进度,HR 看到需协调的事项,IT 看到技术线索;超出各自判断范围的,交由治理团队接手。此设计针对信息过载与责任不清:各角色仅获取与其职责相关的信息;转交不等于问题已解决——接手方获得完整上下文,其余各方也清楚下一步由谁负责。
+员工看进度，HR 看协作事项，IT 看技术线索，身份异常交由治理团队判断。针对信息过载与责任不清，按职责提供必要上下文，说明事实、待核实事项和接手责任，推动协作，不把转交视为解决。
 
 **2）操作可行性的统一判定**
 
-改动关键日期(如调动生效日)会牵动一连串已确认的事项,因此系统用一套统一规则判断"能否提交、能否执行"——无论在对话中询问还是点击按钮,结果始终一致,不会出现按钮与提示相互矛盾。关键日期变更后,先前的确认自动失效:须生成新版本、经相关人重新确认并通过审批,方可执行。系统以当前业务状态为依据,同时呈现暂停原因与恢复步骤。
+对话、按钮与提交共用规则；关键日期变更使旧确认失效，新版本须重新确认，获批后才能执行。以当前状态而非历史对话为依据，避免旧确认被误用及提示与操作矛盾，并将暂停原因转化为恢复步骤。
 
 *Anomalies are handed off by role — the employee sees progress, HR sees what needs coordination, IT sees technical clues — and anything beyond a role's scope is routed to the governance team, so the recipient gets full context while a handoff is never mistaken for a resolution. A single shared rule gates chat, buttons, and submission alike, so feasibility never has two answers; a key-date change invalidates prior sign-offs and blocks execution until a new version is re-confirmed and approved.*
 
