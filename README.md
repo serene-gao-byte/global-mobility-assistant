@@ -3,7 +3,7 @@
 **Learning prototype** · Role-scoped AI copilot for cross-border employee moves.
 Not an SAP official product · Fictional data · Simulated execution.
 
-一个学习性原型 · 面向跨境员工调动的角色隔离 AI 副驾。
+一个学习性原型 · 面向跨境员工调动的权限角色隔离 AI 助手。
 非 SAP 官方产品 · 虚构数据 · 模拟执行。
 
 ---
@@ -17,15 +17,21 @@ Not an SAP official product · Fictional data · Simulated execution.
 
 ---
 
-## 一句话 · In one sentence
+## 项目背景 · Project background
 
-> **The agent never invents a permission layer. It acts strictly inside the SF role the signed-in user already holds — and where a decision falls outside that role, it pauses and names who owns it.**
->
-> **Agent 不自造权限层。它严格在当前登录用户已持有的 SF 角色内行动 —— 一旦某个决定落在该角色之外,它就暂停,并指名该由谁接手。**
+一家中国新能源集团正在拓展沙特市场。员工先在个人档案页发现相关机会，了解岗位要求后自主决定申请。随着申请与调动流程推进，HRBP 协调业务安排，IT 在相应阶段提供账号与系统支持。
 
-A Chinese renewable-energy group is expanding into Saudi Arabia. One employee's international move ties three people together — the employee, the HR business partner, and the IT admin — each with their own view, responsibilities, and boundaries. Joule (the copilot) coordinates the process, flags risks, and moves tasks forward, while leaving key decisions and approvals to the right people.
+本项目探索如何将分散的信息与流程组织为统一的工作体验：员工、HR 与 IT 围绕同一个业务方向，获得各自需要的信息和帮助，明确下一步与接手责任。统一体验不意味着共享全部信息或权限；关键判断与审批仍由相应人员承担。
 
-一家中国新能源集团正在拓展沙特市场。一次国际调动把三个人绑在一起 —— 员工、HRBP、IT 管理员 —— 各有各的视图、职责与边界。Joule(副驾)负责协调流程、提示风险、推动任务,同时把关键判断与审批交回给对的人。
+A Chinese renewable-energy group is expanding into Saudi Arabia. An employee discovers an opportunity through her profile and chooses whether to apply. As the application and move progress, HR coordinates business arrangements and IT prepares the required account and system support. The prototype connects these role-specific experiences while leaving key decisions and approvals with the responsible people.
+
+### 故事地图 · Story map
+
+**AI 如何融入 HR 业务：一段跨国人才流动的故事**
+
+从人才机会到跨团队协作，让员工、HR 与 IT 在统一体验中协同推进公司出海战略。
+
+![跨国人才流动故事地图：员工发现机会，HR 协调，IT 提供系统支持 · Story map — employee discovers the opportunity, HR coordinates, IT prepares system support](assets/story-map.png)
 
 ---
 
@@ -41,71 +47,32 @@ A Chinese renewable-energy group is expanding into Saudi Arabia. One employee's 
 | 2 | HR 路由一位专家 · HR routes a specialist | 按 责任→资质→授权→产能 推荐 · Recommends by responsibility → qualification → authorization → capacity | **HRBP** · HR sends the request; the agent only recommends |
 | 3 | IT 观察到身份异常 · IT observes an identity anomaly | 描述所见、路由至治理团队 · Describes what it sees, routes to governance | **身份治理 / 合规团队** · The agent does not conclude a root cause or propose an operation |
 
-Same event, three views, cross-tab state synced in real time. 同一事件,三个视角,跨标签页实时同步。
+Same event, three views, cross-tab state synced in real time. 同一事件，三个视角，跨标签页实时同步。
 
 ---
 
-## 架构一览 · Architecture at a glance
+## 关键设计决策 · Key design decisions
 
-The agent is an **orchestration layer over SAP SuccessFactors** — not a parallel system with its own permissions. Everything it can *know*, *change*, and *reach* is inherited from three existing SF platform mechanisms.
+**1）异常按角色分流与交接**
 
-Agent 是 **SAP SuccessFactors 之上的编排层** —— 不是一个自带权限的旁挂系统。它能"知道"、能"改"、能"去"的一切,都继承自三个既有的 SF 平台机制。
+同一异常,不同角色看到不同信息:员工看到进度,HR 看到需协调的事项,IT 看到技术线索;超出各自判断范围的,交由治理团队接手。此设计针对信息过载与责任不清:各角色仅获取与其职责相关的信息;转交不等于问题已解决——接手方获得完整上下文,其余各方也清楚下一步由谁负责。
 
-> 以下为基于 SAP SuccessFactors / Joule 既有权限与集成机制的**设计思路**。当前原型通过角色视图和本地状态模拟相关交互,**尚未连接真实 SAP 系统**,也未实际执行 RBP 校验或 IPS / Work Zone 授权同步。
-> The following describes the **design approach** built on existing SF / Joule permission and integration mechanisms. This prototype simulates the interactions via role views and local state; it is **not connected to a real SAP system** and does not perform actual RBP checks or IPS / Work Zone provisioning sync.
+**2）操作可行性的统一判定**
 
-```
-          ┌─────────────────────────────────────────────┐
-          │   Joule agent · orchestration layer          │
-          │   编排层:识别变更 · 拉取上下文 · 推动/暂停    │
-          └───────────────┬─────────────────────────────┘
-                          │  every action must resolve against ↓
-        ┌─────────────────┼─────────────────────┐
-        ▼                 ▼                     ▼
-   ┌─────────┐      ┌──────────────┐      ┌────────────┐
-   │  RBP    │      │  Document    │      │ Navigation │
-   │ 角色权限 │      │  Grounding   │      │  路由配置   │
-   ├─────────┤      ├──────────────┤      ├────────────┤
-   │ 能看什么 │      │ 依据从哪来    │      │ 能去哪里    │
-   │ 能改什么 │      │ 来源可见      │      │ 落在已配置  │
-   │ what it  │      │ no source,   │      │ routes only│
-   │ sees /   │      │ no claim     │      │ 的目的地上  │
-   │ can edit │      │              │      │            │
-   └─────────┘      └──────────────┘      └────────────┘
-```
+改动关键日期(如调动生效日)会牵动一连串已确认的事项,因此系统用一套统一规则判断"能否提交、能否执行"——无论在对话中询问还是点击按钮,结果始终一致,不会出现按钮与提示相互矛盾。关键日期变更后,先前的确认自动失效:须生成新版本、经相关人重新确认并通过审批,方可执行。系统以当前业务状态为依据,同时呈现暂停原因与恢复步骤。
 
-- **RBP (Role-Based Permissions)** — the spine. The agent inherits the session user's exact scope: fields the user can't see, the agent can't fetch; objects the user can't edit, the agent can't edit for them.
-  主轴。Agent 继承当前会话用户的确切范围:用户看不到的字段,Agent 拉不到;用户不能改的对象,Agent 不能替他改。
-- **Document Grounding** — the evidence. Every claim the agent surfaces carries a source label (`system` / `self-report` / `unverified`). No source, no claim.
-  依据。Agent 呈现的每条依据都带来源标签,无来源不发言。
-- **Navigation** — the reach. The agent's "next step" must land on a route already configured in SF; it can't send the user to a page it invented. Navigation decides *which page* the agent may reach — it is not authorization to *edit data or start approvals* there; write actions still go through RBP and workflow.
-  可达。Agent 的"下一步"必须落在 SF 已配置的路由上,不能跳去它自己发明的页面。导航只决定**能去哪个页面**,不等于获得在该页面**改数据或发起审批**的授权;写操作仍走 RBP 与工作流。
+*Anomalies are handed off by role — the employee sees progress, HR sees what needs coordination, IT sees technical clues — and anything beyond a role's scope is routed to the governance team, so the recipient gets full context while a handoff is never mistaken for a resolution. A single shared rule gates chat, buttons, and submission alike, so feasibility never has two answers; a key-date change invalidates prior sign-offs and blocks execution until a new version is re-confirmed and approved.*
 
-Full write-up: [`docs/security-agent-design.md`](docs/security-agent-design.md) · 完整设计说明见此。
+### 代码入口与实现边界 · Implementation pointers and scope
 
----
+- **统一判定：**[`prototype/zh/hrbp.html`](prototype/zh/hrbp.html) 中的 `computeSubmitGate()` 供对话、按钮与提交处理使用；改期时清除旧确认和审批状态，执行处理另行检查批准状态。英文页采用相同设计。
+- **按角色交接：**见 [`employee.html`](prototype/zh/employee.html)、[`hrbp.html`](prototype/zh/hrbp.html)、[`it.html`](prototype/zh/it.html) 中的进度提示、交接摘要与治理团队转交说明；共享状态位于 [`prototype/shared/state.js`](prototype/shared/state.js)。
 
-## 为什么这套权限设计是合理的 · Why the permission design is sound
+当前通过前端角色视图与本地状态模拟上述交互，未连接真实 SAP 系统，也未实际执行 RBP 校验或 IPS / Work Zone 授权同步。角色视图不等于服务端访问控制；确认、审批、执行和转交均为模拟。真实集成仍需由业务服务执行权限、审批和结果核验。
 
-The design is deliberately **not novel**. It is the SF-native expression of two patterns that leading enterprise-AI and identity platforms already codify. That is the point: a reviewer should recognize the shape, not have to trust an invention.
+These interactions are simulated through role views and local state. The prototype does not connect to SAP, validate RBP, or run IPS / Work Zone provisioning. Role views are not server-side access control; confirmation, approval, execution, and handoff are simulated.
 
-这套设计刻意 **不追求原创**。它是两个业界既有模式在 SF 平台上的本地化表达。这正是要点:评审看到的应是熟悉的形状,而不必去信任一个凭空发明的东西。
-
-| 本原型的机制 · Our mechanism | 对应的行业标准 · Maps to industry standard | 为什么这样对 · Why it's right |
-|---|---|---|
-| Agent 严格继承会话用户的 RBP 范围 · Agent inherits the session user's RBP scope | **最小权限 RBAC** · least-privilege RBAC (e.g. Microsoft Entra ID's governing principle) | 边界是**结构性**的,不是 prompt 里的一句软约束 · The boundary is *structural*, not a soft instruction in a prompt |
-| Agent 只能触达已配置的 Navigation 路由 · Agent can only reach configured Navigation routes | **工具白名单** · tool allowlist (Anthropic MCP: don't expose write/destructive tools → forces a human confirmation step) | 没暴露的动作就调不到 —— 与"高风险步骤留人确认"同构 · An un-exposed action simply can't be called |
-| 无来源不发言,来源标签可见 · No source, no claim; source labels visible | **透明性原则** · transparency (Anthropic: show planning, document tool boundaries) | 防止"看起来合理的编造" —— AI 最常见的失败模式 · Defends against confident, unsourced fabrication |
-| 操作边界与人工确认要求由**既有权限 + 工作流约束 + 业务影响**共同确定,而非 prompt 维护 · Operation boundaries and human-confirmation requirements are determined by existing permissions + workflow constraints + business impact, not maintained in a prompt | **poka-yoke / 防呆** (Anthropic: design so mistakes are hard to make) | 客户改 RBP 或工作流,Agent 边界自动跟着变 —— 不重训、不改 prompt · Change the config, the boundary follows |
-
-**风险分层如何从配置推导 · How risk tiers fall out of config:**
-
-- **低 · Low** — 不改变任何业务状态,只读当前用户 RBP 域内数据 → Agent 直接完成。 *No state change, reads only within RBP scope → agent proceeds.*
-- **中 · Medium** — 触发既有签署失效或产生新对象,但仍在用户授权内 → Agent 执行机械步骤,但**关键决定必须由持相应角色的人做出**。锚点:*是否触发既有签署失效*(工作流配置可查询)。 *Triggers existing sign-off invalidation but stays in scope → agent does the mechanical steps; the human with the role makes the call.*
-- **高 · High** — 涉及跨专业域判断(合规/隐私/身份治理),或该判断权限不属于当前角色 → Agent **拒绝自动化解决**,只观察、描述、路由。锚点:*该决定是否在当前角色权限之外*(RBP 可查询)。 *Cross-domain judgment, or authority the current role doesn't hold → agent observes and routes, does not resolve.*
-
-> 独到之处 · What's distinctive: **风险分层的判定与 SF 平台机制同源** —— 中风险 = 触发签署失效(工作流可查询);高风险 = 当前用户无该决策权限(RBP 可查询)。这是"嫁接在平台上"与"外挂在平台旁"的根本区别。
-> The risk tiers share a source of truth with the platform itself. That's the difference between *grafted onto* the platform and *bolted beside* it.
+详细设计材料：[`docs/security-agent-design.md`](docs/security-agent-design.md)。
 
 ---
 
@@ -140,9 +107,12 @@ Ctrl-Click the three role cards on the Landing page to open Employee / HRBP / IT
 
 ---
 
-## Repository layout · 仓库结构
+## 目录结构 · Repository layout
 
 ```
+assets/
+└── story-map.png    Story map · 故事地图
+
 prototype/          Runnable prototype — open index.html to start
 ├── index.html      Landing page · 3 role entries (English)
 ├── employee.html   Employee (Lin Chen) view · 6 steps
@@ -165,17 +135,6 @@ docs/               Design + narrative documents
 
 ---
 
-## For reviewers · 给评审
-
-- **Design decisions are visible in the UI** — every card carries a capability tag (标准业务功能模拟 / 原生 AI 功能模拟 / 项目扩展设计).
-- **Version invalidation actually runs** — changing the effective date in the HRBP tab invalidates prior sign-offs and blocks approvals until re-confirmed. 改生效日期会真的让先前签署失效,并阻断审批直到重新确认。
-- **No view claims "complete" at the end** — proceeding is not the same as verified, and the demo respects that distinction.
-- **AI's pauses are the point** — three concrete moments where the tool stops and names who does the next step. 三处暂停才是重点。
-
-30 分钟建议路径 · If you have 30 minutes: start with `docs/narrative.md`, run the prototype, then read `docs/security-agent-design.md` for the safe-autonomous-action design.
-
----
-
 ## Boundaries · 边界
 
 - No real model, no real SAP tenant, no database, no network calls. 无真实模型、无真实 SAP 租户、无数据库、无网络调用。
@@ -191,13 +150,3 @@ docs/               Design + narrative documents
 This prototype uses `innerHTML` with an `esc()` helper for HTML-escaping. Data is entirely embedded fictional content with no external inputs. If ever extended to accept real data or deployed as a real product, `innerHTML` patterns should be replaced with `textContent` / DOM APIs or a sanitizer library.
 
 本原型使用 `innerHTML` 配合 `esc()` 做 HTML 转义。数据全部为内嵌虚构内容,无外部输入。若将来接入真实数据或作为真实产品部署,应将 `innerHTML` 模式替换为 `textContent` / DOM API 或引入 sanitizer 库。
-
----
-
-## References · 参考
-
-行业实践锚点,佐证上文"为什么合理"一节 · Industry-practice anchors behind the *why it's sound* section:
-
-- Anthropic — *Building Effective Agents*: simplicity, transparency, well-documented tool boundaries, human checkpoints. https://www.anthropic.com/engineering/building-effective-agents
-- Anthropic — *MCP connector* (tool allowlist / denylist; denylisting write or destructive tools to force a human confirmation step). https://platform.claude.com/docs/en/agents-and-tools/mcp-connector
-- Microsoft Entra ID — role-based access control and the principle of least privilege. https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/custom-overview
